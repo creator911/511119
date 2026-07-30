@@ -26,6 +26,12 @@ import { OperationDialog } from "../OperationDialog";
 import dialogStyles from "../operation-dialog.module.css";
 import type { AdminMemberDetail } from "@/lib/admin-operations";
 import { MAX_POINTS } from "@/lib/commerce-limits";
+import {
+  MAX_WALLET_REQUEST_AMOUNT,
+  MIN_WALLET_REQUEST_AMOUNT,
+  type WalletRequest,
+  type WalletRequestStatus,
+} from "@/lib/wallet-contract";
 import type {
   AdminMemberListFilters,
   AdminMemberPageResult,
@@ -68,6 +74,25 @@ interface MemberGroupsApiResponse {
   loginId?: string;
   revision?: number;
   groups?: MemberGroupOption[];
+}
+
+interface MemberWalletApiResponse {
+  ok?: boolean;
+  message?: string;
+  request?: WalletRequest;
+  requests?: WalletRequest[];
+}
+
+interface MemberWalletDraft {
+  id: string;
+  amount: string;
+  status: WalletRequestStatus;
+  depositorName: string;
+  bankName: string;
+  accountNumber: string;
+  accountHolder: string;
+  adminMemo: string;
+  createdAt: string;
 }
 
 interface LegacyMemberRecord extends MemberListRecord {
@@ -156,6 +181,16 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
   const [groupOptions, setGroupOptions] = useState<MemberGroupOption[]>([]);
   const [groupRevision, setGroupRevision] = useState(0);
   const [groupCounts, setGroupCounts] = useState<Record<string, number>>({});
+  const [walletDialogOpen, setWalletDialogOpen] = useState(false);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletError, setWalletError] = useState("");
+  const [walletMember, setWalletMember] =
+    useState<LegacyMemberRecord | null>(null);
+  const [walletRequests, setWalletRequests] = useState<WalletRequest[]>([]);
+  const [walletDrafts, setWalletDrafts] = useState<
+    Record<string, MemberWalletDraft>
+  >({});
+  const [walletSavingKey, setWalletSavingKey] = useState("");
 
   const members = result.rows.map(adminMemberListRecord).map(
     (record) => memberOverrides[String(record.id)] ?? record,
@@ -211,6 +246,12 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     setGroupDialogOpen(false);
     setGroupError("");
   }, [groupSaving]);
+
+  const closeWalletDialog = useCallback(() => {
+    if (walletSavingKey) return;
+    setWalletDialogOpen(false);
+    setWalletError("");
+  }, [walletSavingKey]);
 
   useEffect(() => {
     if (!dialogOpen) return;
@@ -555,6 +596,160 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
       );
     } finally {
       setGroupSaving(false);
+    }
+  };
+
+  const openMemberWallet = async (record: LegacyMemberRecord) => {
+    const id = String(record.id);
+    setWalletMember(record);
+    setWalletRequests([]);
+    setWalletDrafts({});
+    setWalletError("");
+    setWalletDialogOpen(true);
+    setWalletLoading(true);
+    try {
+      const params = new URLSearchParams({ userId: id });
+      const response = await fetch(
+        `/api/admin/wallet/requests?${params.toString()}`,
+        {
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        },
+      );
+      const payload = await readMemberWalletResponse(response);
+      if (response.status === 401) {
+        redirectToAdminLogin();
+        return;
+      }
+      if (!response.ok || !Array.isArray(payload.requests)) {
+        throw new Error(
+          payload.message ?? "회원의 충전·출금 내역을 불러오지 못했습니다.",
+        );
+      }
+      setWalletRequests(payload.requests);
+      setWalletDrafts(
+        Object.fromEntries(
+          payload.requests.map((request) => [
+            walletRequestKey(request),
+            walletDraftFromRequest(request),
+          ]),
+        ),
+      );
+    } catch (cause) {
+      setWalletError(
+        cause instanceof Error
+          ? cause.message
+          : "회원의 충전·출금 내역을 불러오지 못했습니다.",
+      );
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  const updateWalletDraft = (
+    key: string,
+    changes: Partial<MemberWalletDraft>,
+  ) => {
+    setWalletDrafts((current) => {
+      const draft = current[key];
+      if (!draft) return current;
+      return {
+        ...current,
+        [key]: { ...draft, ...changes },
+      };
+    });
+  };
+
+  const saveMemberWalletRequest = async (request: WalletRequest) => {
+    const key = walletRequestKey(request);
+    const draft = walletDrafts[key];
+    if (!draft || walletSavingKey) return;
+    const amount = Number(draft.amount);
+    if (
+      !Number.isSafeInteger(amount) ||
+      amount < MIN_WALLET_REQUEST_AMOUNT ||
+      amount > MAX_WALLET_REQUEST_AMOUNT
+    ) {
+      setWalletError(
+        `금액은 ${MIN_WALLET_REQUEST_AMOUNT.toLocaleString("ko-KR")}원부터 ${MAX_WALLET_REQUEST_AMOUNT.toLocaleString("ko-KR")}원까지 입력해 주세요.`,
+      );
+      return;
+    }
+    const createdAt = walletLocalDateTimeToIso(draft.createdAt);
+    if (!createdAt) {
+      setWalletError("신청일시는 초 단위까지 정확히 입력해 주세요.");
+      return;
+    }
+
+    setWalletSavingKey(key);
+    setWalletError("");
+    try {
+      const response = await fetch(
+        `/api/admin/wallet/requests/${encodeURIComponent(request.id)}`,
+        {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            kind: request.kind,
+            ...draft,
+            amount,
+            createdAt,
+            expectedUpdatedAt: request.updatedAt,
+          }),
+        },
+      );
+      const payload = await readMemberWalletResponse(response);
+      if (response.status === 401) {
+        redirectToAdminLogin();
+        return;
+      }
+      if (!response.ok || !payload.request) {
+        throw new Error(
+          payload.message ?? "충전·출금 내역을 수정하지 못했습니다.",
+        );
+      }
+      const updated = payload.request;
+      const updatedKey = walletRequestKey(updated);
+      setWalletRequests((current) =>
+        current.map((item) =>
+          walletRequestKey(item) === key ? updated : item,
+        ),
+      );
+      setWalletDrafts((current) => {
+        const next = { ...current };
+        delete next[key];
+        next[updatedKey] = walletDraftFromRequest(updated);
+        return next;
+      });
+      if (walletMember) {
+        const memberKey = String(walletMember.id);
+        setWalletMember((current) =>
+          current ? { ...current, points: updated.memberPoints } : current,
+        );
+        setMemberOverrides((current) => ({
+          ...current,
+          [memberKey]: {
+            ...(current[memberKey] ?? walletMember),
+            points: updated.memberPoints,
+          },
+        }));
+      }
+      pushToast({
+        title: "충전·출금 내역을 수정했습니다.",
+        message: `${updated.id} 내역과 회원 포인트 정합성을 반영했습니다.`,
+        tone: "success",
+      });
+    } catch (cause) {
+      setWalletError(
+        cause instanceof Error
+          ? cause.message
+          : "충전·출금 내역을 수정하지 못했습니다.",
+      );
+    } finally {
+      setWalletSavingKey("");
     }
   };
 
@@ -2070,6 +2265,13 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                       >
                         그룹
                       </button>
+                      <button
+                        type="button"
+                        className="legacy-member-wallet"
+                        onClick={() => void openMemberWallet(record)}
+                      >
+                        충환변경
+                      </button>
                     </td>
                   </tr>,
                   <tr
@@ -2217,6 +2419,257 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                 <p className="legacy-member-group-state">
                   등록된 접근가능그룹이 없습니다.
                 </p>
+              )}
+            </>
+          )}
+        </div>
+      </OperationDialog>
+      <OperationDialog
+        open={walletDialogOpen}
+        title="충환변경"
+        subtitle={
+          walletMember
+            ? `${walletMember.loginId} 회원의 충전·출금 신청내역`
+            : undefined
+        }
+        busy={Boolean(walletSavingKey)}
+        onClose={closeWalletDialog}
+        footer={
+          <AdminButton
+            onClick={closeWalletDialog}
+            disabled={Boolean(walletSavingKey)}
+          >
+            닫기
+          </AdminButton>
+        }
+      >
+        <div className="legacy-member-wallet-editor">
+          {walletLoading ? (
+            <p className="legacy-member-wallet-state" role="status">
+              충전·출금 내역을 불러오는 중입니다.
+            </p>
+          ) : (
+            <>
+              {walletError ? (
+                <p className="legacy-member-wallet-error" role="alert">
+                  {walletError}
+                </p>
+              ) : null}
+              {walletMember ? (
+                <div className="legacy-member-wallet-summary">
+                  <span>
+                    회원 <strong>{walletMember.loginId}</strong>
+                  </span>
+                  <span>
+                    이름 <strong>{walletMember.name || "-"}</strong>
+                  </span>
+                  <span>
+                    현재 포인트{" "}
+                    <strong>
+                      {walletMember.points.toLocaleString("ko-KR")}P
+                    </strong>
+                  </span>
+                  <span>
+                    전체 내역{" "}
+                    <strong>
+                      {walletRequests.length.toLocaleString("ko-KR")}건
+                    </strong>
+                  </span>
+                </div>
+              ) : null}
+              {walletRequests.length === 0 ? (
+                <p className="legacy-member-wallet-state">
+                  등록된 충전·출금 내역이 없습니다.
+                </p>
+              ) : (
+                <div className="legacy-member-wallet-list">
+                  {walletRequests.map((request) => {
+                    const key = walletRequestKey(request);
+                    const draft = walletDrafts[key];
+                    if (!draft) return null;
+                    const rowSaving = walletSavingKey === key;
+                    return (
+                      <article
+                        className="legacy-member-wallet-card"
+                        key={key}
+                      >
+                        <header>
+                          <span
+                            className={`legacy-member-wallet-kind legacy-member-wallet-kind-${request.kind}`}
+                          >
+                            {request.kind === "charge" ? "충전" : "출금"}
+                          </span>
+                          <strong>
+                            {Number(draft.amount || 0).toLocaleString("ko-KR")}
+                            원
+                          </strong>
+                          <span
+                            className={`legacy-member-wallet-status legacy-member-wallet-status-${draft.status}`}
+                          >
+                            {walletStatusLabel(draft.status)}
+                          </span>
+                        </header>
+                        <div className="legacy-member-wallet-fields">
+                          <label className="legacy-member-wallet-field-id">
+                            <span>신청번호</span>
+                            <input
+                              type="text"
+                              maxLength={80}
+                              value={draft.id}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateWalletDraft(key, {
+                                  id: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label>
+                            <span>금액</span>
+                            <input
+                              type="number"
+                              min={MIN_WALLET_REQUEST_AMOUNT}
+                              max={MAX_WALLET_REQUEST_AMOUNT}
+                              step={1}
+                              value={draft.amount}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateWalletDraft(key, {
+                                  amount: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label>
+                            <span>처리상태</span>
+                            <select
+                              value={draft.status}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateWalletDraft(key, {
+                                  status: event.currentTarget
+                                    .value as WalletRequestStatus,
+                                })
+                              }
+                            >
+                              <option value="requested">처리대기</option>
+                              <option value="approved">승인</option>
+                              <option value="rejected">반려</option>
+                            </select>
+                          </label>
+                          <label>
+                            <span>신청일시</span>
+                            <input
+                              type="datetime-local"
+                              step={1}
+                              value={draft.createdAt}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateWalletDraft(key, {
+                                  createdAt: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                          {request.kind === "charge" ? (
+                            <label>
+                              <span>입금자명</span>
+                              <input
+                                type="text"
+                                maxLength={80}
+                                value={draft.depositorName}
+                                disabled={rowSaving}
+                                onChange={(event) =>
+                                  updateWalletDraft(key, {
+                                    depositorName: event.currentTarget.value,
+                                  })
+                                }
+                              />
+                            </label>
+                          ) : (
+                            <>
+                              <label>
+                                <span>은행명</span>
+                                <input
+                                  type="text"
+                                  maxLength={80}
+                                  value={draft.bankName}
+                                  disabled={rowSaving}
+                                  onChange={(event) =>
+                                    updateWalletDraft(key, {
+                                      bankName: event.currentTarget.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                <span>계좌번호</span>
+                                <input
+                                  type="text"
+                                  maxLength={80}
+                                  value={draft.accountNumber}
+                                  disabled={rowSaving}
+                                  onChange={(event) =>
+                                    updateWalletDraft(key, {
+                                      accountNumber:
+                                        event.currentTarget.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label>
+                                <span>예금주</span>
+                                <input
+                                  type="text"
+                                  maxLength={80}
+                                  value={draft.accountHolder}
+                                  disabled={rowSaving}
+                                  onChange={(event) =>
+                                    updateWalletDraft(key, {
+                                      accountHolder:
+                                        event.currentTarget.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                            </>
+                          )}
+                          <label className="legacy-member-wallet-field-memo">
+                            <span>관리자 메모</span>
+                            <input
+                              type="text"
+                              maxLength={500}
+                              value={draft.adminMemo}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateWalletDraft(key, {
+                                  adminMemo: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                        </div>
+                        <footer>
+                          <span>
+                            최종변경 {formatWalletAdminDate(request.updatedAt)}
+                          </span>
+                          <AdminButton
+                            variant="primary"
+                            loading={rowSaving}
+                            disabled={Boolean(
+                              walletSavingKey && !rowSaving,
+                            )}
+                            onClick={() =>
+                              void saveMemberWalletRequest(request)
+                            }
+                          >
+                            내역 수정
+                          </AdminButton>
+                        </footer>
+                      </article>
+                    );
+                  })}
+                </div>
               )}
             </>
           )}
@@ -2652,6 +3105,83 @@ async function readMemberGroupsResponse(
   } catch {
     return {};
   }
+}
+
+async function readMemberWalletResponse(
+  response: Response,
+): Promise<MemberWalletApiResponse> {
+  try {
+    return (await response.json()) as MemberWalletApiResponse;
+  } catch {
+    return {};
+  }
+}
+
+function walletRequestKey(request: WalletRequest): string {
+  return `${request.kind}:${request.id}`;
+}
+
+function walletDraftFromRequest(request: WalletRequest): MemberWalletDraft {
+  return {
+    id: request.id,
+    amount: String(request.amount),
+    status: request.status,
+    depositorName: request.depositorName,
+    bankName: request.bankName,
+    accountNumber: request.accountNumber,
+    accountHolder: request.accountHolder,
+    adminMemo: request.adminMemo,
+    createdAt: walletDateTimeInput(request.createdAt),
+  };
+}
+
+function walletDate(value: string): Date | null {
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/u.test(value)
+    ? `${value.replace(" ", "T")}Z`
+    : value;
+  const date = new Date(normalized);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function walletDateTimeInput(value: string): string {
+  const date = walletDate(value);
+  if (!date) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}T${part("hour")}:${part("minute")}:${part("second")}`;
+}
+
+function walletLocalDateTimeToIso(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/u.test(value)) {
+    return null;
+  }
+  const date = new Date(`${value}+09:00`);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function formatWalletAdminDate(value: string): string {
+  const date = walletDate(value);
+  return date
+    ? date.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })
+    : value;
+}
+
+function walletStatusLabel(status: WalletRequestStatus): string {
+  return status === "requested"
+    ? "처리대기"
+    : status === "approved"
+      ? "승인"
+      : "반려";
 }
 
 function firstApiError(result: MemberApiResponse): string | undefined {

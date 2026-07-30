@@ -58,11 +58,16 @@ test("protects wallet mutations and records a single atomic balance change", asy
   assert.match(customerRoute, /isSameOrigin/);
   assert.match(adminRoute, /requireAdminApiSession/);
   assert.match(adminRoute, /assertSameOrigin/);
+  assert.match(adminRoute, /export async function PUT/);
+  assert.match(adminRoute, /editAdminWalletRequest/);
   assert.match(adminRoute, /export async function DELETE/);
   assert.match(adminRoute, /processDecision\(request, context, "approve"\)/);
   assert.match(adminRoute, /processDecision\(request, context, "reject"\)/);
   assert.match(service, /wallet_processing_guards/);
   assert.match(service, /wallet_ledger/);
+  assert.match(service, /balanceAdjustment/);
+  assert.match(service, /expectedUpdatedAt/);
+  assert.match(service, /wallet\.request\.edit/);
   assert.match(service, /database\.batch/);
   assert.match(schema, /walletRequestRateLimits/);
   assert.match(schema, /walletProcessingGuards/);
@@ -114,6 +119,29 @@ test("administrator wallet lists keep the legacy table, search, and action geome
     css,
     /\.legacy-wallet-col-withdraw-manage \{[\s\S]*?81\.109375px/,
   );
+});
+
+test("member management exposes editable wallet history down to seconds", async () => {
+  const [manager, css] = await Promise.all([
+    readFile(
+      new URL(
+        "../app/adm/(protected)/users/UsersManager.tsx",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+    readFile(new URL("../app/adm/legacy-admin.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(manager, /충환변경/);
+  assert.match(manager, /type="datetime-local"/);
+  assert.match(manager, /step=\{1\}/);
+  assert.match(manager, /method: "PUT"/);
+  assert.match(manager, /expectedUpdatedAt: request\.updatedAt/);
+  assert.match(manager, /입금자명/);
+  assert.match(manager, /계좌번호/);
+  assert.match(css, /\.legacy-member-wallet-card/);
+  assert.match(css, /\.legacy-member-wallet-status-approved/);
 });
 
 test("SQLite guards roll back duplicate and insufficient balance approvals", () => {
@@ -277,5 +305,228 @@ test("SQLite guards roll back duplicate and insufficient balance approvals", () 
          WHERE request_type = ? AND request_id = ?`,
       )
       .get(kind, requestId).total;
+  }
+});
+
+test("approved wallet corrections atomically reconcile points and ledger", () => {
+  const database = new DatabaseSync(":memory:");
+  database.exec(`
+    CREATE TABLE users (
+      id TEXT PRIMARY KEY,
+      points INTEGER NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE charge_requests (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      amount INTEGER NOT NULL,
+      depositor_name TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'requested',
+      admin_memo TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE TABLE wallet_processing_guards (
+      request_type TEXT NOT NULL,
+      request_id TEXT NOT NULL,
+      transition_guard INTEGER NOT NULL CHECK(transition_guard = 1),
+      balance_guard INTEGER NOT NULL CHECK(balance_guard = 1),
+      PRIMARY KEY (request_type, request_id)
+    );
+    CREATE TABLE wallet_ledger (
+      id TEXT PRIMARY KEY,
+      request_type TEXT NOT NULL,
+      request_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      delta INTEGER NOT NULL CHECK(delta <> 0),
+      balance_after INTEGER NOT NULL CHECK(balance_after >= 0),
+      admin_username TEXT NOT NULL DEFAULT '',
+      UNIQUE(request_type, request_id)
+    );
+  `);
+  database
+    .prepare("INSERT INTO users (id, points) VALUES (?, ?)")
+    .run("member-1", 10_000_000);
+  database
+    .prepare(
+      `INSERT INTO charge_requests (
+         id, user_id, amount, depositor_name, status, created_at, updated_at
+       ) VALUES (?, ?, ?, ?, 'approved', ?, ?)`,
+    )
+    .run(
+      "CHG-original",
+      "member-1",
+      10_000_000,
+      "rksk",
+      "2026-07-30 12:36:18",
+      "revision-1",
+    );
+  database
+    .prepare(
+      `INSERT INTO wallet_ledger (
+         id, request_type, request_id, user_id, delta, balance_after
+       ) VALUES (?, 'charge', ?, ?, ?, ?)`,
+    )
+    .run(
+      "ledger-original",
+      "CHG-original",
+      "member-1",
+      10_000_000,
+      10_000_000,
+    );
+
+  editCharge({
+    currentId: "CHG-original",
+    nextId: "CHG-corrected",
+    currentAmount: 10_000_000,
+    nextAmount: 9_000_000,
+    currentStatus: "approved",
+    nextStatus: "approved",
+    expectedUpdatedAt: "revision-1",
+    nextUpdatedAt: "revision-2",
+  });
+  assert.equal(readPoints(), 9_000_000);
+  assert.equal(readLedger("CHG-corrected")?.delta, 9_000_000);
+  assert.equal(readLedger("CHG-corrected")?.balance_after, 9_000_000);
+  assert.equal(readLedger("CHG-original"), undefined);
+
+  editCharge({
+    currentId: "CHG-corrected",
+    nextId: "CHG-corrected",
+    currentAmount: 9_000_000,
+    nextAmount: 9_000_000,
+    currentStatus: "approved",
+    nextStatus: "rejected",
+    expectedUpdatedAt: "revision-2",
+    nextUpdatedAt: "revision-3",
+  });
+  assert.equal(readPoints(), 0);
+  assert.equal(readLedger("CHG-corrected"), undefined);
+
+  assert.throws(
+    () =>
+      editCharge({
+        currentId: "CHG-corrected",
+        nextId: "CHG-corrected",
+        currentAmount: 9_000_000,
+        nextAmount: 8_000_000,
+        currentStatus: "rejected",
+        nextStatus: "approved",
+        expectedUpdatedAt: "stale-revision",
+        nextUpdatedAt: "revision-4",
+      }),
+    /constraint/iu,
+  );
+  assert.equal(readPoints(), 0);
+  assert.equal(
+    database
+      .prepare(
+        "SELECT amount FROM charge_requests WHERE id = 'CHG-corrected'",
+      )
+      .get().amount,
+    9_000_000,
+  );
+  database.close();
+
+  function editCharge({
+    currentId,
+    nextId,
+    currentAmount,
+    nextAmount,
+    currentStatus,
+    nextStatus,
+    expectedUpdatedAt,
+    nextUpdatedAt,
+  }) {
+    const currentPoints = readPoints();
+    const previousEffect =
+      currentStatus === "approved" ? currentAmount : 0;
+    const nextEffect = nextStatus === "approved" ? nextAmount : 0;
+    const balanceAdjustment = nextEffect - previousEffect;
+    const nextPoints = currentPoints + balanceAdjustment;
+    const guardId = `edit-${nextUpdatedAt}`;
+
+    database.exec("BEGIN IMMEDIATE");
+    try {
+      database
+        .prepare(
+          `UPDATE charge_requests
+           SET id = ?, amount = ?, status = ?, updated_at = ?
+           WHERE id = ? AND updated_at = ? AND amount = ? AND status = ?`,
+        )
+        .run(
+          nextId,
+          nextAmount,
+          nextStatus,
+          nextUpdatedAt,
+          currentId,
+          expectedUpdatedAt,
+          currentAmount,
+          currentStatus,
+        );
+      database
+        .prepare(
+          `INSERT INTO wallet_processing_guards (
+             request_type, request_id, transition_guard, balance_guard
+           ) VALUES ('charge', ?, changes(), 1)`,
+        )
+        .run(guardId);
+      database
+        .prepare(
+          `DELETE FROM wallet_ledger
+           WHERE request_type = 'charge' AND request_id = ?`,
+        )
+        .run(currentId);
+      if (balanceAdjustment !== 0) {
+        database
+          .prepare(
+            `UPDATE users SET points = ?
+             WHERE id = 'member-1' AND points = ?`,
+          )
+          .run(nextPoints, currentPoints);
+        database
+          .prepare(
+            `UPDATE wallet_processing_guards
+             SET balance_guard = CASE WHEN changes() = 1 THEN 1 ELSE 0 END
+             WHERE request_type = 'charge' AND request_id = ?`,
+          )
+          .run(guardId);
+      }
+      if (nextStatus === "approved") {
+        database
+          .prepare(
+            `INSERT INTO wallet_ledger (
+               id, request_type, request_id, user_id, delta, balance_after
+             ) VALUES (?, 'charge', ?, 'member-1', ?, ?)`,
+          )
+          .run(`ledger-${nextUpdatedAt}`, nextId, nextEffect, nextPoints);
+      }
+      database
+        .prepare(
+          `DELETE FROM wallet_processing_guards
+           WHERE request_type = 'charge' AND request_id = ?`,
+        )
+        .run(guardId);
+      database.exec("COMMIT");
+    } catch (error) {
+      database.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
+  function readPoints() {
+    return database
+      .prepare("SELECT points FROM users WHERE id = 'member-1'")
+      .get().points;
+  }
+
+  function readLedger(requestId) {
+    return database
+      .prepare(
+        `SELECT delta, balance_after FROM wallet_ledger
+         WHERE request_type = 'charge' AND request_id = ?`,
+      )
+      .get(requestId);
   }
 });

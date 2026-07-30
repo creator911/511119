@@ -4806,7 +4806,7 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin .legacy-member-col-manage {
-  width: 60.09375px;
+  width: 72px;
 }
 
 .kiel-legacy-admin #container_wr .legacy-member-table thead th {
@@ -4933,6 +4933,186 @@ body:has(.kiel-legacy-admin) {
   font-size: 1em !important;
   font-weight: 400 !important;
   line-height: 25px !important;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet {
+  display: block;
+  width: 54px;
+  min-width: 54px;
+  height: 25px !important;
+  min-height: 25px !important;
+  margin: 3px auto 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #596b8d !important;
+  color: #fff !important;
+  font-size: 0.92em !important;
+  font-weight: 400 !important;
+  line-height: 25px !important;
+}
+
+.kiel-legacy-admin #container_wr section[role="dialog"]:has(.legacy-member-wallet-editor) {
+  width: min(980px, calc(100vw - 30px));
+  border: 1px solid #cfd4dc;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+}
+
+.kiel-legacy-admin #container_wr section[role="dialog"]:has(.legacy-member-wallet-editor) > header {
+  min-height: 45px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d6dce7;
+  background: #f3f3f3;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-editor {
+  min-height: 180px;
+  color: #333;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #d7dce3;
+  background: #f7f8fa;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-summary strong {
+  color: #28384f;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-state,
+.kiel-legacy-admin #container_wr .legacy-member-wallet-error {
+  margin: 0 0 10px;
+  padding: 12px;
+  border: 1px solid #d6dce7;
+  background: #f6f6f6;
+  color: #555;
+  line-height: 20px;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-error {
+  border-color: #f1c6c6;
+  background: #fff1f1;
+  color: #b64040;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-list {
+  display: grid;
+  gap: 12px;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-card {
+  padding: 14px;
+  border: 1px solid #d7dce3;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-card > header {
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-card > header strong {
+  color: #111;
+  font-size: 16px;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-kind,
+.kiel-legacy-admin #container_wr .legacy-member-wallet-status {
+  display: inline-flex;
+  min-height: 25px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-kind-charge {
+  background: #f6ebce;
+  color: #8a6112;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-kind-withdrawal {
+  background: #e6edf8;
+  color: #315582;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-status {
+  margin-left: auto;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-status-requested {
+  background: #f1f1f1;
+  color: #666;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-status-approved {
+  background: #dff4e9;
+  color: #16734b;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-status-rejected {
+  background: #fbe5e5;
+  color: #a23a3a;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-fields label {
+  display: grid;
+  gap: 5px;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-fields label > span {
+  color: #596470;
+  font-weight: 700;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-fields input,
+.kiel-legacy-admin #container_wr .legacy-member-wallet-fields select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #cfd5dd;
+  border-radius: 0;
+  background: #fff;
+  color: #333;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-field-id,
+.kiel-legacy-admin #container_wr .legacy-member-wallet-field-memo {
+  grid-column: span 2;
+}
+
+.kiel-legacy-admin #container_wr .legacy-member-wallet-card > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid #e3e6ea;
+  background: transparent;
+  color: #7a838d;
 }
 
 .kiel-legacy-admin #container_wr section[role="dialog"]:has(.legacy-member-group-selector) {
