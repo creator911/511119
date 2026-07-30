@@ -42,8 +42,9 @@ interface DaumPostcodeWindow extends Window {
   };
 }
 
-const SCRIPT_URL =
+export const POSTCODE_SCRIPT_SOURCE =
   "https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+const SCRIPT_URL = "/vendor/postcode.v2.js";
 let scriptPromise: Promise<void> | null = null;
 let closeActiveDialog: (() => void) | null = null;
 
