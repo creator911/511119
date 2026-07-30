@@ -23,6 +23,7 @@ import {
   readBoundedJson,
 } from "@/lib/http-boundary";
 import { publicOrderStatusLabel } from "@/lib/order-status";
+import { isRequestSameOrigin } from "@/lib/request-origin";
 
 interface UserRow {
   id: string;
@@ -139,7 +140,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const startedAt = Date.now();
   try {
-    if (!isSameOrigin(request)) {
+    if (!isRequestSameOrigin(request)) {
       await waitForMinimumResponseTime(startedAt);
       return noStoreJson(
         { error: "아이디 또는 비밀번호를 확인해 주세요." },
@@ -305,7 +306,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!isSameOrigin(request)) {
+  if (!isRequestSameOrigin(request)) {
     return noStoreJson({ ok: false }, { status: 403 });
   }
   let invalidated = true;
@@ -334,16 +335,6 @@ export async function DELETE(request: Request) {
   );
   response.headers.set("set-cookie", clearCustomerSessionCookie(request));
   return response;
-}
-
-function isSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  if (!origin) return true;
-  try {
-    return new URL(origin).origin === new URL(request.url).origin;
-  } catch {
-    return false;
-  }
 }
 
 async function waitForMinimumResponseTime(startedAt: number) {

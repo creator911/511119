@@ -13,6 +13,7 @@ import {
   isJsonObject,
   readBoundedJson,
 } from "@/lib/http-boundary";
+import { isRequestSameOrigin } from "@/lib/request-origin";
 
 const MIN_RESPONSE_TIME_MS = 450;
 const ATTEMPT_WINDOW_MS = 10 * 60 * 1_000;
@@ -43,7 +44,7 @@ export async function POST(request: Request): Promise<Response> {
   const startedAt = Date.now();
 
   try {
-    if (!isSameOrigin(request)) {
+    if (!isRequestSameOrigin(request)) {
       await waitForMinimumResponseTime(startedAt);
       return genericLoginFailure(400);
     }
@@ -98,7 +99,7 @@ export async function POST(request: Request): Promise<Response> {
 }
 
 export async function DELETE(request: Request): Promise<Response> {
-  if (!isSameOrigin(request)) {
+  if (!isRequestSameOrigin(request)) {
     return jsonResponse({ ok: false }, 403);
   }
 
@@ -136,16 +137,6 @@ async function readCredentials(
   }
 
   return { username, password };
-}
-
-function isSameOrigin(request: Request): boolean {
-  const origin = request.headers.get("origin");
-  if (!origin) return true;
-  try {
-    return new URL(origin).origin === new URL(request.url).origin;
-  } catch {
-    return false;
-  }
 }
 
 async function waitForMinimumResponseTime(startedAt: number): Promise<void> {

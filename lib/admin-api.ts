@@ -8,6 +8,7 @@ import {
   HttpBoundaryError,
   readBoundedJson,
 } from "@/lib/http-boundary";
+import { isRequestSameOrigin } from "@/lib/request-origin";
 
 export class AdminApiError extends Error {
   constructor(
@@ -56,7 +57,10 @@ export function assertSameOrigin(request: Request): void {
     throw new AdminApiError(403, "요청을 확인할 수 없습니다.");
   }
 
-  if (originUrl.origin !== requestUrl.origin) {
+  if (
+    originUrl.origin !== requestUrl.origin &&
+    !isRequestSameOrigin(request)
+  ) {
     throw new AdminApiError(403, "요청을 확인할 수 없습니다.");
   }
 }
