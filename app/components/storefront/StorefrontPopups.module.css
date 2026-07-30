@@ -1,0 +1,119 @@
+.stack {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  pointer-events: none;
+  font-family: "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+}
+
+.popup {
+  position: fixed;
+  top: clamp(0px, var(--popup-top, 10px), calc(100dvh - 100px));
+  left: clamp(0px, var(--popup-left, 10px), calc(100vw - 100px));
+  display: flex;
+  width: min(var(--popup-width, 450px), calc(100vw - 24px));
+  height: min(var(--popup-height, 500px), calc(100dvh - 24px));
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #222;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+}
+
+.header {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 12px 18px;
+  background: #292929;
+  color: #fff;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.closeButton {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+  font: 300 27px/1 Arial, sans-serif;
+  place-items: center;
+}
+
+.closeButton:focus-visible,
+.footer button:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--site-primary-color, #3949ab);
+  outline-offset: 2px;
+}
+
+.content {
+  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 150px;
+  padding: 26px 22px 28px;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.content p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 22px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentcolor;
+  color: var(--site-primary-color, #3949ab);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.footer {
+  display: flex;
+  min-height: 45px;
+  border-top: 1px solid #ddd;
+  background: #f5f5f5;
+}
+
+.footer button {
+  flex: 1;
+  padding: 11px 12px;
+  border: 0;
+  color: #555;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.footer button + button {
+  max-width: 92px;
+  border-left: 1px solid #ddd;
+}
+
+@media (max-width: 767px) {
+  .popup {
+    top: clamp(12px, var(--popup-top, 12px), calc(100dvh - 112px));
+    left: clamp(12px, var(--popup-left, 12px), calc(100vw - 112px));
+  }
+
+  .content {
+    min-height: 120px;
+    padding: 22px 18px 24px;
+  }
+}

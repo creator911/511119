@@ -1,0 +1,340 @@
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.typeTable img,
+.restockTable img {
+  width: 42px;
+  height: 42px;
+  margin-right: 8px;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.typeTable {
+  width: 1004px;
+  table-layout: fixed;
+}
+
+.typeTable thead tr,
+.typeTable thead th {
+  box-sizing: border-box;
+  height: 47px;
+}
+
+.typeTable tbody tr,
+.typeTable tbody th,
+.typeTable tbody td {
+  box-sizing: border-box;
+  height: 61px;
+}
+
+.typeTable th:nth-child(1),
+.typeTable td:nth-child(1) {
+  width: 80px;
+}
+
+.typeTable th:nth-child(2),
+.typeTable td:nth-child(2) {
+  width: 514px;
+}
+
+.typeTable th:nth-child(n + 3),
+.typeTable td:nth-child(n + 3) {
+  width: 70px;
+  text-align: center;
+}
+
+.typeTable th:last-child,
+.typeTable td:last-child {
+  width: 60px;
+}
+
+.typeTable td:nth-child(2) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.typeSaveActions {
+  width: 1005px;
+  margin: 10px 0;
+  text-align: right;
+}
+
+.typePager {
+  width: 1005px !important;
+  margin-top: 60px !important;
+}
+
+.optionStockEmptyPage,
+.optionStockEmptySummary,
+.optionStockEmptySearch,
+.optionStockEmptyTable,
+.optionStockEmptyDescription {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+}
+
+.restockEmptyPage,
+.restockEmptySummary,
+.restockEmptySearch,
+.restockEmptyTable {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+}
+
+.restockEmptySummary,
+.restockEmptySearch {
+  height: 30px;
+  min-height: 30px;
+}
+
+.restockEmptySearch {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.restockEmptySearch select {
+  box-sizing: border-box;
+  width: 82px !important;
+  margin-right: 7.21875px;
+}
+
+.restockSearchInput {
+  box-sizing: border-box;
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 4.21875px;
+}
+
+.restockEmptyTable {
+  margin-bottom: 10px;
+}
+
+.restockEmptyTable table {
+  box-sizing: border-box;
+  width: 1005px;
+  table-layout: fixed;
+}
+
+.restockEmptyTable thead tr,
+.restockEmptyTable thead th {
+  box-sizing: border-box;
+  height: 32px !important;
+}
+
+.restockEmptyTable input[type="checkbox"] {
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .restockSearchInput {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 5px !important;
+}
+
+.restockEmptyCell {
+  box-sizing: border-box;
+  height: 223px !important;
+}
+
+.optionStockEmptySummary,
+.optionStockEmptySearch {
+  height: 30px;
+  min-height: 30px;
+}
+
+.optionStockEmptySearch {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.optionStockEmptySearch select:first-of-type {
+  box-sizing: border-box;
+  width: 124px !important;
+  margin-right: 7.21875px;
+}
+
+.optionStockEmptySearch select:nth-of-type(2) {
+  box-sizing: border-box;
+  width: 70px !important;
+  margin-right: 7.21875px;
+}
+
+.optionStockSearchInput {
+  box-sizing: border-box;
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 4.21875px;
+}
+
+.optionStockEmptyTable table {
+  box-sizing: border-box;
+  width: 1005px;
+  table-layout: fixed;
+}
+
+.optionStockEmptyTable thead tr,
+.optionStockEmptyTable thead th {
+  box-sizing: border-box;
+  height: 32px !important;
+}
+
+.optionStockEmptyCell {
+  box-sizing: border-box;
+  height: 223px !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .optionStockSearchInput {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 5px !important;
+}
+
+.optionStockEmptyDescription {
+  box-sizing: border-box;
+  height: 58px;
+}
+
+.typeTable input[type="checkbox"],
+.optionTable input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.selectedProductHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  margin: 10px 0;
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.selectedProductHeading img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.selectedProductHeading strong,
+.selectedProductHeading span {
+  display: block;
+}
+
+.selectedProductHeading span {
+  margin-top: 4px;
+  color: #777;
+  font-size: 12px;
+}
+
+.optionTable input[type="text"],
+.optionTable input:not([type]) {
+  width: 100%;
+}
+
+.optionTable input[type="number"] {
+  width: 86px;
+  text-align: right;
+}
+
+.optionTable th:nth-child(1),
+.optionTable th:nth-child(2) {
+  width: 22%;
+}
+
+.optionTable th:nth-child(3),
+.optionTable th:nth-child(4),
+.optionTable th:nth-child(7) {
+  width: 90px;
+}
+
+.optionTable th:nth-child(5),
+.optionTable th:nth-child(6),
+.optionTable th:nth-child(8) {
+  width: 65px;
+}
+
+.optionActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.restockTable td:nth-child(2) {
+  display: flex;
+  align-items: center;
+}
+
+.restockTable td:nth-child(2) strong,
+.restockTable td:nth-child(2) small {
+  display: block;
+}
+
+.restockTable td:nth-child(2) small {
+  margin-top: 3px;
+  color: #888;
+}
+
+.restockTable td:nth-child(6) input {
+  width: 100%;
+  min-width: 150px;
+}
+
+.successMessage,
+.errorMessage {
+  margin: 12px 0;
+  padding: 11px 14px;
+  border: 1px solid;
+}
+
+.successMessage {
+  border-color: #b8d8c0;
+  color: #236c35;
+  background: #f4fbf6;
+}
+
+.errorMessage {
+  border-color: #e0b6b3;
+  color: #a72d26;
+  background: #fff6f5;
+}
+
+@media (max-width: 760px) {
+  .optionTable {
+    min-width: 820px;
+  }
+
+  .restockTable {
+    min-width: 940px;
+  }
+}

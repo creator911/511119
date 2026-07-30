@@ -1,0 +1,105 @@
+.maintenanceBody {
+  min-height: 120px;
+}
+
+.progressList {
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progressList li {
+  padding: 3px 0;
+  color: #555;
+}
+
+.updateAction {
+  padding: 28px 0;
+  text-align: center;
+}
+
+.error {
+  color: #d13f4a;
+}
+
+:global(body:has(.rawRuntimeInfo)) {
+  min-width: 934px;
+  margin: 8px;
+  overflow-x: auto;
+  background: #fff;
+  color: #000;
+  font: 13px/1.35 Verdana, Arial, sans-serif;
+}
+
+.rawRuntimeInfo {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 934px;
+  height: 26316.546875px;
+  padding-top: 8px;
+  background: #fff;
+}
+
+.phpTable {
+  box-sizing: border-box;
+  width: 934px;
+  margin: 0 auto 16px;
+  border: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+  font: 13px/1.35 Verdana, Arial, sans-serif;
+}
+
+.phpTable th,
+.phpTable td {
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border: 1px solid #666;
+  color: #000;
+  overflow-wrap: anywhere;
+}
+
+.phpTable thead th,
+.heroTable th {
+  background: #99c;
+  color: #000;
+  font-weight: 700;
+  text-align: center;
+}
+
+.phpTable tbody th {
+  width: 330px;
+  background: #ccf;
+  font-weight: 700;
+  text-align: left;
+}
+
+.phpTable tbody td {
+  background: #ddd;
+  text-align: left;
+}
+
+.heroTable {
+  height: 74px;
+}
+
+.heroTable th {
+  font-size: 24px;
+}
+
+.systemTable {
+  height: 745px;
+}
+
+.compactTable {
+  height: 61px;
+}
+
+.sampleTable {
+  height: 98.265625px;
+}
+
+.standardTable {
+  height: 260px;
+}

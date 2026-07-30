@@ -1,0 +1,76 @@
+.message {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid;
+}
+
+.success {
+  border-color: #b7d8c4;
+  background: #eff8f2;
+  color: #26754a;
+}
+
+.failed {
+  border-color: #ecc7ca;
+  background: #fff1f2;
+  color: #b3323d;
+}
+
+.clubCell {
+  max-width: 460px;
+  text-align: left !important;
+}
+
+.clubCell strong,
+.clubCell span,
+.ownerCell small {
+  display: block;
+}
+
+.clubCell span,
+.ownerCell small {
+  margin-top: 4px;
+  color: #767c86;
+  white-space: pre-line;
+}
+
+.actions {
+  min-width: 210px;
+}
+
+.actions button {
+  margin: 2px;
+}
+
+.empty {
+  padding: 35px !important;
+  color: #777;
+  text-align: center !important;
+}
+
+.form {
+  margin-top: 24px;
+}
+
+.form h2 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.form input {
+  width: min(620px, 95%);
+}
+
+.form textarea {
+  width: min(720px, 95%);
+  min-height: 90px;
+  padding: 7px;
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 10px;
+}

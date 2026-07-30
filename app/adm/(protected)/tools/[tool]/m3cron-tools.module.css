@@ -1,0 +1,224 @@
+.settingsRoot,
+.logsRoot {
+  display: block;
+}
+
+.settingsRoot {
+  padding-bottom: 10px;
+}
+
+:global(.kiel-legacy-admin #container_wr):has(.settingsRoot) {
+  min-height: 187px;
+}
+
+:global(.kiel-legacy-admin #container_wr):has(.logsRoot) {
+  min-height: 276px;
+}
+
+.settingsTable {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.settingsTable th:nth-child(1) {
+  width: 31px;
+}
+
+.settingsTable th:nth-child(2) {
+  width: 156px;
+}
+
+.settingsTable th:nth-child(3) {
+  width: 45px;
+}
+
+.settingsTable th:nth-child(4) {
+  width: 39px;
+}
+
+.settingsTable th:nth-child(5) {
+  width: 60px;
+}
+
+.settingsTable th:nth-child(6) {
+  width: 60px;
+}
+
+.settingsTable th:nth-child(7) {
+  width: 53px;
+}
+
+.settingsTable th:nth-child(8),
+.settingsTable th:nth-child(9),
+.settingsTable th:nth-child(10) {
+  width: 40px;
+}
+
+.settingsTable th:nth-child(11) {
+  width: 160px;
+}
+
+.settingsTable th:nth-child(12) {
+  width: 100px;
+}
+
+.settingsTable th:nth-child(13),
+.settingsTable th:nth-child(14) {
+  width: 40px;
+}
+
+.settingsTable th:nth-child(15) {
+  width: 100px;
+}
+
+.settingsTable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global(.kiel-legacy-admin #container_wr) .settingsTable input[type="number"] {
+  width: 32px;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding-right: 2px !important;
+  padding-left: 2px !important;
+  line-height: 24px !important;
+  text-align: center;
+}
+
+:global(.kiel-legacy-admin #container_wr) .settingsTable :global(.btn) {
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 6px !important;
+  font-size: 11px;
+  line-height: 26px !important;
+}
+
+.settingsTable thead th {
+  height: 32px !important;
+  padding: 0 5px !important;
+  line-height: 31px !important;
+  white-space: nowrap;
+}
+
+:global(.kiel-legacy-admin #container_wr) .settingsTable tbody tr,
+:global(.kiel-legacy-admin #container_wr) .settingsTable tbody td {
+  height: 39px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr) .settingsTable tbody td {
+  padding: 4px 5px !important;
+}
+
+.enabledMark {
+  color: #218c5e;
+  font-weight: 700;
+}
+
+.disabledMark {
+  color: #111;
+  font-weight: 700;
+}
+
+.failedBadge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: #d13f4a;
+  color: #fff;
+  font-size: 10px;
+}
+
+.orderButton {
+  position: fixed;
+  z-index: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 5px !important;
+  border-top: 1px solid #ddd;
+  background: #fff;
+  text-align: center;
+}
+
+.editForm {
+  margin-bottom: 20px;
+}
+
+.editLabelColumn {
+  width: 190px;
+}
+
+.descriptionInput {
+  width: min(650px, 90%);
+}
+
+.logDeleteWrap {
+  height: 41px;
+  margin-bottom: 10px;
+  padding-bottom: 0;
+  border-bottom: 1px solid #e5e7ec;
+}
+
+.logDelete {
+  display: flex;
+  height: 41px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.logDelete input[type="password"] {
+  width: 240px;
+}
+
+.logsTable {
+  min-width: 940px;
+  table-layout: fixed;
+}
+
+.logsTable th:nth-child(1) {
+  width: 260px;
+}
+
+.logsTable th:nth-child(2) {
+  width: 240px;
+}
+
+.logsTable th:nth-child(3) {
+  width: 140px;
+}
+
+.logsTable th:nth-child(4) {
+  width: 165px;
+}
+
+.logsTable th:nth-child(5) {
+  width: 65px;
+}
+
+.logsTable th:nth-child(6) {
+  width: 130px;
+}
+
+.statusMessage {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid;
+}
+
+.statusSuccess {
+  border-color: #b7d8c4;
+  background: #eff8f2;
+  color: #26754a;
+}
+
+.statusError {
+  border-color: #ecc7ca;
+  background: #fff1f2;
+  color: #b3323d;
+}

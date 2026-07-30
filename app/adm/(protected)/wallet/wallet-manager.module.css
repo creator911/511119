@@ -1,0 +1,213 @@
+.stack {
+  display: grid;
+  gap: 14px;
+}
+
+.successNotice,
+.errorNotice {
+  padding: 11px 13px;
+  border: 1px solid;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.successNotice {
+  border-color: #b9d9c5;
+  color: #22613b;
+  background: #f0faf4;
+}
+
+.errorNotice {
+  border-color: #e3bcbc;
+  color: #9b3434;
+  background: #fff3f3;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns:
+    minmax(240px, 1fr)
+    minmax(140px, 190px)
+    minmax(140px, 190px);
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.filters label,
+.decisionBox label {
+  display: grid;
+  gap: 5px;
+}
+
+.filters label > span,
+.decisionBox label > span {
+  color: #65707c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tableScroll {
+  overflow-x: auto;
+  border: 1px solid #e1e5ea;
+}
+
+.table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th,
+.table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #e8ebef;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  color: #5f6975;
+  background: #f5f7f9;
+  font-size: 10px;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table td strong,
+.table td small {
+  display: block;
+}
+
+.table td small {
+  margin-top: 2px;
+  color: #8b949e;
+  overflow-wrap: anywhere;
+}
+
+.activeRow {
+  background: #fff8f6;
+}
+
+.amount {
+  color: #27303b;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.empty {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  padding: 28px;
+  color: #89939f;
+  font-size: 12px;
+  text-align: center;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.7fr);
+  gap: 22px;
+}
+
+.detailList {
+  margin: 0;
+  border-top: 1px solid #e3e7eb;
+}
+
+.detailList > div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  border-bottom: 1px solid #e3e7eb;
+}
+
+.detailList dt,
+.detailList dd {
+  margin: 0;
+  padding: 11px 12px;
+  overflow-wrap: anywhere;
+}
+
+.detailList dt {
+  color: #66717d;
+  background: #f6f7f9;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.detailList dd {
+  color: #333c47;
+  font-size: 12px;
+}
+
+.decisionBox {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+}
+
+.decisionActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.processed {
+  margin: 0;
+  padding: 11px 12px;
+  color: #6e7883;
+  background: #f5f6f8;
+  font-size: 11px;
+}
+
+@media (max-width: 860px) {
+  .filters,
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}
+:global(html[data-admin-dark]) .tableScroll,
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .table td,
+:global(html[data-admin-dark]) .detailList,
+:global(html[data-admin-dark]) .detailList > div {
+  border-color: var(--admin-border);
+}
+
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .detailList dt,
+:global(html[data-admin-dark]) .processed {
+  background: var(--admin-dark-surface-subtle);
+}
+
+:global(html[data-admin-dark]) .filters label > span,
+:global(html[data-admin-dark]) .decisionBox label > span,
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .detailList dt,
+:global(html[data-admin-dark]) .processed {
+  color: var(--admin-dark-text-soft);
+}
+
+:global(html[data-admin-dark]) .amount,
+:global(html[data-admin-dark]) .detailList dd {
+  color: var(--admin-dark-text-strong);
+}
+
+:global(html[data-admin-dark]) .activeRow {
+  background: var(--admin-dark-surface-selected);
+}
+
+:global(html[data-admin-dark]) .successNotice {
+  border-color: #39765a;
+  background: #204634;
+  color: #9ee3c0;
+}
+
+:global(html[data-admin-dark]) .errorNotice {
+  border-color: #87494e;
+  background: #512c2f;
+  color: #f4a8ad;
+}

@@ -1,0 +1,352 @@
+.card {
+  position: relative;
+  min-width: 0;
+  margin-bottom: 0;
+  color: #151515;
+  background: #fff;
+  font-family: "S-Core Dream", "s-core-dream", sans-serif;
+  font-size: 15px;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.carouselCard {
+  margin-bottom: 20px;
+}
+
+.bordered {
+  border: 1px solid #e5e5e5;
+}
+
+.bordered:hover {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+
+.plain {
+  border: 0;
+}
+
+.imageLink,
+.name a,
+.bottom a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.imageArea {
+  position: relative;
+  overflow: hidden;
+  margin: 10px;
+  background: #fff;
+}
+
+.plain .imageArea {
+  margin: 0 0 10px;
+}
+
+.imageFrame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+.imageFrame::before {
+  display: block;
+  padding-top: 100%;
+  background: #fff;
+  content: "";
+}
+
+.primaryImage {
+  display: block;
+}
+
+.secondaryImage {
+  display: none;
+}
+
+.card:hover .secondaryImage {
+  display: block;
+}
+
+.imageFrame img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: auto;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.badgeArea {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.badge {
+  position: relative;
+  display: block;
+  width: 70px;
+  height: 18px;
+  margin-bottom: 1px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.badgePurple {
+  background: #8e24aa;
+}
+
+.badge_recommend {
+  background: #ff9500;
+}
+
+.badge_discount {
+  background: #cc2300;
+}
+
+.badge_new {
+  background: #cc2300;
+}
+
+.badge_popular {
+  background: #00897b;
+}
+
+.badge_hit {
+  background: #3c3c3e;
+}
+
+.badge_neutral,
+.badgeNeutral {
+  background: #a6a6a6;
+}
+
+.discountPercent {
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  width: 80px;
+  height: 80px;
+  padding-top: 57px;
+  color: #fff;
+  background: #cc2300;
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  transform: rotate(-45deg);
+}
+
+.soldOut {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(20, 20, 20, 0.62);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.descriptionInner {
+  position: relative;
+  overflow: hidden;
+  padding: 0 10px 10px;
+}
+
+.plain .descriptionInner {
+  padding: 0 0 10px;
+}
+
+.name {
+  position: relative;
+  height: 48px;
+  margin: 10px 0 5px;
+  overflow: hidden;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.name a:hover,
+.name a:focus-visible,
+.card:hover .name a {
+  text-decoration: underline;
+}
+
+.price {
+  min-height: 27px;
+}
+
+.price strong {
+  margin-right: 7px;
+  color: #cc2300;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.price del {
+  margin-right: 7px;
+  color: #959595;
+  font-size: 15px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.info {
+  position: relative;
+  height: 38px;
+  margin-top: 10px;
+  overflow: hidden;
+  color: #959595;
+  font-size: 13px;
+}
+
+.countdownSpacer {
+  height: 1.7rem;
+}
+
+.social {
+  position: relative;
+  height: 30px;
+  margin-top: 10px;
+}
+
+.social ul {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social li {
+  margin-left: 1px;
+}
+
+.socialButton {
+  display: block;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: #b5b5b5;
+  font-size: 12px;
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.wishButton span {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 400;
+}
+
+.wishButton:hover,
+.wishButton:focus-visible,
+.wishButton.wished {
+  background: #cc2300;
+}
+
+.wishButton.wished span {
+  font-weight: 900;
+}
+
+.facebookButton span,
+.twitterButton span {
+  font-family: "Font Awesome 5 Brands";
+  font-weight: 400;
+}
+
+.facebookButton:hover,
+.facebookButton:focus-visible {
+  background: #39558f;
+}
+
+.twitterButton:hover,
+.twitterButton:focus-visible {
+  background: #4698e0;
+}
+
+.bottom {
+  position: relative;
+  display: flex;
+  min-height: 47px;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 12px 10px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.plain .bottom {
+  padding: 12px 0;
+}
+
+.bottom a:hover,
+.bottom a:focus-visible {
+  color: #000;
+  text-decoration: underline;
+}
+
+.ratings {
+  display: inline-flex;
+  width: 75px;
+  justify-content: flex-end;
+  color: #a5a5a5;
+  font-family: "Font Awesome 5 Free";
+  font-size: 13px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.ratings > span {
+  width: 15px;
+}
+
+.ratings .ratingSelected {
+  color: #cc2300;
+  font-weight: 900;
+}
+
+@media (max-width: 576px) {
+  .bordered .imageArea {
+    margin: 5px;
+  }
+
+  .bordered .descriptionInner {
+    padding: 0 5px 5px;
+  }
+
+  .bordered .bottom {
+    padding: 12px 5px;
+  }
+
+  .carouselCard.bordered .imageArea {
+    margin: 10px;
+  }
+
+  .carouselCard.bordered .descriptionInner {
+    padding: 0 10px 10px;
+  }
+
+  .carouselCard.bordered .bottom {
+    padding: 12px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

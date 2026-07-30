@@ -1,0 +1,188 @@
+.themeList {
+  box-sizing: border-box;
+  width: 1000px;
+  height: 319px;
+  margin-top: 40px;
+  padding-top: 10px;
+  overflow: hidden;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 302px 302px;
+  gap: 10px;
+  width: 614px;
+}
+
+.card {
+  box-sizing: border-box;
+  width: 302px;
+  height: 299px;
+  border: 1px solid #d5d5d5;
+  background: #fff;
+}
+
+.info {
+  box-sizing: border-box;
+  width: 300px;
+  height: 268px;
+}
+
+.info img {
+  display: block;
+  width: 300px;
+  height: 225px;
+  object-fit: fill;
+}
+
+.info strong {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 300px;
+  height: 41px;
+  padding: 0 10px;
+  background: rgb(229, 236, 239);
+  color: #333;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 41px;
+}
+
+.actions {
+  display: grid;
+  align-items: center;
+  box-sizing: border-box;
+  width: 302px;
+  height: 26px;
+  margin: 4px 0 0 -1px;
+  grid-template-columns: 58px 121px 60px 3px 60px;
+}
+
+.actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 26px;
+  min-height: 26px;
+  padding: 0;
+  border-radius: 0;
+  font: 12px/24px Arial, "Malgun Gothic", sans-serif;
+  cursor: pointer;
+}
+
+.applyCtl {
+  grid-column: 1;
+  width: 58px;
+  border: 0;
+  background: #999;
+  color: #fff;
+}
+
+.detailCtl {
+  grid-column: 3;
+  width: 60px;
+  margin-left: 0 !important;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  color: #333;
+}
+
+.previewCtl {
+  grid-column: 5;
+  width: 60px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  color: #333;
+}
+
+.card[data-active="true"] {
+  border-color: #999;
+}
+
+.actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.detailOverlay {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: grid;
+  padding: 30px;
+  background: rgb(0 0 0 / 45%);
+  place-items: center;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .detailDialog {
+  position: relative !important;
+  inset: auto !important;
+  box-sizing: border-box !important;
+  width: 560px !important;
+  max-width: calc(100vw - 60px) !important;
+  max-height: calc(100vh - 60px) !important;
+  overflow: auto !important;
+  padding: 15px !important;
+  border: 1px solid #333 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 30%) !important;
+  color: #222 !important;
+}
+
+.detailDialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.detailDialog h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.detailDialog .closeCtl {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #333;
+  font: 24px/30px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.detailDialog > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+}
+
+.detailDialog dl {
+  margin: 12px 0 0;
+  border-top: 1px solid #ddd;
+}
+
+.detailDialog dl > div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  min-height: 34px;
+  border-bottom: 1px solid #ddd;
+}
+
+.detailDialog dt,
+.detailDialog dd {
+  margin: 0;
+  padding: 8px 10px;
+}
+
+.detailDialog dt {
+  background: #f5f6fa;
+  font-weight: 700;
+}
