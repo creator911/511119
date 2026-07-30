@@ -88,7 +88,7 @@ export async function SiteFrame({
           telephone: companySettings.customerServicePhone,
           copyright: `Copyright © ${companySettings.companyName}. All Rights Reserved.`,
         }}
-        logo="/legacy/logo.png"
+        logo="/legacy/goldrian-logo.png"
         primaryLinks={[
           {
             label: "서비스이용약관",
@@ -117,7 +117,7 @@ function localShopLogo(
 ): `/${string}` | undefined;
 function localShopLogo(
   value: unknown,
-  fallback: `/${string}` | undefined = "/legacy/logo.png",
+  fallback: `/${string}` | undefined = "/legacy/goldrian-logo.png",
 ): `/${string}` | undefined {
   if (
     typeof value === "string" &&

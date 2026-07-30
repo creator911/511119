@@ -46,13 +46,13 @@ test("uses the Goldrian identity and exact business information", async () => {
 
 test("ships the supplied Goldrian logo at its original dimensions", async () => {
   const logo = await readFile(
-    new URL("../public/legacy/logo.png", import.meta.url),
+    new URL("../public/legacy/goldrian-logo.png", import.meta.url),
   );
   assert.equal(logo.readUInt32BE(16), 1983);
   assert.equal(logo.readUInt32BE(20), 793);
 
   const socialLogo = await readFile(
-    new URL("../public/og.png", import.meta.url),
+    new URL("../public/goldrian-og.png", import.meta.url),
   );
   assert.equal(socialLogo.readUInt32BE(16), 1983);
   assert.equal(socialLogo.readUInt32BE(20), 793);

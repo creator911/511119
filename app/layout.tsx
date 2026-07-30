@@ -43,8 +43,8 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: metaSettings.robots,
     referrer: "same-origin",
     icons: {
-      icon: "/legacy/logo.png",
-      shortcut: "/legacy/logo.png",
+      icon: "/legacy/goldrian-logo.png",
+      shortcut: "/legacy/goldrian-logo.png",
     },
     openGraph: {
       type: "website",
@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: metaSettings.description,
       images: [
         {
-          url: "/og.png",
+          url: "/goldrian-og.png",
           width: 1983,
           height: 793,
           alt: "GOLDRIAN 골드리안",
@@ -65,7 +65,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: metaSettings.title,
       description: metaSettings.description,
-      images: ["/og.png"],
+      images: ["/goldrian-og.png"],
     },
   };
 }
