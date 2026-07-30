@@ -90,6 +90,9 @@ export default async function RootLayout({
       data-site-theme={themeSettings.enabled ? themeSettings.theme : undefined}
       style={themeStyle}
     >
+      <head>
+        <script src="/vendor/postcode.v2.js" defer />
+      </head>
       <body>{children}</body>
     </html>
   );
