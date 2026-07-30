@@ -6,6 +6,15 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 
 const d1 = "DB";
 const r2 = "MEDIA";
+const runtimeVariables: Record<string, string> = {};
+for (const name of [
+  "ADMIN_USERNAME",
+  "ADMIN_PASSWORD_HASH",
+  "SESSION_SECRET",
+] as const) {
+  const value = process.env[name];
+  if (value) runtimeVariables[name] = value;
+}
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
@@ -30,6 +39,9 @@ const localBindingConfig = {
         },
       ]
     : [],
+  ...(Object.keys(runtimeVariables).length > 0
+    ? { vars: runtimeVariables }
+    : {}),
 };
 
 export default defineConfig(async () => {
