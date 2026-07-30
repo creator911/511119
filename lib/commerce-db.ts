@@ -397,6 +397,24 @@ export async function ensureCommerceSchema() {
         database.prepare(
           "CREATE INDEX IF NOT EXISTS wishlist_owner_idx ON wishlist_items(owner_key)",
         ),
+        database.prepare(`CREATE TABLE IF NOT EXISTS member_memos (
+          id TEXT PRIMARY KEY,
+          sender_user_id TEXT NOT NULL,
+          recipient_user_id TEXT NOT NULL,
+          body TEXT NOT NULL,
+          read_at TEXT,
+          sender_deleted INTEGER NOT NULL DEFAULT 0,
+          recipient_deleted INTEGER NOT NULL DEFAULT 0,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )`),
+        database.prepare(
+          `CREATE INDEX IF NOT EXISTS member_memos_recipient_idx
+           ON member_memos(recipient_user_id, recipient_deleted, created_at)`,
+        ),
+        database.prepare(
+          `CREATE INDEX IF NOT EXISTS member_memos_sender_idx
+           ON member_memos(sender_user_id, sender_deleted, created_at)`,
+        ),
         database.prepare(`CREATE TABLE IF NOT EXISTS product_interaction_rate_limits (
           user_id TEXT NOT NULL,
           window_start INTEGER NOT NULL,

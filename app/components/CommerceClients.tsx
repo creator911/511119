@@ -636,45 +636,103 @@ export function CustomerRegisterClient({
 }
 
 export function MyPageClient() {
-  const [name, setName] = useState("회원");
-  const [points, setPoints] = useState(0);
-  const [coupons, setCoupons] = useState(0);
+  const [member, setMember] = useState({
+    name: "회원",
+    points: 0,
+    coupons: 0,
+    email: "",
+    phone: "",
+    postcode: "",
+    address1: "",
+    address2: "",
+    lastLoginAt: "",
+    joinedAt: "",
+  });
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [orders, setOrders] = useState<
     Array<{ id: string; orderedAt: string; label: string; amount: number; status: string }>
   >([]);
+  const [pointHistory, setPointHistory] = useState<
+    Array<{
+      id: string;
+      delta: number;
+      balanceAfter: number;
+      reason: string;
+      expiresAt: string;
+      createdAt: string;
+    }>
+  >([]);
+  const [wishlist, setWishlist] = useState<
+    Array<ProductSummary & { wishedAt: string }>
+  >([]);
 
   useEffect(() => {
-    fetch("/api/customer/session")
-      .then(
-        async (response) =>
-          (await response.json()) as {
-            user?: { name?: string; points?: number; coupons?: number };
-            orders?: typeof orders;
-          },
-      )
-      .then((result) => {
-        if (!result.user) {
+    Promise.all([
+      fetch("/api/customer/session", { cache: "no-store" }),
+      fetch("/api/customer/wishlist", { cache: "no-store" }),
+    ])
+      .then(async ([sessionResponse, wishlistResponse]) => {
+        const sessionResult = (await sessionResponse.json()) as {
+          user?: {
+            name?: string;
+            points?: number;
+            coupons?: number;
+            email?: string;
+            phone?: string;
+            postcode?: string;
+            address1?: string;
+            address2?: string;
+            lastLoginAt?: string;
+            joinedAt?: string;
+          };
+          orders?: typeof orders;
+          pointHistory?: typeof pointHistory;
+        };
+        if (!sessionResult.user) {
           window.location.assign(
             "/bbs/login.php?return_url=%2Fshop%2Fmypage.php",
           );
           return;
         }
-        if (result.user.name) setName(result.user.name);
-        if (
-          typeof result.user.points === "number" &&
-          Number.isFinite(result.user.points)
-        ) {
-          setPoints(Math.max(0, Math.trunc(result.user.points)));
+        const user = sessionResult.user;
+        setMember({
+          name: user.name || "회원",
+          points:
+            typeof user.points === "number" && Number.isFinite(user.points)
+              ? Math.max(0, Math.trunc(user.points))
+              : 0,
+          coupons:
+            typeof user.coupons === "number" && Number.isFinite(user.coupons)
+              ? Math.max(0, Math.trunc(user.coupons))
+              : 0,
+          email: user.email ?? "",
+          phone: user.phone ?? "",
+          postcode: user.postcode ?? "",
+          address1: user.address1 ?? "",
+          address2: user.address2 ?? "",
+          lastLoginAt: user.lastLoginAt ?? "",
+          joinedAt: user.joinedAt ?? "",
+        });
+        if (Array.isArray(sessionResult.orders)) {
+          setOrders(sessionResult.orders);
         }
-        if (
-          typeof result.user.coupons === "number" &&
-          Number.isFinite(result.user.coupons)
-        ) {
-          setCoupons(Math.max(0, Math.trunc(result.user.coupons)));
+        if (Array.isArray(sessionResult.pointHistory)) {
+          setPointHistory(sessionResult.pointHistory);
         }
-        if (Array.isArray(result.orders)) setOrders(result.orders);
+        if (wishlistResponse.ok) {
+          const wishlistResult = (await wishlistResponse.json()) as {
+            products?: Array<ProductSummary & { wishedAt?: string }>;
+          };
+          if (Array.isArray(wishlistResult.products)) {
+            setWishlist(
+              wishlistResult.products.map((product) => ({
+                ...product,
+                wishedAt: product.wishedAt ?? "",
+              })),
+            );
+          }
+        }
         setLoaded(true);
       })
       .catch(() => {
@@ -699,10 +757,19 @@ export function MyPageClient() {
 
   return (
     <MyPagePanel
-      memberName={name}
-      points={points}
-      coupons={coupons}
+      memberName={member.name}
+      memberEmail={member.email}
+      memberPhone={member.phone}
+      memberPostcode={member.postcode}
+      memberAddress1={member.address1}
+      memberAddress2={member.address2}
+      lastLoginAt={member.lastLoginAt}
+      joinedAt={member.joinedAt}
+      points={member.points}
+      coupons={member.coupons}
       orders={orders}
+      pointHistory={pointHistory}
+      wishlist={wishlist}
     />
   );
 }

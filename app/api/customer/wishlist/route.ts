@@ -22,24 +22,29 @@ export async function GET(request: Request) {
     await ensureCommerceSchema();
     const result = await commerceDb()
       .prepare(
-        `SELECT product_id
+        `SELECT product_id, created_at
          FROM wishlist_items
          WHERE owner_key = ?
          ORDER BY created_at DESC, id DESC
          LIMIT ?`,
       )
       .bind(session.userId, MAX_WISHLIST_ITEMS)
-      .all<{ product_id: string }>();
-    const productIds = (result.results ?? []).map((row) => row.product_id);
+      .all<{ product_id: string; created_at: string }>();
+    const rows = result.results ?? [];
+    const productIds = rows.map((row) => row.product_id);
     const products = (
       await Promise.all(
-        productIds.slice(0, 3).map((productId) =>
-          getStorefrontProduct(productId),
-        ),
+        rows.slice(0, 8).map(async (row) => {
+          const product = await getStorefrontProduct(row.product_id);
+          return product?.active
+            ? {
+                ...toProductSummary(product),
+                wishedAt: row.created_at,
+              }
+            : null;
+        }),
       )
-    ).flatMap((product) =>
-      product?.active ? [toProductSummary(product)] : [],
-    );
+    ).flatMap((product) => (product ? [product] : []));
     return noStoreJson({ productIds, products });
   } catch {
     return noStoreJson(

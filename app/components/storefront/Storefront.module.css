@@ -3656,194 +3656,586 @@
 
 /* My page */
 
-.memberSummary {
-  display: grid;
-  grid-template-columns: 1.2fr 1.8fr;
-  margin-bottom: 30px;
-  border: 1px solid #ddd;
-  background: #fff;
-}
-
-.memberGreeting {
-  display: grid;
-  min-height: 160px;
-  grid-template-columns: 64px minmax(0, 1fr);
-  align-content: center;
-  align-items: center;
-  gap: 16px;
-  padding: 25px;
-  border-right: 1px solid #ddd;
-}
-
-.memberAvatar {
-  display: grid;
-  width: 64px;
-  height: 64px;
-  grid-row: span 2;
-  place-items: center;
-  border-radius: 50%;
-  color: #fff;
-  background: var(--kiel-dark);
-  font-size: 22px;
-}
-
-.memberGreeting p {
-  margin: 0;
+.myPage {
+  min-height: 540px;
+  padding: 30px 0 90px;
   color: #555;
-  font-size: 15px;
+  background: #fff;
+  font: 14px/1.6 "S-Core Dream", "S-CoreDream", Arial, sans-serif;
 }
 
-.memberGreeting p strong {
-  color: #111;
-  font-size: 18px;
-}
-
-.memberGreeting div > span {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 3px 8px;
-  border: 1px solid #ddd;
-  color: #777;
-  font-size: 9px;
-}
-
-.memberGreeting > a {
-  grid-column: 2;
-  justify-self: start;
-  color: #888;
-  font-size: 10px;
-  text-decoration: underline;
-}
-
-.memberStats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0;
-}
-
-.memberStats > div {
+.myPageActions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid var(--kiel-line);
+  justify-content: flex-end;
+  gap: 4px;
+  margin-bottom: 20px;
 }
 
-.memberStats > div:last-child {
-  border-right: 0;
-}
-
-.memberStats dt {
-  color: #888;
-  font-size: 11px;
-}
-
-.memberStats dd {
-  margin: 10px 0 0;
-  color: var(--kiel-red);
-  font-size: 19px;
-  font-weight: 700;
-}
-
-.myPageMenuGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 30px;
-}
-
-.myPageMenuGrid a {
-  position: relative;
-  display: grid;
-  min-height: 135px;
-  grid-template-columns: 42px minmax(0, 1fr);
-  align-content: center;
-  gap: 5px 12px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  color: #555;
-  background: #fff;
-  text-decoration: none;
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.myPageMenuGrid a:hover {
-  border-color: #333;
-  transform: translateY(-2px);
-}
-
-.myPageMenuGrid a > span {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  grid-row: span 2;
-  place-items: center;
-  border-radius: 50%;
+.myPageActions a,
+.myPageActions button {
+  min-height: 31px;
+  padding: 6px 13px;
+  border: 0;
+  border-radius: 0;
   color: #fff;
-  background: var(--kiel-red);
-  font: 18px Arial, sans-serif;
+  background: #333;
+  font: 12px/19px "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.myPageMenuGrid strong {
-  color: #222;
-  font-size: 14px;
+.myPageActions a:hover,
+.myPageActions button:hover,
+.myPageActions a:focus-visible,
+.myPageActions button:focus-visible {
+  color: #fff;
+  background: #111;
 }
 
-.myPageMenuGrid p {
+.myPageActions .myPageLeaveButton {
+  background: #858585;
+}
+
+.myPageMemberPanel {
+  position: relative;
+  margin-bottom: 70px;
+  border: 1px solid #d5d5d5;
+  background: #fff;
+}
+
+.myPageMemberPanel > header {
+  min-height: 102px;
+  padding: 20px;
+  border-bottom: 1px solid #d5d5d5;
+  background: #f8f8f8;
+}
+
+.myPageMemberPanel h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   margin: 0;
-  color: #999;
-  font-size: 10px;
-  line-height: 1.5;
+  color: #333;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
-.myPageMenuGrid em {
+.myPageMemberPanel h2 i {
+  color: #757575;
+}
+
+.myPageBalances {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.myPageBalanceValue {
+  padding: 0;
+  border: 0;
+  color: #d01849;
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.myPageSmallButton {
+  min-height: 22px;
+  margin-left: 2px;
+  padding: 2px 8px;
+  border: 1px solid #888;
+  color: #555;
+  background: transparent;
+  font: 10px/16px "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+  cursor: pointer;
+}
+
+.myPageBalanceDivider {
+  margin: 0 7px;
+  color: #d5d5d5;
+}
+
+.myPageProfileCollapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.28s ease,
+    opacity 0.2s ease;
+}
+
+.myPageProfileCollapse > div {
+  overflow: hidden;
+}
+
+.myPageProfileOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.myPageProfileCollapse dl {
+  display: grid;
+  grid-template-columns: 15% 35% 15% 35%;
+  margin: 0;
+  padding: 22px 20px;
+}
+
+.myPageProfileCollapse dt,
+.myPageProfileCollapse dd {
+  min-width: 0;
+  margin: 3px 0;
+  padding-right: 12px;
+}
+
+.myPageProfileCollapse dt {
+  color: #333;
+  font-weight: 600;
+}
+
+.myPageProfileCollapse dd:last-child {
+  grid-column: span 3;
+}
+
+.myPageProfileToggle {
   position: absolute;
-  top: 50%;
-  right: 18px;
-  color: #bbb;
-  font: 25px Arial, sans-serif;
-  transform: translateY(-50%);
+  bottom: -30px;
+  left: 50%;
+  width: 50px;
+  height: 30px;
+  margin-left: -25px;
+  padding: 5px 0 0;
+  border: 1px solid #d5d5d5;
+  border-top: 0;
+  color: #757575;
+  background: #f8f8f8;
+  text-align: center;
+  cursor: pointer;
 }
 
-.orderTable {
+.myPageProfileToggle i {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.myPageSection {
+  margin-bottom: 50px;
+}
+
+.myPageWishlistSection {
+  margin-bottom: 0;
+}
+
+.myPageHeadline {
+  position: relative;
+  display: flex;
+  min-height: 39px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #d9dde2;
+}
+
+.myPageHeadline h2 {
+  margin: 0;
+  padding: 0 0 10px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 29px;
+}
+
+.myPageHeadline a {
+  margin-top: 0;
+  padding: 5px 10px;
+  border: 1px solid #333;
+  color: #333;
+  background: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.myPageHeadline a:hover {
+  color: #fff;
+  background: #333;
+}
+
+.myPageOrderTable {
   border-top: 1px solid #333;
 }
 
-.orderTableHeader,
-.orderTableRow {
+.myPageOrderHeader,
+.myPageOrderRow {
   display: grid;
-  grid-template-columns: 120px 150px minmax(240px, 1fr) 130px 100px;
+  grid-template-columns: 130px 180px minmax(230px, 1fr) 135px 105px;
   align-items: center;
   text-align: center;
 }
 
-.orderTableHeader {
+.myPageOrderHeader {
   min-height: 45px;
   border-bottom: 1px solid #ccc;
-  color: #777;
+  color: #666;
   background: #f8f8f8;
-  font-size: 10px;
+  font-size: 11px;
 }
 
-.orderTableRow {
+.myPageOrderRow {
   min-height: 62px;
-  border-bottom: 1px solid var(--kiel-line);
+  border-bottom: 1px solid #ececec;
   color: #666;
   font-size: 11px;
   text-decoration: none;
 }
 
-.orderTableRow strong {
+.myPageOrderRow:hover {
+  background: #fff6f6;
+}
+
+.myPageOrderRow strong {
   color: #222;
   font-size: 12px;
 }
 
-.orderTableRow em {
-  color: var(--kiel-red);
+.myPageOrderRow em {
+  color: #d01849;
   font-style: normal;
   font-weight: 600;
+}
+
+.myPageEmpty {
+  margin: 40px 0 0;
+  color: #888;
+  font-size: 13px;
+  text-align: center;
+}
+
+.myPageEmpty i {
+  margin-right: 6px;
+}
+
+.myPageWishlistGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 -10px;
+}
+
+.myPageWishlistGrid article {
+  min-width: 0;
+  padding: 10px;
+}
+
+.myPageWishlistGrid article > div {
+  padding: 10px;
+  border: 1px solid #dadada;
+  background: #fff;
+}
+
+.myPageWishlistGrid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.myPageWishlistGrid h3 {
+  margin: 15px 0 10px;
+  overflow: hidden;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.myPageWishlistGrid h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.myPageWishlistGrid article > div:hover h3 a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.myPageWishlistGrid p {
+  margin: 0;
+  color: #959595;
+  font-size: 11px;
+}
+
+.myPageWishlistGrid p i {
+  margin-right: 5px;
+}
+
+.myPageDialogBackdrop {
+  position: fixed;
+  z-index: 1300;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.48);
+  animation: myPageFadeIn 0.18s ease both;
+}
+
+.myPageDialog {
+  width: min(780px, 100%);
+  max-height: min(720px, calc(100vh - 40px));
+  overflow: auto;
+  border: 1px solid #333;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.18);
+  animation: myPageDialogIn 0.22s ease both;
+}
+
+.myPageDialog > header {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  color: #fff;
+  background: #333;
+}
+
+.myPageDialog > header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 17px;
+}
+
+.myPageDialog > header button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  font: 27px/34px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.myPageDialog > div {
+  padding: 20px;
+}
+
+.myPageDialogEmpty {
+  display: flex;
+  min-height: 160px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: #777;
+  text-align: center;
+}
+
+.myPageDialogEmpty a {
+  padding: 7px 12px;
+  border: 1px solid #333;
+  color: #333;
+  text-decoration: none;
+}
+
+.myPageMemo > nav {
+  display: flex;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #333;
+}
+
+.myPageMemo > nav button {
+  min-height: 38px;
+  padding: 7px 15px;
+  border: 1px solid #ddd;
+  border-bottom: 0;
+  color: #666;
+  background: #fff;
+  font: 11px "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+  cursor: pointer;
+}
+
+.myPageMemo > nav button + button {
+  border-left: 0;
+}
+
+.myPageMemo > nav button[aria-pressed="true"] {
+  color: #fff;
+  border-color: #333;
+  background: #333;
+}
+
+.myPageMemoMessage {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #c9d4ed;
+  color: #2c477e;
+  background: #f5f8ff;
+  font-size: 11px;
+}
+
+.myPageMemoForm {
+  display: grid;
+  gap: 13px;
+}
+
+.myPageMemoForm label {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  align-items: start;
+}
+
+.myPageMemoForm label > span {
+  min-height: 41px;
+  padding: 11px 12px;
+  color: #555;
+  background: #f8f8f8;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.myPageMemoForm input,
+.myPageMemoForm textarea {
+  width: 100%;
+  min-height: 41px;
+  padding: 9px 11px;
+  border: 1px solid #ccc;
+  color: #333;
+  background: #fff;
+  font: 12px/1.5 "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+}
+
+.myPageMemoForm textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.myPageMemoForm > div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.myPageMemoForm > div span {
+  color: #999;
+  font-size: 10px;
+}
+
+.myPageMemoForm > div button {
+  min-width: 90px;
+  min-height: 36px;
+  border: 0;
+  color: #fff;
+  background: #333;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.myPageMemoList {
+  border-top: 1px solid #333;
+}
+
+.myPageMemoList article {
+  position: relative;
+  padding: 14px 60px 14px 13px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+.myPageMemoList .myPageMemoUnread {
+  background: #fff9f8;
+}
+
+.myPageMemoList article > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.myPageMemoList article strong {
+  color: #333;
+  font-size: 11px;
+}
+
+.myPageMemoList article time {
+  color: #999;
+  font-size: 10px;
+}
+
+.myPageMemoList article p {
+  margin: 8px 0 0;
+  color: #555;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.myPageMemoList article > button {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  padding: 4px 8px;
+  border: 1px solid #bbb;
+  color: #666;
+  background: #fff;
+  font-size: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.myPagePointTable {
+  border-top: 2px solid #333;
+}
+
+.myPagePointTable > div {
+  display: grid;
+  min-height: 44px;
+  grid-template-columns: 150px minmax(180px, 1fr) 100px 100px 100px;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 11px;
+  text-align: center;
+}
+
+.myPagePointTable > div:first-child {
+  color: #555;
+  background: #f8f8f8;
+  font-weight: 600;
+}
+
+.myPagePointTable strong {
+  color: #333;
+}
+
+.myPagePointTable em {
+  color: #008c68;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.myPagePointTable .myPagePointMinus {
+  color: #d01849;
+}
+
+@keyframes myPageFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes myPageDialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
 }
 
 @media (min-width: 992px) {
@@ -4059,6 +4451,15 @@
 
   .memberStats {
     min-height: 120px;
+  }
+
+  .myPageWishlistGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .myPageOrderHeader,
+  .myPageOrderRow {
+    grid-template-columns: 110px 145px minmax(180px, 1fr) 115px 85px;
   }
 
   .mobileFloatingBar {
@@ -4508,6 +4909,51 @@
     font-size: 9px;
     font-weight: 400;
   }
+
+  .myPage {
+    padding-top: 24px;
+  }
+
+  .myPageProfileCollapse dl {
+    grid-template-columns: 38% 62%;
+  }
+
+  .myPageProfileCollapse dd:last-child {
+    grid-column: auto;
+  }
+
+  .myPageOrderHeader {
+    display: none;
+  }
+
+  .myPageOrderRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px 15px;
+    padding: 15px;
+    text-align: left;
+  }
+
+  .myPageOrderRow > * {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .myPageOrderRow > *::before {
+    margin-right: 10px;
+    color: #999;
+    content: attr(data-label);
+    font-size: 9px;
+    font-weight: 400;
+  }
+
+  .myPagePointTable {
+    min-width: 640px;
+  }
+
+  .myPageDialog > div {
+    overflow-x: auto;
+  }
 }
 
 @media (max-width: 575px) {
@@ -4777,6 +5223,92 @@
   .orderTableRow {
     grid-template-columns: 1fr;
   }
+
+  .myPageActions {
+    gap: 2px;
+  }
+
+  .myPageActions a,
+  .myPageActions button {
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 10px;
+  }
+
+  .myPageMemberPanel > header {
+    padding: 17px 15px;
+  }
+
+  .myPageMemberPanel h2 {
+    font-size: 17px;
+  }
+
+  .myPageBalances {
+    font-size: 11px;
+  }
+
+  .myPageSmallButton {
+    display: none;
+  }
+
+  .myPageProfileCollapse dl {
+    padding: 16px 14px;
+    font-size: 11px;
+  }
+
+  .myPageHeadline {
+    margin-bottom: 15px;
+  }
+
+  .myPageWishlistGrid {
+    margin-right: -5px;
+    margin-left: -5px;
+  }
+
+  .myPageWishlistGrid article {
+    padding: 5px;
+  }
+
+  .myPageWishlistGrid article > div {
+    padding: 8px;
+  }
+
+  .myPageWishlistGrid h3 {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .myPageOrderRow {
+    grid-template-columns: 1fr;
+  }
+
+  .myPageDialogBackdrop {
+    padding: 10px;
+  }
+
+  .myPageDialog {
+    max-height: calc(100vh - 20px);
+  }
+
+  .myPageDialog > div {
+    padding: 12px;
+  }
+
+  .myPageMemoForm label {
+    grid-template-columns: 1fr;
+  }
+
+  .myPageMemoForm label > span {
+    min-height: 0;
+    padding: 7px 2px;
+    background: transparent;
+  }
+
+  .myPageMemoList article > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4791,8 +5323,14 @@
 
   .drawerBackdrop,
   .mobileDrawer,
-  .searchOverlay {
+  .searchOverlay,
+  .myPageDialogBackdrop,
+  .myPageDialog {
     animation: none;
+  }
+
+  .myPageProfileCollapse {
+    transition: none;
   }
 }
 

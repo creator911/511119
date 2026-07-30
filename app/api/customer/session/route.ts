@@ -15,6 +15,7 @@ import {
   getCustomerSession,
   verifyCustomerPassword,
 } from "@/lib/customer-auth";
+import { ensureAdminPointSchema } from "@/lib/admin-points";
 import {
   HttpBoundaryError,
   isJsonObject,
@@ -41,16 +42,26 @@ export async function GET(request: Request) {
   const session = await getCustomerSession(request);
   if (!session) return noStoreJson({ user: null, orders: [] });
   try {
-    await ensureCommerceSchema();
+    await ensureAdminPointSchema();
     const database = commerceDb();
-    const [currentUser, orders, couponCount] = await Promise.all([
+    const [currentUser, orders, couponCount, pointHistory] = await Promise.all([
       database
         .prepare(
-          `SELECT points
+          `SELECT points, email, phone, postcode, address1, address2,
+                  last_login_at, created_at
            FROM users WHERE id = ? AND active = 1 LIMIT 1`,
         )
         .bind(session.userId)
-        .first<{ points: number }>(),
+        .first<{
+          points: number;
+          email: string;
+          phone: string;
+          postcode: string;
+          address1: string;
+          address2: string;
+          last_login_at: string | null;
+          created_at: string;
+        }>(),
       database
         .prepare(
           `SELECT id, created_at, total, status
@@ -64,6 +75,23 @@ export async function GET(request: Request) {
           status: string;
         }>(),
       countAvailableCustomerCoupons(session.userId),
+      database
+        .prepare(
+          `SELECT id, delta, balance_after, reason, expires_at, created_at
+           FROM admin_point_ledger
+           WHERE user_id = ? AND deleted_at IS NULL
+           ORDER BY created_at DESC, id DESC
+           LIMIT 50`,
+        )
+        .bind(session.userId)
+        .all<{
+          id: string;
+          delta: number;
+          balance_after: number;
+          reason: string;
+          expires_at: string | null;
+          created_at: string;
+        }>(),
     ]);
     if (!currentUser) {
       return noStoreJson({ user: null, orders: [] });
@@ -75,7 +103,25 @@ export async function GET(request: Request) {
         name: session.name,
         points: Math.max(0, Math.trunc(Number(currentUser.points) || 0)),
         coupons: couponCount,
+        email: currentUser.email,
+        phone: currentUser.phone,
+        postcode: currentUser.postcode,
+        address1: currentUser.address1,
+        address2: currentUser.address2,
+        lastLoginAt: currentUser.last_login_at ?? "",
+        joinedAt: currentUser.created_at,
       },
+      pointHistory: (pointHistory.results ?? []).map((entry) => ({
+        id: entry.id,
+        delta: Math.trunc(Number(entry.delta) || 0),
+        balanceAfter: Math.max(
+          0,
+          Math.trunc(Number(entry.balance_after) || 0),
+        ),
+        reason: entry.reason,
+        expiresAt: entry.expires_at ?? "",
+        createdAt: entry.created_at,
+      })),
       orders: (orders.results ?? []).map((order) => ({
         id: order.id,
         orderedAt: order.created_at,
