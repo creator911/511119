@@ -4952,6 +4952,10 @@ body:has(.kiel-legacy-admin) {
   line-height: 25px !important;
 }
 
+.kiel-legacy-admin div[role="presentation"]:has(.legacy-member-wallet-editor) {
+  z-index: 1100;
+}
+
 .kiel-legacy-admin #container_wr section[role="dialog"]:has(.legacy-member-wallet-editor) {
   width: min(980px, calc(100vw - 30px));
   border: 1px solid #cfd4dc;

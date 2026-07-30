@@ -142,6 +142,10 @@ test("member management exposes editable wallet history down to seconds", async 
   assert.match(manager, /계좌번호/);
   assert.match(css, /\.legacy-member-wallet-card/);
   assert.match(css, /\.legacy-member-wallet-status-approved/);
+  assert.match(
+    css,
+    /div\[role="presentation"\]:has\(\.legacy-member-wallet-editor\) \{[\s\S]*?z-index: 1100/,
+  );
 });
 
 test("SQLite guards roll back duplicate and insufficient balance approvals", () => {
