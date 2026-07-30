@@ -559,13 +559,18 @@ export function CustomerLoginClient({
             headers: { "content-type": "application/json" },
             body: JSON.stringify(payload),
           });
-          const result = (await response.json()) as { error?: string };
+          const result = (await response.json()) as {
+            error?: string;
+            role?: "admin" | "member";
+          };
           if (!response.ok) {
             setError(result.error || "아이디 또는 비밀번호를 확인해 주세요.");
             return;
           }
           window.dispatchEvent(new CustomEvent(CUSTOMER_SESSION_EVENT));
-          window.location.assign(returnUrl);
+          window.location.assign(
+            result.role === "admin" ? "/shop" : returnUrl,
+          );
         } catch {
           setError("로그인 요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.");
         } finally {

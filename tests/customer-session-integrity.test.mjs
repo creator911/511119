@@ -101,7 +101,7 @@ test("a stale profile request cannot undo a password reset or adopt its session"
 });
 
 test("session cookies sign an explicit guarded version and preserve persistence", async () => {
-  const [auth, profile, login, register, rate] = await Promise.all([
+  const [auth, profile, login, register, rate, loginClient] = await Promise.all([
     readFile(new URL("../lib/customer-auth.ts", import.meta.url), "utf8"),
     readFile(
       new URL("../app/api/customer/profile/route.ts", import.meta.url),
@@ -116,6 +116,10 @@ test("session cookies sign an explicit guarded version and preserve persistence"
       "utf8",
     ),
     readFile(new URL("../lib/auth-rate.ts", import.meta.url), "utf8"),
+    readFile(
+      new URL("../app/components/CommerceClients.tsx", import.meta.url),
+      "utf8",
+    ),
   ]);
   const cookieFactory = auth.slice(
     auth.indexOf("export async function createCustomerSessionCookie"),
@@ -142,6 +146,12 @@ test("session cookies sign an explicit guarded version and preserve persistence"
   assert.match(login, /state\.session_version = \?/);
   assert.match(login, /sessionVersion: Number\(user\.session_version\)/);
   assert.match(login, /remember: payload\.remember === true/);
+  assert.match(login, /authenticateAdminCredentials\(/);
+  assert.match(login, /createAdminSessionCookie\(/);
+  assert.match(login, /role: "admin"/);
+  assert.match(login, /requestedPrimaryAdmin/);
+  assert.match(login, /role: "member"/);
+  assert.match(loginClient, /result\.role === "admin" \? "\/shop" : returnUrl/);
   assert.match(register, /INSERT INTO user_session_state/);
   assert.match(register, /sessionVersion: 1/);
   assert.match(register, /isUserIdentityConflict\(error\)/);

@@ -2,6 +2,11 @@ import {
   checkAuthRateLimit,
   clearAuthRateLimit,
 } from "@/lib/auth-rate";
+import {
+  authenticateAdminCredentials,
+  createAdminSessionCookie,
+  getPrimaryAdminUsername,
+} from "@/lib/auth";
 import { commerceDb, ensureCommerceSchema } from "@/lib/commerce-db";
 import { countAvailableCustomerCoupons } from "@/lib/commerce-promotions";
 import {
@@ -152,8 +157,36 @@ export async function POST(request: Request) {
       MAX_ATTEMPTS_PER_WINDOW,
       database,
     );
+    const adminIdentity = !rateLimit.limited
+      ? await authenticateAdminCredentials(
+          loginId,
+          password,
+          undefined,
+          database,
+        )
+      : null;
+    if (adminIdentity) {
+      await waitForMinimumResponseTime(startedAt);
+      const response = noStoreJson({ ok: true, role: "admin" });
+      response.headers.set(
+        "set-cookie",
+        await createAdminSessionCookie(
+          undefined,
+          new URL(request.url).protocol === "https:",
+          adminIdentity,
+        ),
+      );
+      await clearAuthRateLimit(request, "customer-login", database);
+      return response;
+    }
+
+    // The primary administrator identifier is reserved and must never fall
+    // through to an ordinary customer account with the same login id.
+    const primaryAdminUsername = getPrimaryAdminUsername();
+    const requestedPrimaryAdmin =
+      primaryAdminUsername.length > 0 && loginId === primaryAdminUsername;
     const passwordMatches =
-      !rateLimit.limited && user && user.active
+      !rateLimit.limited && !requestedPrimaryAdmin && user && user.active
         ? await verifyCustomerPassword(password, user.password_hash)
         : false;
     await waitForMinimumResponseTime(startedAt);
@@ -197,7 +230,7 @@ export async function POST(request: Request) {
         { status: 401 },
       );
     }
-    const response = noStoreJson({ ok: true });
+    const response = noStoreJson({ ok: true, role: "member" });
     response.headers.set(
       "set-cookie",
       await createCustomerSessionCookie(request, {
