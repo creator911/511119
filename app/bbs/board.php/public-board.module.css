@@ -1,0 +1,388 @@
+.page {
+  width: min(1140px, calc(100% - 32px));
+  min-height: 52vh;
+  margin: 0 auto;
+  padding: 34px 0 90px;
+}
+
+.intro {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid #454545;
+}
+
+.intro h2,
+.intro p {
+  margin: 0;
+}
+
+.intro h2 {
+  color: #3f3f3f;
+  font-size: 24px;
+}
+
+.intro p {
+  margin-top: 7px;
+  color: #777;
+  font-size: 13px;
+}
+
+.boardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.boardCard {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #dedede;
+  color: #333;
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.boardCard:hover {
+  border-color: #555;
+  transform: translateY(-2px);
+}
+
+.boardCard > span {
+  color: #a4260d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.boardCard strong {
+  font-size: 20px;
+}
+
+.boardCard p {
+  min-height: 42px;
+  margin: 0;
+  color: #666;
+  overflow-wrap: anywhere;
+}
+
+.boardCard small {
+  color: #999;
+}
+
+.search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: min(520px, 100%);
+  margin: 0 0 20px auto;
+}
+
+.search label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.search input {
+  min-width: 0;
+  height: 44px;
+  padding: 0 13px;
+  border: 1px solid #cfcfcf;
+}
+
+.search button {
+  min-width: 76px;
+  border: 0;
+  background: #444;
+  color: #fff;
+  cursor: pointer;
+}
+
+.postList {
+  border-top: 2px solid #454545;
+}
+
+.postList > a {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 120px 120px;
+  min-height: 68px;
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+  color: #444;
+  text-decoration: none;
+}
+
+.postList > a:hover {
+  background: #fafafa;
+}
+
+.postNumber,
+.postAuthor,
+.postMeta {
+  padding: 0 12px;
+  color: #777;
+  font-size: 12px;
+  text-align: center;
+}
+
+.postTitle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.postTitle strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.postTitle small {
+  flex: 0 0 auto;
+  color: #b32b11;
+}
+
+.postMeta {
+  display: grid;
+  gap: 3px;
+}
+
+.postMeta small {
+  color: #aaa;
+}
+
+.empty,
+.noComments {
+  margin: 0;
+  padding: 64px 20px;
+  border: 1px solid #e5e5e5;
+  color: #888;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 28px;
+}
+
+.pagination a {
+  display: inline-flex;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  color: #666;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.pagination a:hover,
+.pagination a[aria-current="page"] {
+  border-color: #444;
+  background: #444;
+  color: #fff;
+}
+
+.postDetail {
+  border-top: 2px solid #454545;
+  border-bottom: 1px solid #ddd;
+}
+
+.postDetail > header {
+  padding: 22px 24px;
+  border-bottom: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.postDetail h2 {
+  display: inline;
+  margin: 0;
+  color: #333;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+
+.notice {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 4px 8px;
+  background: #a4260d;
+  color: #fff;
+  font-size: 11px;
+  vertical-align: 3px;
+}
+
+.postDetail dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 14px 0 0;
+  color: #777;
+  font-size: 12px;
+}
+
+.postDetail dl div {
+  display: flex;
+  gap: 6px;
+}
+
+.postDetail dt {
+  font-weight: 600;
+}
+
+.postDetail dd {
+  margin: 0;
+}
+
+.postBody {
+  min-height: 220px;
+  padding: 32px 24px 58px;
+  color: #444;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.comments {
+  margin-top: 30px;
+}
+
+.comments > h3 {
+  margin: 0;
+  padding: 0 2px 12px;
+  border-bottom: 2px solid #454545;
+  font-size: 17px;
+}
+
+.comments > h3 span {
+  color: #a4260d;
+}
+
+.comments ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comments li {
+  padding: 18px 16px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.comments li header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.comments li header strong {
+  font-size: 13px;
+}
+
+.comments time {
+  color: #999;
+  font-size: 11px;
+}
+
+.comments li p {
+  margin: 9px 0 0;
+  color: #555;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.noComments {
+  border-top: 0;
+  padding: 38px 18px;
+}
+
+.bottomActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+
+.bottomActions a {
+  min-width: 88px;
+  padding: 11px 18px;
+  border: 1px solid #444;
+  background: #444;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-top: 24px;
+    padding-bottom: 60px;
+  }
+
+  .boardGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .boardCard {
+    padding: 19px;
+  }
+
+  .postList > a {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 4px 0;
+    padding: 12px 0;
+  }
+
+  .postNumber {
+    grid-row: 1 / 3;
+  }
+
+  .postAuthor,
+  .postMeta {
+    padding: 0 14px;
+    text-align: left;
+  }
+
+  .postAuthor {
+    grid-column: 2;
+  }
+
+  .postMeta {
+    display: flex;
+    grid-column: 2;
+    gap: 10px;
+  }
+
+  .postDetail > header {
+    padding: 18px 16px;
+  }
+
+  .postDetail h2 {
+    font-size: 19px;
+  }
+
+  .postBody {
+    min-height: 180px;
+    padding: 24px 16px 44px;
+  }
+
+  .comments li {
+    padding: 16px 8px;
+  }
+
+  .bottomActions a {
+    width: 100%;
+  }
+}

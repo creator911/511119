@@ -1,0 +1,340 @@
+.labelColumn {
+  width: 190px;
+}
+
+.wideInput {
+  width: min(520px, 90%);
+}
+
+.codeInput {
+  width: 260px;
+  text-transform: uppercase;
+}
+
+.moneyInput {
+  width: 150px;
+  text-align: right;
+}
+
+.postcodeInput {
+  width: 100px;
+}
+
+.inlineControls,
+.radioGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.radioGroup {
+  gap: 18px;
+}
+
+.radioGroup label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.fieldError {
+  display: block;
+  margin-top: 5px;
+  color: #d13f4a;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  margin: 10px 0 20px;
+}
+
+.couponIntro {
+  margin-top: 0 !important;
+}
+
+.couponSummary,
+.couponSearch,
+.couponTable {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+}
+
+.couponSummary {
+  height: 30px;
+  min-height: 30px;
+  margin: 0 0 10px !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .couponSummary {
+  margin: 0 0 10px !important;
+}
+
+.couponSearch {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 30px;
+  min-height: 30px;
+}
+
+.couponSearch select {
+  box-sizing: border-box;
+  width: 82px !important;
+  margin-right: 7.21875px;
+}
+
+.couponSearchInput {
+  box-sizing: border-box;
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 4.21875px;
+}
+
+.couponListForm {
+  box-sizing: border-box;
+  width: 1005px;
+  min-width: 1005px;
+}
+
+.couponTable {
+  margin-bottom: 10px;
+}
+
+.couponTable table {
+  box-sizing: border-box;
+  width: 1005px !important;
+  table-layout: fixed;
+}
+
+.couponTable thead th,
+.couponTable thead tr {
+  box-sizing: border-box;
+  height: 32px !important;
+}
+
+.couponTable input[type="checkbox"] {
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .couponSearchInput {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 5px !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .couponTable
+  thead
+  th {
+  height: 32px !important;
+  padding: 7px 5px !important;
+  line-height: 16px !important;
+  vertical-align: middle !important;
+}
+
+.shippingListSection,
+.shippingCreateSection,
+.shippingListForm,
+.shippingCreateForm,
+.shippingListTable,
+.shippingCreateTable {
+  box-sizing: border-box;
+  width: 1005px;
+  min-width: 1005px;
+}
+
+.shippingListTable,
+.shippingCreateTable {
+  margin: 0 !important;
+}
+
+.shippingListTable table,
+.shippingCreateTable table {
+  box-sizing: border-box;
+  width: 1005px !important;
+  table-layout: fixed;
+}
+
+.shippingListTable thead tr,
+.shippingListTable thead th {
+  box-sizing: border-box;
+  height: 32px !important;
+}
+
+.shippingListTable thead th {
+  vertical-align: middle !important;
+}
+
+.shippingListTable input[type="checkbox"] {
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.shippingListTable tbody .empty_table {
+  box-sizing: border-box;
+  height: 223px !important;
+}
+
+.shippingListActions {
+  height: 45px;
+  padding-top: 10px;
+}
+
+.shippingListDelete {
+  box-sizing: border-box;
+  width: 63.203125px !important;
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 0 !important;
+  border: 0;
+  border-radius: 0;
+  background: #9eacc6;
+  color: #fff;
+  cursor: pointer;
+}
+
+.shippingCreateSection {
+  margin-top: 20px;
+}
+
+.shippingCreateTable tbody tr,
+.shippingCreateTable tbody th,
+.shippingCreateTable tbody td {
+  box-sizing: border-box;
+  height: 45.921875px !important;
+}
+
+.shippingCreateTable tbody th,
+.shippingCreateTable tbody td {
+  padding: 10px !important;
+  vertical-align: middle;
+}
+
+.shippingRegionInput,
+.shippingPostcodeInput,
+.shippingPriceInput {
+  box-sizing: border-box;
+  height: 24px !important;
+  min-height: 24px !important;
+}
+
+.shippingRegionInput {
+  width: 212px !important;
+}
+
+.shippingPostcodeInput {
+  width: 92px !important;
+}
+
+.shippingPriceInput {
+  width: 80px !important;
+  text-align: right;
+}
+
+.shippingConfirm {
+  box-sizing: border-box;
+  height: 40px;
+  padding-top: 10px;
+}
+
+.shippingConfirmButton {
+  width: 56.171875px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingListTable
+  thead
+  th {
+  height: 32px !important;
+  padding: 7px 5px !important;
+  line-height: 16px !important;
+  vertical-align: middle !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingCreateTable
+  table {
+  width: 1004px !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingCreateTable
+  tbody
+  th,
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingCreateTable
+  tbody
+  td {
+  height: 45.921875px !important;
+  padding: 10px !important;
+  vertical-align: middle !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingRegionInput,
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingPostcodeInput,
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingPriceInput {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 5px !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .shippingListDelete {
+  width: 63.203125px !important;
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 0 !important;
+}
+
+.statusMessage {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid;
+}
+
+.statusSuccess {
+  border-color: #b7d8c4;
+  background: #eff8f2;
+  color: #26754a;
+}
+
+.statusError {
+  border-color: #ecc7ca;
+  background: #fff1f2;
+  color: #b3323d;
+}

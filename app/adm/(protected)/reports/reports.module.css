@@ -1,0 +1,809 @@
+.legacyRanking,
+.legacyRankingSummary,
+.legacyRankingSearch,
+.legacyRankingDesc,
+.legacyRankingTable {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+}
+
+.legacyRankingSummary,
+.legacyRankingSearch {
+  height: 30px;
+  min-height: 30px;
+}
+
+.legacyRankingSearch {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.legacyRankingSearch select {
+  box-sizing: border-box;
+  height: 30px !important;
+  min-height: 30px !important;
+  width: 124px !important;
+  margin-right: 7.21875px;
+}
+
+.legacyRankingSearch input[type="text"] {
+  width: 80px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+}
+
+.rankingPeriodLabel {
+  display: inline-block;
+  width: 45px;
+  margin-right: 7.21875px;
+}
+
+.rankingMiddleLabel,
+.rankingEndLabel {
+  display: inline-block;
+  width: 18px;
+  margin: 0 7.21875px;
+}
+
+.rankingEndLabel {
+  margin-left: 7.21875px;
+}
+
+.legacyRankingDesc {
+  height: 40px;
+  min-height: 40px;
+}
+
+.legacyRankingTable table {
+  box-sizing: border-box;
+  width: 1005px !important;
+  table-layout: fixed;
+}
+
+.legacyRankingTable thead tr,
+.legacyRankingTable thead th {
+  box-sizing: border-box;
+  height: 32px !important;
+}
+
+.legacyRankingTable tbody tr,
+.legacyRankingTable tbody td {
+  box-sizing: border-box;
+  height: 61px !important;
+}
+
+.legacyRankingTable tbody tr:nth-child(14),
+.legacyRankingTable tbody tr:nth-child(14) td {
+  height: 83px !important;
+}
+
+.legacyRankingTable tbody img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.legacyRankingPager {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+  height: 55px !important;
+  margin: 10px 0 20px !important;
+  padding: 20px 0 0 !important;
+}
+
+.legacyIncompleteSummary,
+.legacyIncompleteSearch,
+.legacyIncompleteTable {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+}
+
+.legacyIncompleteSummary {
+  margin: 10px 0 0 !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .legacyIncompleteSummary {
+  margin: 10px 0 0 !important;
+}
+
+.legacyIncompleteSummary,
+.legacyIncompleteSearch {
+  height: 30px;
+  min-height: 30px;
+}
+
+.legacyIncompleteSearch {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.legacyIncompleteSearch select {
+  box-sizing: border-box;
+  width: 70px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin-right: 7.21875px;
+}
+
+.legacyIncompleteSearch input[type="text"],
+.legacyIncompleteSearch input:not([type]) {
+  box-sizing: border-box;
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 4.21875px;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .legacyIncompleteSearch
+  input#incomplete-query {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 5px !important;
+}
+
+.legacyIncompleteTable {
+  margin: 0;
+}
+
+.legacyIncompleteTable table {
+  box-sizing: border-box;
+  width: 1005px !important;
+  table-layout: fixed;
+}
+
+.legacyIncompleteTable thead tr,
+.legacyIncompleteTable thead th {
+  box-sizing: border-box;
+  height: 32px !important;
+}
+
+.legacyIncompleteTable input[type="checkbox"] {
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.legacyIncompleteTable tbody tr,
+.legacyIncompleteTable tbody td {
+  box-sizing: border-box;
+  height: 61px;
+}
+
+.legacyIncompleteEmpty {
+  height: 223px !important;
+}
+
+.legacyIncompleteFooterSpacer {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 10px;
+}
+
+.salesLauncher {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-sizing: border-box;
+  width: 1005px;
+  height: 175px;
+  padding: 20px 15px;
+}
+
+.salesLaunchForm {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 975px;
+  height: 30px;
+  flex: 0 0 30px;
+  margin: 0;
+  padding: 0;
+}
+
+.salesLaunchForm strong {
+  flex: 0 0 70px;
+  width: 70px;
+  margin-right: 4.21875px;
+  color: #222;
+  font-size: 12px;
+  font-weight: 700;
+  position: relative;
+  top: -1.921875px;
+}
+
+.salesLaunchForm input:not([type="hidden"]) {
+  box-sizing: border-box;
+  margin: 0;
+  border-radius: 0 !important;
+}
+
+.salesLaunchForm input[type="text"] {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 3px !important;
+}
+
+:global(.kiel-legacy-admin)
+  :global(#container_wr)
+  .salesLaunchForm
+  input[type="text"] {
+  box-sizing: border-box !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 3px !important;
+}
+
+.salesDateInput {
+  flex: 0 0 80px;
+  width: 80px !important;
+}
+
+.salesMonthInput {
+  flex: 0 0 68px;
+  width: 68px !important;
+}
+
+.salesYearInput {
+  flex: 0 0 56px;
+  width: 56px !important;
+}
+
+.salesDailyUnit,
+.salesRangeSeparator,
+.salesEndUnit {
+  display: inline-block;
+  flex: 0 0 auto;
+  margin-left: 4.21875px;
+  white-space: nowrap;
+}
+
+.salesDailyUnit {
+  width: 40.21875px;
+}
+
+.salesRangeSeparator {
+  width: 24.640625px;
+}
+
+.salesRangeSeparator + input {
+  margin-left: 9.21875px !important;
+}
+
+.salesEndUnit {
+  width: 12px;
+}
+
+.salesSubmit {
+  flex: 0 0 34px;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin-left: 9.21875px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: #ff4081 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.filters {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #dfe4ea;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.filterFields {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.field,
+.dateFields {
+  min-width: 150px;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #626d79;
+  font-size: 11px;
+}
+
+.fieldWide {
+  min-width: 260px;
+  flex: 1 1 260px;
+}
+
+.field > span,
+.dateFields legend {
+  padding: 0;
+  color: #626d79;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.dateFields input {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #cfd6de;
+  border-radius: 2px;
+  background: #fff;
+  color: #303842;
+  outline: 0;
+}
+
+.field input:focus,
+.field select:focus,
+.dateFields input:focus {
+  border-color: #3b73c8;
+  box-shadow: 0 0 0 2px rgba(59, 115, 200, 0.13);
+}
+
+.dateFields {
+  min-width: 300px;
+  grid-template-columns: minmax(125px, 1fr) auto minmax(125px, 1fr);
+  align-items: center;
+}
+
+.dateFields legend {
+  grid-column: 1 / -1;
+  margin-bottom: 6px;
+}
+
+.filterActions {
+  display: flex;
+  gap: 7px;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid #c9d0d9;
+  border-radius: 2px;
+  background: #fff;
+  color: #4c5662;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.primaryButton {
+  border-color: #2e66b8;
+  background: #2e66b8;
+  color: #fff;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #dfe4ea;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.metric span {
+  display: block;
+  margin-bottom: 8px;
+  color: #7a8490;
+  font-size: 10px;
+}
+
+.metric strong {
+  display: block;
+  color: #303842;
+  font-size: 20px;
+  letter-spacing: -0.04em;
+}
+
+.positive {
+  color: #198754 !important;
+}
+
+.negative {
+  color: #c23d4b !important;
+}
+
+.pointCreateSection {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid #dfe4ea;
+  background: #fff;
+}
+
+.pointCreateSection h2 {
+  margin: 0 0 14px;
+  color: #303842;
+  font-size: 14px;
+}
+
+.pointCreateForm {
+  display: grid;
+  grid-template-columns:
+    minmax(130px, 0.8fr)
+    minmax(220px, 1.6fr)
+    minmax(140px, 0.8fr)
+    minmax(145px, 0.8fr)
+    auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.pointCreateForm label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  color: #626d79;
+  font-size: 11px;
+}
+
+.pointCreateForm input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+}
+
+.pointCreateForm button {
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+.pointSuccess,
+.pointError {
+  margin: 10px 0 0;
+  color: #198754;
+  font-size: 11px;
+}
+
+.pointError {
+  color: #c23d4b;
+}
+
+.pointHelp {
+  margin: 10px 0 0;
+  color: #7a8490;
+  font-size: 10px;
+}
+
+.twoColumn {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.twoColumn > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.tableScroll {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #4c5662;
+  font-size: 11px;
+}
+
+.table th,
+.table td {
+  padding: 10px 11px;
+  border-bottom: 1px solid #e7ebef;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table th {
+  border-top: 1px solid #dfe4ea;
+  background: #f6f8fa;
+  color: #68737f;
+  font-weight: 700;
+  text-align: center;
+}
+
+.table tbody tr:hover {
+  background: #fbfcfd;
+}
+
+.table small {
+  display: block;
+  margin-top: 3px;
+  color: #929aa4;
+  font-size: 9px;
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+  text-align: right !important;
+}
+
+.center {
+  text-align: center !important;
+}
+
+.primaryLink {
+  color: #2e66b8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primaryLink:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: #eef1f4;
+  color: #68737f;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badgePositive {
+  background: #e8f6ee;
+  color: #177d4f;
+}
+
+.badgeWarning {
+  background: #fff4dd;
+  color: #986b11;
+}
+
+.badgeNegative {
+  background: #fcebee;
+  color: #b33645;
+}
+
+.empty {
+  margin: 0;
+  padding: 34px 20px;
+  color: #8b949e;
+  text-align: center;
+}
+
+.unavailableAction {
+  color: #a2a8af;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 15px;
+}
+
+.pageLink,
+.pageCurrent,
+.pageDisabled,
+.pageGap {
+  min-width: 30px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border: 1px solid #d9dfe6;
+  border-radius: 2px;
+  background: #fff;
+  color: #66717d;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.pageCurrent {
+  border-color: #2e66b8;
+  background: #2e66b8;
+  color: #fff;
+  font-weight: 700;
+}
+
+.pageDisabled {
+  pointer-events: none;
+  opacity: 0.42;
+}
+
+.pageGap {
+  border-color: transparent;
+  background: transparent;
+}
+
+@media (max-width: 980px) {
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filterActions {
+    justify-content: flex-end;
+  }
+
+  .twoColumn {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pointCreateForm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .filterFields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .field,
+  .fieldWide,
+  .dateFields {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dateFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dateFields span {
+    display: none;
+  }
+
+  .filterActions > * {
+    flex: 1;
+  }
+
+  .pointCreateForm {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+:global(html[data-admin-dark]) .filters,
+:global(html[data-admin-dark]) .field input,
+:global(html[data-admin-dark]) .field select,
+:global(html[data-admin-dark]) .dateFields input,
+:global(html[data-admin-dark]) .secondaryButton,
+:global(html[data-admin-dark]) .metric,
+:global(html[data-admin-dark]) .pageLink,
+:global(html[data-admin-dark]) .pageDisabled,
+:global(html[data-admin-dark]) .pageGap {
+  border-color: var(--admin-border);
+  background: var(--admin-dark-surface);
+  color: var(--admin-dark-text);
+}
+
+:global(html[data-admin-dark]) .field,
+:global(html[data-admin-dark]) .dateFields,
+:global(html[data-admin-dark]) .field > span,
+:global(html[data-admin-dark]) .dateFields legend,
+:global(html[data-admin-dark]) .metric span,
+:global(html[data-admin-dark]) .table,
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .pageLink,
+:global(html[data-admin-dark]) .pageDisabled,
+:global(html[data-admin-dark]) .pageGap {
+  color: var(--admin-dark-text-soft);
+}
+
+:global(html[data-admin-dark]) .metric strong {
+  color: var(--admin-dark-text-strong);
+}
+
+:global(html[data-admin-dark]) .pointCreateSection {
+  border-color: var(--admin-border);
+  background: var(--admin-dark-surface);
+}
+
+:global(html[data-admin-dark]) .pointCreateSection h2 {
+  color: var(--admin-dark-text-strong);
+}
+
+:global(html[data-admin-dark]) .pointCreateForm label,
+:global(html[data-admin-dark]) .pointHelp {
+  color: var(--admin-dark-text-soft);
+}
+
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .table td {
+  border-color: var(--admin-border);
+}
+
+:global(html[data-admin-dark]) .table th {
+  background: var(--admin-dark-surface-subtle);
+}
+
+:global(html[data-admin-dark]) .table tbody tr:hover {
+  background: var(--admin-dark-surface-hover);
+}
+
+:global(html[data-admin-dark]) .primaryLink {
+  color: #9ec5ff;
+}
+
+:global(html[data-admin-dark]) .positive {
+  color: var(--admin-success) !important;
+}
+
+:global(html[data-admin-dark]) .badge {
+  background: #353c45;
+  color: #d5dae0;
+}
+
+:global(html[data-admin-dark]) .badgePositive {
+  background: #204634;
+  color: #9ee3c0;
+}
+
+:global(html[data-admin-dark]) .badgeWarning {
+  background: #4d3b20;
+  color: #f2ca87;
+}
+
+:global(html[data-admin-dark]) .badgeNegative {
+  background: #512c2f;
+  color: #f4a8ad;
+}
+
+:global(html[data-admin-dark]) .primaryButton,
+:global(html[data-admin-dark]) .pageCurrent {
+  border-color: #ff8069;
+  background: #c94229;
+  color: #fff;
+}

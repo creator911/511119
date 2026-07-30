@@ -1,0 +1,385 @@
+.page {
+  display: flex;
+  width: 1005px;
+  min-width: 1005px;
+  padding-top: 10px;
+  flex-direction: column;
+}
+
+.fixedActions {
+  display: flex;
+  gap: 4.21875px;
+}
+
+.successMessage,
+.errorMessage {
+  margin: 0 0 10px;
+  padding: 10px 20px;
+  border: 1px solid #f2f2f2;
+  background: #f9f9f9;
+  line-height: 18px;
+}
+
+.successMessage {
+  color: #356d42;
+}
+
+.errorMessage {
+  border-color: #f7d9d9;
+  background: #fdebf3;
+  color: #ce4242;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 1005px;
+  min-width: 0 !important;
+  height: 30px;
+  min-height: 30px;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  border-top: 1px solid #dde2e8 !important;
+  border-bottom: 1px solid #dde2e8 !important;
+  background: #f2f5f8 !important;
+  color: #30343a;
+}
+
+.summary strong {
+  color: #222;
+  font-weight: 700;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 1005px !important;
+  height: 30px;
+  min-height: 30px;
+  margin: 10px 0 !important;
+  padding: 0 6px !important;
+  border-bottom: 1px solid #e5e5e5 !important;
+  background: #fff !important;
+}
+
+.search select,
+.search input {
+  height: 30px !important;
+  min-height: 30px !important;
+  margin-right: 5px;
+}
+
+.search select:first-of-type {
+  width: 105px;
+}
+
+.search select:nth-of-type(2) {
+  width: 76px;
+}
+
+.search input {
+  width: 130px;
+}
+
+.search button {
+  width: auto !important;
+  min-width: 42px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #ff4081 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.description {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 40px;
+  min-height: 40px;
+  margin: 0 0 10px !important;
+  padding: 10px 20px !important;
+  background: #f6f6f6 !important;
+  color: #222;
+}
+
+.tableScroll {
+  width: 1005px;
+  margin: 0 0 10px;
+  overflow-x: auto;
+}
+
+.tableScroll table {
+  width: 1004px;
+  min-width: 1004px !important;
+  table-layout: fixed;
+  border-top: 1px solid #c7d2d9 !important;
+  border-left: 1px solid #c7d2d9 !important;
+}
+
+.tableScroll table thead th {
+  height: 32px !important;
+  padding: 8px 5px !important;
+  border: 0 !important;
+  border-right: 1px solid #c7d2d9 !important;
+  border-bottom: 1px solid #c7d2d9 !important;
+  background: #e5eef3 !important;
+  color: #222 !important;
+  font-size: 0.92em !important;
+  font-weight: 700 !important;
+  line-height: normal !important;
+  white-space: nowrap;
+}
+
+.tableScroll table tbody td {
+  height: 61px !important;
+  padding: 5px !important;
+  border: 0 !important;
+  border-right: 1px solid #d9e0e5 !important;
+  border-bottom: 1px solid #d9e0e5 !important;
+  background: #fff !important;
+  color: #111 !important;
+  line-height: 20px !important;
+}
+
+.tableScroll table tbody tr:nth-child(even) td {
+  background: #f1f4f7 !important;
+}
+
+.codeColumn {
+  width: 100px;
+}
+
+.nameColumn {
+  width: 334px;
+}
+
+.numberColumn {
+  width: 60px;
+}
+
+.inputColumn {
+  width: 60px;
+}
+
+.toggleColumn {
+  width: 70px;
+}
+
+.restockColumn {
+  width: 70px;
+}
+
+.manageColumn {
+  width: 60px;
+}
+
+.center {
+  text-align: center;
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.lowStock,
+.negativeStock {
+  color: #ff0033 !important;
+  font-weight: 700;
+}
+
+.numberInput {
+  width: 50px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 4px !important;
+  border: 1px solid #c8d4dc !important;
+  background: #f7fbfd !important;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.productCell {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.productCell::after {
+  display: block;
+  clear: both;
+  content: "";
+}
+
+.productImage {
+  display: inline !important;
+  float: none;
+  width: 50px;
+  height: 50px;
+  margin: 0;
+  background: #f2f2f2;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.productName {
+  display: block;
+  overflow: hidden;
+  color: #111;
+  line-height: 22px;
+  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.productName:hover {
+  text-decoration: underline;
+}
+
+.manageLink {
+  color: #222;
+  text-decoration: none;
+}
+
+.manageLink:hover {
+  text-decoration: underline;
+}
+
+.changedRow td {
+  box-shadow: inset 0 0 0 9999px rgba(255, 246, 198, 0.32);
+}
+
+.empty {
+  height: 150px !important;
+  color: #777 !important;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 36px;
+  margin: 10px 0;
+}
+
+.pagination button,
+.pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid #d6dce7;
+  background: #fff;
+  color: #555;
+}
+
+.pagination button {
+  cursor: pointer;
+}
+
+/* The legacy shell deliberately uses strong global selectors. Keep the stock
+   page's source-matched dimensions authoritative inside that shell. */
+:global(.kiel-legacy-admin) :global(#container_wr) .page .summary {
+  width: 1005px !important;
+  min-width: 1005px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  background: #f2f5f8 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .search {
+  width: 1005px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin: 10px 0 !important;
+  padding: 0 6px !important;
+  background: #fff !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .search select,
+:global(.kiel-legacy-admin) :global(#container_wr) .page .search input {
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .search button {
+  width: auto !important;
+  min-width: 42px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 8px !important;
+  border-radius: 0 !important;
+  background: #ff4081 !important;
+  color: #fff !important;
+  text-indent: 0 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .description {
+  width: 1005px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  margin: 0 0 10px !important;
+  padding: 10px 20px !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .fixedActions {
+  display: flex !important;
+  gap: 4.21875px !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .tableScroll {
+  width: 1005px !important;
+  margin: 0 0 10px !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .tableScroll table {
+  width: 1004px !important;
+  min-width: 1004px !important;
+  table-layout: fixed !important;
+  border-top: 1px solid #c7d2d9 !important;
+  border-left: 1px solid #c7d2d9 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .tableScroll table thead th {
+  height: 32px !important;
+  padding: 8px 5px !important;
+  border: 0 !important;
+  border-right: 1px solid #c7d2d9 !important;
+  border-bottom: 1px solid #c7d2d9 !important;
+  background: #e5eef3 !important;
+  color: #222 !important;
+  font-size: 0.92em !important;
+  font-weight: 700 !important;
+  line-height: normal !important;
+  white-space: nowrap !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .tableScroll table tbody td {
+  height: 61px !important;
+  padding: 5px !important;
+  border: 0 !important;
+  border-right: 1px solid #d9e0e5 !important;
+  border-bottom: 1px solid #d9e0e5 !important;
+  line-height: 20px !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .page .numberInput {
+  width: 50px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 4px !important;
+}

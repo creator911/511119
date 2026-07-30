@@ -1,0 +1,51 @@
+.form {
+  margin-bottom: 28px;
+}
+
+.form input {
+  width: min(620px, 95%);
+}
+
+.form textarea {
+  width: min(720px, 95%);
+  min-height: 120px;
+  padding: 7px;
+  resize: vertical;
+}
+
+.error,
+.runError {
+  display: block;
+  margin-top: 5px;
+  color: #b3323d;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid;
+}
+
+.success {
+  border-color: #b7d8c4;
+  background: #eff8f2;
+  color: #26754a;
+}
+
+.failed {
+  border-color: #ecc7ca;
+  background: #fff1f2;
+  color: #b3323d;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.empty {
+  padding: 35px !important;
+  color: #777;
+  text-align: center !important;
+}

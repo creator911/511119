@@ -1,0 +1,232 @@
+.stack {
+  display: grid;
+  gap: 14px;
+}
+
+.successMessage,
+.errorMessage {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #c9ead9;
+  background: #edf8f2;
+  color: #287f54;
+  font-size: 12px;
+}
+
+.errorMessage {
+  border-color: #efcece;
+  background: #fff2f2;
+  color: #a74444;
+}
+
+.emptyState {
+  min-height: 130px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  color: #7d8792;
+  font-size: 12px;
+}
+
+.tableScroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 940px;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e8ec;
+  color: #46515d;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  background: #f7f8fa;
+  color: #697581;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover td {
+  background: #fbfcfd;
+}
+
+.username {
+  color: #303a45;
+  font-size: 12px;
+}
+
+.permissionSummary {
+  min-width: 220px;
+  max-width: 360px;
+  color: #66717d;
+}
+
+.rowActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.immutableLabel {
+  display: block;
+  color: #7d8792;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.editorForm {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.fieldLabel {
+  color: #4c5865;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.field small,
+.permissionOption small {
+  color: #87919c;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.passwordGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.activeOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #4d5965;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.activeOption input,
+.permissionOption input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: #365f99;
+}
+
+.permissionFieldset {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #dce1e7;
+}
+
+.permissionFieldset legend {
+  padding: 0 6px;
+  color: #4c5865;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.permissionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.permissionOption {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e2e6eb;
+  background: #fafbfc;
+  color: #4d5965;
+  cursor: pointer;
+}
+
+.permissionOption span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.permissionOption strong {
+  font-size: 11px;
+}
+
+.editorActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+:global(html[data-admin-dark]) .successMessage {
+  border-color: #39765a;
+  background: #204634;
+  color: #9ee3c0;
+}
+
+:global(html[data-admin-dark]) .errorMessage {
+  border-color: #87494e;
+  background: #512c2f;
+  color: #f4a8ad;
+}
+
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .permissionOption {
+  border-color: var(--admin-border);
+  background: var(--admin-dark-surface-subtle);
+  color: var(--admin-dark-text);
+}
+
+:global(html[data-admin-dark]) .table td,
+:global(html[data-admin-dark]) .permissionFieldset {
+  border-color: var(--admin-border);
+  color: var(--admin-dark-text);
+}
+
+:global(html[data-admin-dark]) .table tbody tr:hover td {
+  background: var(--admin-dark-surface-hover);
+}
+
+:global(html[data-admin-dark]) .username,
+:global(html[data-admin-dark]) .fieldLabel,
+:global(html[data-admin-dark]) .permissionFieldset legend,
+:global(html[data-admin-dark]) .permissionOption strong {
+  color: var(--admin-dark-text-strong);
+}
+
+:global(html[data-admin-dark]) .field small,
+:global(html[data-admin-dark]) .permissionOption small,
+:global(html[data-admin-dark]) .permissionSummary,
+:global(html[data-admin-dark]) .immutableLabel,
+:global(html[data-admin-dark]) .emptyState {
+  color: var(--admin-dark-text-soft);
+}

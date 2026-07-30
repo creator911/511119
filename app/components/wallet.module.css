@@ -1,0 +1,279 @@
+.walletLayout {
+  width: min(100%, 920px);
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.header {
+  text-align: center;
+}
+
+.header > span {
+  color: #a17932;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.header h1 {
+  margin: 8px 0;
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.header p {
+  margin: 0;
+  color: #666;
+}
+
+.balanceCard {
+  padding: 22px 28px;
+  border: 1px solid #e5d6b8;
+  border-radius: 8px;
+  background: #fffaf1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.balanceCard span {
+  color: #6d604b;
+}
+
+.balanceCard strong {
+  color: #8b641f;
+  font-size: 24px;
+}
+
+.requestForm {
+  padding: 28px;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  background: #fff;
+  display: grid;
+  gap: 20px;
+}
+
+.requestForm label {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 18px;
+}
+
+.requestForm label > span {
+  font-weight: 700;
+}
+
+.requestForm input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.requestForm input:focus {
+  border-color: #9a712c;
+  outline: 2px solid rgb(154 113 44 / 15%);
+}
+
+.requestForm small {
+  grid-column: 2;
+  color: #777;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.actions a,
+.actions button,
+.requestLinks a {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.actions a {
+  color: #333;
+  background: #fff;
+}
+
+.actions button {
+  color: #fff;
+  background: #222;
+  cursor: pointer;
+}
+
+.actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.guide {
+  padding: 22px 26px;
+  border-radius: 8px;
+  background: #f6f6f6;
+}
+
+.guide strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.guide ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #666;
+  line-height: 1.8;
+}
+
+.requestLinks {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.requestLinks a {
+  color: #fff;
+  background: #333;
+}
+
+.requestList {
+  display: grid;
+  gap: 12px;
+}
+
+.requestList article {
+  position: relative;
+  padding: 22px;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.requestList article > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 90px;
+}
+
+.requestList article > div:first-child strong {
+  font-size: 20px;
+}
+
+.kind {
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: #76551c;
+  background: #f5e8ce;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.requestList dl {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.requestList dl div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.requestList dt {
+  color: #777;
+}
+
+.requestList dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status_requested {
+  color: #725a1e;
+  background: #fff0bd;
+}
+
+.status_approved {
+  color: #17623b;
+  background: #d9f3e5;
+}
+
+.status_rejected {
+  color: #8d2929;
+  background: #f8dddd;
+}
+
+.empty {
+  padding: 60px 20px;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  color: #777;
+  background: #fff;
+  text-align: center;
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #e8bcbc;
+  border-radius: 4px;
+  color: #962d2d;
+  background: #fff2f2;
+}
+
+@media (max-width: 640px) {
+  .balanceCard {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .requestForm {
+    padding: 20px;
+  }
+
+  .requestForm label {
+    grid-template-columns: 1fr;
+  }
+
+  .requestForm small {
+    grid-column: 1;
+  }
+
+  .actions,
+  .requestLinks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .requestList dl div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}

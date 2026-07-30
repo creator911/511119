@@ -1,0 +1,176 @@
+.stack {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  gap: 14px;
+}
+
+.layout {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.75fr);
+  align-items: start;
+  gap: 14px;
+}
+
+.layout > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.headerActions,
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.successNotice,
+.errorNotice {
+  padding: 11px 13px;
+  border: 1px solid;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.successNotice {
+  border-color: #b9d9c5;
+  color: #22613b;
+  background: #f0faf4;
+}
+
+.errorNotice {
+  border-color: #e3bcbc;
+  color: #9b3434;
+  background: #fff3f3;
+}
+
+.tableScroll {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e1e5ea;
+}
+
+.table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table th,
+.table td {
+  padding: 10px 11px;
+  border-bottom: 1px solid #e8ebef;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  color: #5f6975;
+  background: #f5f7f9;
+  font-size: 10px;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table td strong,
+.table td small {
+  display: block;
+}
+
+.table td small {
+  margin-top: 2px;
+  color: #8b949e;
+}
+
+.activeRow {
+  background: #fff8f6;
+}
+
+.form {
+  display: grid;
+  gap: 15px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field > span {
+  color: #59636f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.field > small {
+  color: #87919c;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.field .fieldError {
+  color: #a33c3c;
+}
+
+.formActions {
+  justify-content: space-between;
+  padding-top: 3px;
+}
+
+.deleteHelp {
+  margin: -5px 0 0;
+  color: #8a6570;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .headerActions {
+    width: 100%;
+  }
+}
+:global(html[data-admin-dark]) .tableScroll,
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .table td {
+  border-color: var(--admin-border);
+}
+
+:global(html[data-admin-dark]) .table th {
+  background: var(--admin-dark-surface-subtle);
+  color: var(--admin-dark-text);
+}
+
+:global(html[data-admin-dark]) .activeRow {
+  background: var(--admin-dark-surface-selected);
+}
+
+:global(html[data-admin-dark]) .field > span {
+  color: var(--admin-dark-text-soft);
+}
+
+:global(html[data-admin-dark]) .successNotice {
+  border-color: #39765a;
+  background: #204634;
+  color: #9ee3c0;
+}
+
+:global(html[data-admin-dark]) .errorNotice {
+  border-color: #87494e;
+  background: #512c2f;
+  color: #f4a8ad;
+}

@@ -1,0 +1,214 @@
+.page {
+  position: relative;
+  width: 1005px;
+  min-width: 1005px;
+}
+
+.page :global(.legacy-event-bulk-summary) {
+  width: 1005px;
+  height: 30px;
+  min-height: 30px;
+}
+
+.page :global(.legacy-event-bulk-summary .ov_listall) {
+  display: inline-block;
+  height: 30px;
+  margin-right: 5px;
+  color: #3f51b5;
+  line-height: 30px;
+  vertical-align: top;
+}
+
+.page :global(.legacy-event-bulk-event-search),
+.page :global(.legacy-event-bulk-product-search) {
+  display: flex;
+  align-items: center;
+  column-gap: 4.21875px;
+  width: 1005px;
+  height: 30px;
+}
+
+.page :global(.legacy-event-bulk-event-search select) {
+  width: 146px;
+  min-width: 146px;
+  max-width: 146px;
+  margin-right: 3px;
+}
+
+.page :global(.legacy-event-bulk-product-search select) {
+  margin-right: 3px;
+}
+
+.page :global(.legacy-event-bulk-product-search select:first-of-type) {
+  width: 124px;
+  min-width: 124px;
+  max-width: 124px;
+}
+
+.page :global(.legacy-event-bulk-product-search select:nth-of-type(2)) {
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+}
+
+:global(.kiel-legacy-admin #container_wr)
+  .page
+  :global(.legacy-event-bulk-product-search input.frm_input[type="text"]) {
+  width: 152px;
+  min-width: 152px;
+  max-width: 152px;
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  line-height: 22px !important;
+}
+
+.page :global(.legacy-event-bulk-intro),
+.page :global(.legacy-event-bulk-warning) {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 40px;
+  min-height: 40px;
+}
+
+.page :global(.legacy-event-bulk-table-wrap) {
+  position: relative;
+  width: 1005px;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.page :global(.legacy-event-bulk-table) {
+  clear: both;
+  width: 1005px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.page :global(.legacy-event-bulk-col-check) {
+  width: 70px;
+}
+
+.page :global(.legacy-event-bulk-col-code) {
+  width: 77.09375px;
+}
+
+.page :global(.legacy-event-bulk-col-name) {
+  width: 856.90625px;
+}
+
+.page :global(.legacy-event-bulk-table thead tr),
+.page :global(.legacy-event-bulk-table thead th) {
+  height: 32px;
+}
+
+.page :global(.legacy-event-bulk-table thead th) {
+  padding: 8px 5px;
+  border: 1px solid #60718b;
+  background: #6f809a;
+  color: #fff;
+  font-size: 0.92em;
+  font-weight: 400;
+  text-align: center;
+}
+
+.page :global(.legacy-event-bulk-table thead a),
+.page :global(.legacy-event-bulk-table thead a:link),
+.page :global(.legacy-event-bulk-table thead a:visited) {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.page :global(.legacy-event-bulk-table tbody tr) {
+  height: 61px;
+}
+
+.page :global(.legacy-event-bulk-table tbody td) {
+  height: 61px;
+  padding: 5px;
+  border: 1px solid #d6dce7;
+  line-height: 22px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.page :global(.legacy-event-bulk-table tbody .bg0) {
+  background: #fff;
+}
+
+.page :global(.legacy-event-bulk-table tbody .bg1) {
+  background: #eff3f9;
+}
+
+.page :global(.legacy-event-bulk-table .td_chk2) {
+  width: 70px;
+}
+
+.page :global(.legacy-event-bulk-table .td_num) {
+  text-align: center;
+}
+
+.page :global(.legacy-event-bulk-table .td_left) {
+  text-align: left;
+}
+
+.page :global(.legacy-event-bulk-table .td_left a) {
+  display: inline;
+}
+
+.page :global(.legacy-event-bulk-table img) {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.page :global(.legacy-event-bulk-table input[type="checkbox"]) {
+  width: 13px;
+  height: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.page :global(.legacy-event-bulk-warning strong),
+.page :global(.legacy-event-bulk-intro strong) {
+  color: #ff3061;
+}
+
+:global(.kiel-legacy-admin #container_wr)
+  .page
+  :global(.legacy-event-bulk-pagination) {
+  display: block !important;
+  width: 1005px;
+  margin: 0 0 20px !important;
+  padding: 20px 0 0 !important;
+  text-align: center;
+}
+
+.loading {
+  position: absolute;
+  z-index: 2;
+  top: 33px;
+  right: 0;
+  padding: 5px 8px;
+  background: rgb(63 81 181 / 90%);
+  color: #fff;
+}
+
+.status {
+  width: 1005px;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid #cde4d3;
+  background: #eef8f1;
+  color: #245d36;
+}
+
+.failed {
+  border-color: #f1c5c5;
+  background: #fff0f0;
+  color: #a12626;
+}

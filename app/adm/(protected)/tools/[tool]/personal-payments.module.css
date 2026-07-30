@@ -1,0 +1,104 @@
+.root {
+  display: block;
+  padding-bottom: 10px;
+}
+
+:global(.kiel-legacy-admin #container_wr):has(.root) {
+  min-height: 386px;
+}
+
+.listTable {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.listTable th:nth-child(1) {
+  width: 5.5%;
+}
+
+.listTable th:nth-child(2) {
+  width: 7.5%;
+}
+
+.listTable th:nth-child(3) {
+  width: 12.5%;
+}
+
+.listTable th:nth-child(4),
+.listTable th:nth-child(5),
+.listTable th:nth-child(6),
+.listTable th:nth-child(7) {
+  width: 12%;
+}
+
+.listTable th:nth-child(8) {
+  width: 10%;
+}
+
+.listTable th:nth-child(9) {
+  width: 7%;
+}
+
+.listTable th:nth-child(10) {
+  width: 9.5%;
+}
+
+.emptyCell {
+  height: 222px;
+}
+
+.titleButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #333;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pendingBadge {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: #ff3c82;
+  color: #fff;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.formLabelColumn {
+  width: 190px;
+}
+
+.textarea {
+  width: min(700px, 95%);
+  min-height: 110px;
+  padding: 7px;
+  border: 1px solid #d5d9e2;
+  resize: vertical;
+}
+
+.noticeMessage {
+  margin: 5px 0 0;
+  color: #6c7482;
+}
+
+.statusMessage {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid;
+}
+
+.statusSuccess {
+  border-color: #b7d8c4;
+  background: #eff8f2;
+  color: #26754a;
+}
+
+.statusError {
+  border-color: #ecc7ca;
+  background: #fff1f2;
+  color: #b3323d;
+}

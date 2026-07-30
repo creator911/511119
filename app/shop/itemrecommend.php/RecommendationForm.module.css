@@ -1,0 +1,217 @@
+.popup {
+  position: relative;
+  width: 100%;
+  padding: 15px;
+  background: #fff;
+  color: #4b4b4d;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+:global(html) {
+  overflow-y: scroll;
+}
+
+.title {
+  position: relative;
+  height: 60px;
+  margin: 0 0 20px;
+  padding: 15px 10px;
+  background: #353535;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 30px;
+}
+
+.titleClose {
+  position: absolute;
+  top: 19px;
+  right: 10px;
+  width: 19.5px;
+  height: 19.5px;
+  padding: 3.25px;
+  border: 0;
+  border-radius: 3.25px;
+  background: transparent
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e")
+    center/13px auto no-repeat;
+  cursor: pointer;
+  filter: invert(1) grayscale(100%) brightness(200%);
+  opacity: 0.5;
+}
+
+.titleClose:hover {
+  opacity: 0.75;
+}
+
+.titleClose:focus-visible,
+.sendButton:focus-visible,
+.closeButton:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid #5e78cf;
+  outline-offset: 1px;
+}
+
+.form {
+  margin: 0;
+  color: #4b4b4d;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.fieldGroup {
+  display: block;
+  margin: 0 0 10px;
+}
+
+.label {
+  display: inline-block;
+  margin-bottom: 5px;
+  padding: 3px 0 4.5px;
+  color: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 15px;
+}
+
+.requiredMark {
+  position: relative;
+  display: block;
+  margin: 0 0 15px;
+}
+
+.requiredMark::after {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 8px solid #cc2300;
+  border-left: 8px solid transparent;
+  content: "";
+  pointer-events: none;
+}
+
+.input,
+.textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #d5d5d5;
+  border-radius: 0;
+  background: #fff;
+  color: #4b4b4d;
+  font: inherit;
+  transition: border-color 0.2s;
+}
+
+.input {
+  height: 38px;
+  padding: 6px 12px;
+}
+
+.textarea {
+  padding: 6px 10px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.input:hover,
+.textarea:hover,
+.input:focus,
+.textarea:focus {
+  border-color: #5e78cf;
+}
+
+.messageField {
+  margin-bottom: 30px;
+}
+
+.unavailable {
+  padding: 72px 20px;
+  border: 1px solid #d5d5d5;
+  color: #555;
+  text-align: center;
+}
+
+.unavailable strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 17px;
+}
+
+.unavailable p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+}
+
+.actions {
+  display: block;
+  text-align: center;
+}
+
+.sendButton,
+.closeButton {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 7px 20px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.sendButton {
+  border-color: #e53935;
+  background: #e53935;
+}
+
+.sendButton:hover {
+  border-color: #ed5a57;
+  background: #ed5a57;
+}
+
+.closeButton {
+  border-color: #353535;
+  background: #353535;
+}
+
+.closeButton:hover {
+  border-color: #656565;
+  background: #656565;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .textarea,
+  .sendButton,
+  .closeButton {
+    transition: none;
+  }
+}
