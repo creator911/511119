@@ -592,7 +592,7 @@ function ActionTool({
       <div className="local_desc02 local_desc">
         <p>
           이 작업은 새로 구축한 사이트와 새 데이터베이스에만 적용되며 기존
-          KIEL 서버에는 연결하지 않습니다.
+          RIAN 서버에는 연결하지 않습니다.
         </p>
       </div>
       <div className={styles.actionBox}>
@@ -655,7 +655,7 @@ function InformationTool({
     definition.slug === "phpinfo"
       ? [
           ["실행 환경", "Cloudflare Workers / vinext"],
-          ["애플리케이션", "KIEL 독립 쇼핑몰"],
+          ["애플리케이션", "RIAN 독립 쇼핑몰"],
           ["문자 인코딩", "UTF-8"],
           ["데이터베이스", "Cloudflare D1"],
         ]
@@ -665,7 +665,7 @@ function InformationTool({
             ["기존 서버 연결", "없음"],
           ]
         : [
-            ["관리자 모드", "KIEL 통합 관리자"],
+            ["관리자 모드", "RIAN 통합 관리자"],
             ["기존 서버 연결", "없음"],
           ];
 

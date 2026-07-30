@@ -14,7 +14,7 @@ export async function getPriceComparisonSettings(): Promise<PriceComparisonSetti
     feedName:
       typeof settings.feedName === "string" && settings.feedName.trim()
         ? settings.feedName.trim().slice(0, 200)
-        : "KIEL 상품 피드",
+        : "RIAN 상품 피드",
     memo:
       typeof settings.memo === "string"
         ? settings.memo.trim().slice(0, 5_000)

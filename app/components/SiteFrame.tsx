@@ -14,10 +14,7 @@ import {
   getPublicCategorySnapshot,
 } from "@/lib/categories";
 import type { ManagedCategory } from "@/lib/category-contract";
-import {
-  getEffectiveSiteSettings,
-  listPublishedContentPages,
-} from "@/lib/site-content";
+import { getEffectiveSiteSettings } from "@/lib/site-content";
 import { getLegacyShopSettings } from "@/lib/legacy-shop-settings";
 import {
   getStorefrontMenuSettings,
@@ -34,14 +31,12 @@ export async function SiteFrame({
   await connection();
   const [
     companySettings,
-    footerPages,
     publicCategories,
     menuSettings,
     shopSettings,
   ] =
     await Promise.all([
       getEffectiveSiteSettings(),
-      listPublishedContentPages(),
       categorySnapshot
         ? Promise.resolve(getPublicCategorySnapshot(categorySnapshot))
         : getPublicCategories(),
@@ -62,7 +57,7 @@ export async function SiteFrame({
           shopSettings.values.mobile_logo_img,
           undefined,
         )}
-        brandName="키엘골드(KIEL-GOLD)"
+        brandName="골드리안(GOLDRIAN)"
         navigation={navigation}
         quickProductLinks={kielProductTypeLinks}
         searchAction="/shop/search.php"
@@ -95,14 +90,19 @@ export async function SiteFrame({
         }}
         logo="/legacy/logo.png"
         primaryLinks={[
-          ...footerPages.map((entry) => ({
-            label: entry.title,
-            href: `/page/?pid=${encodeURIComponent(entry.slug)}`,
-            important: entry.slug === "privacy",
-          })),
-          { label: "커뮤니티", href: "/bbs/board.php" },
-          { label: "1:1 문의", href: "/bbs/inquiry.php" },
-          { label: "FAQ", href: "/bbs/faq.php" },
+          {
+            label: "서비스이용약관",
+            href: "/bbs/content.php?co_id=provision",
+          },
+          {
+            label: "개인정보처리방침",
+            href: "/bbs/content.php?co_id=privacy",
+            important: true,
+          },
+          {
+            label: "이메일무단수집거부",
+            href: "/bbs/content.php?co_id=noemail",
+          },
         ]}
       />
       <FloatingControls />

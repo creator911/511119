@@ -49,15 +49,15 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "ko_KR",
-      siteName: "KIEL GOLD",
+      siteName: "GOLDRIAN",
       title: metaSettings.title,
       description: metaSettings.description,
       images: [
         {
           url: "/og.png",
-          width: 1200,
-          height: 630,
-          alt: "KIEL GOLD 키엘골드",
+          width: 1983,
+          height: 793,
+          alt: "GOLDRIAN 골드리안",
         },
       ],
     },

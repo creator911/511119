@@ -543,14 +543,8 @@ export function AdminShell({
           <h1>{brand}</h1>
           <div id="hd_top">
             <div id="logo">
-              <Link href="/adm" aria-label="KIEL GOLD 관리자 메인">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/adm-assets/img/logo.png"
-                  width="136"
-                  height="13"
-                  alt="KIEL GOLD"
-                />
+              <Link href="/adm" aria-label="GOLDRIAN 관리자 메인">
+                <span className="adminBrandLogo">GOLDRIAN</span>
               </Link>
             </div>
             <button
@@ -745,7 +739,7 @@ export function AdminShell({
           </div>
           <footer id="ft">
             {sidebarFooter ?? (
-              <p>Copyright © KIEL GOLD. All rights reserved.</p>
+              <p>Copyright © GOLDRIAN. All rights reserved.</p>
             )}
           </footer>
         </main>

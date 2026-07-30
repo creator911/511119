@@ -26,7 +26,7 @@ export default async function CouponZonePage() {
             <div>
               <h2>다운로드 쿠폰</h2>
               <p>
-                키엘골드(KIEL-GOLD) 회원이시라면 쿠폰 다운로드 후 바로
+                골드리안(GOLDRIAN) 회원이시라면 쿠폰 다운로드 후 바로
                 사용하실 수 있습니다.
               </p>
             </div>
@@ -39,7 +39,7 @@ export default async function CouponZonePage() {
             <div>
               <h2>포인트 쿠폰</h2>
               <p>
-                보유하신 키엘골드(KIEL-GOLD) 회원 포인트를 쿠폰으로
+                보유하신 골드리안(GOLDRIAN) 회원 포인트를 쿠폰으로
                 교환하실 수 있습니다.
               </p>
             </div>

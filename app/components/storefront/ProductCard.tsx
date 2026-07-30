@@ -92,7 +92,7 @@ export function ProductCard({
 
   function share(network: "facebook" | "twitter") {
     const pageUrl = new URL(product.href, window.location.origin).href;
-    const title = `${product.name} | 키엘골드(KIEL-GOLD)`;
+    const title = `${product.name} | 골드리안(GOLDRIAN)`;
     const shareUrl =
       network === "facebook"
         ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`

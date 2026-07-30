@@ -5,7 +5,7 @@ import {
 } from "@/lib/admin-tools";
 import { parseManagedMenuEntries } from "@/lib/admin-menu-settings";
 
-const DEFAULT_TITLE = "키엘골드 | KIEL GOLD";
+const DEFAULT_TITLE = "골드리안 | GOLDRIAN";
 const DEFAULT_DESCRIPTION = "순금 주얼리, 골드바, 웨딩 주얼리 전문 쇼핑몰";
 const DEFAULT_PRIMARY_COLOR = "#3949ab";
 

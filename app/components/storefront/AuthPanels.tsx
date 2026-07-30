@@ -23,7 +23,7 @@ export interface LoginPanelProps {
 }
 
 export function LoginPanel({
-  brandName = "키엘골드(KIEL-GOLD)",
+  brandName = "골드리안(GOLDRIAN)",
   registerHref = "/bbs/register.php",
   recoverHref = "/bbs/password_lost.php",
   homeHref = "/shop",
@@ -185,7 +185,7 @@ export function RegisterPanel({
       <div className={styles.container}>
         <header className={styles.formPageHeader}>
           <h1>회원가입</h1>
-          <p>키엘골드 회원이 되어 다양한 서비스를 이용해 보세요.</p>
+          <p>골드리안 회원이 되어 다양한 서비스를 이용해 보세요.</p>
         </header>
         <form
           ref={formRef}

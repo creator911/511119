@@ -292,7 +292,7 @@ export function adminOrderPrintFilename(
     criteria.printCase === "date"
       ? `${criteria.fromDate}-${criteria.toDate}`
       : `${safeFilenamePart(criteria.fromOrderId)}-${safeFilenamePart(criteria.toOrderId)}`;
-  return `kiel-orders-${range}.${criteria.format}`;
+  return `goldrian-orders-${range}.${criteria.format}`;
 }
 
 function orderPrintCells(row: AdminOrderRow): string[] {

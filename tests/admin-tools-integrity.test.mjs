@@ -166,7 +166,7 @@ test("theme, menu, and metadata saves are consumed by the storefront", async () 
     /listLegacyAdminToolRecords\("popup-layers"\)/,
   );
   assert.match(catalog, /defaultValue: "#3949ab"/);
-  assert.match(catalog, /defaultValue: "키엘골드 \| KIEL GOLD"/);
+  assert.match(catalog, /defaultValue: "골드리안 \| GOLDRIAN"/);
   assert.match(library, /validateStorefrontSettings\(slug, settings/);
   assert.match(layout, /getStorefrontMetaSettings\(\)/);
   assert.match(layout, /getStorefrontThemeSettings\(\)/);

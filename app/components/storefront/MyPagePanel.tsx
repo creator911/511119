@@ -71,7 +71,7 @@ const defaultMenuLinks = [
   },
   {
     label: "쇼핑 계속하기",
-    description: "키엘골드 전체 상품을 둘러봅니다.",
+    description: "골드리안 전체 상품을 둘러봅니다.",
     href: "/shop",
     icon: "◆",
   },

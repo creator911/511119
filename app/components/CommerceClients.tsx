@@ -1003,7 +1003,7 @@ export function CustomerRecoveryClient() {
         </p>
         <p>
           가입하신 이메일과 성함을 적어{" "}
-          <a href="mailto:Kiel-marke@naver.com">Kiel-marke@naver.com</a>으로
+          <a href="mailto:goldrian@naver.com">goldrian@naver.com</a>으로
           문의해 주세요. 본인 확인 후 안전하게 안내해 드립니다.
         </p>
       </div>

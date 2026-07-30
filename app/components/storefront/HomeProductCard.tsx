@@ -107,7 +107,7 @@ export function HomeProductCard({
 
   function share(network: "facebook" | "twitter") {
     const productUrl = new URL(product.href, window.location.origin).href;
-    const title = `${accessibleProductName} | 키엘골드(KIEL-GOLD)`;
+    const title = `${accessibleProductName} | 골드리안(GOLDRIAN)`;
     const shareUrl =
       network === "facebook"
         ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(

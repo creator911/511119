@@ -79,7 +79,7 @@ export async function GET(request: Request) {
       orders: (orders.results ?? []).map((order) => ({
         id: order.id,
         orderedAt: order.created_at,
-        label: "키엘골드 주문",
+        label: "골드리안 주문",
         amount: order.total,
         status: publicOrderStatusLabel(order.status),
         href: `/shop/orderinquiry.php?order_id=${encodeURIComponent(order.id)}`,

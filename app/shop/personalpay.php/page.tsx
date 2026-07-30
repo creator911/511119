@@ -88,7 +88,7 @@ export default async function PersonalPaymentPage({
                   href={`/shop/personalpay.php?token=${encodeURIComponent(payment.publicToken)}`}
                 >
                   <div className={styles.cardMark} aria-hidden="true">
-                    KIEL
+                    RIAN
                   </div>
                   <h2>{payment.title}</h2>
                   <p className={styles.cardPrice}>

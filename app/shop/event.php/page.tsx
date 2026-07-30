@@ -38,7 +38,7 @@ export default async function EventPage({
       <main className={styles.page} id="main-content">
         <div className={styles.listHeader}>
           <h2>진행 중인 이벤트</h2>
-          <p>키엘골드에서 준비한 새로운 소식과 혜택을 확인해 보세요.</p>
+          <p>골드리안에서 준비한 새로운 소식과 혜택을 확인해 보세요.</p>
         </div>
         {events.length > 0 ? (
           <div className={styles.grid}>

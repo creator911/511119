@@ -42,7 +42,7 @@ export default async function PublicBoardPage({
         <main id="main-content" className={styles.page}>
           <header className={styles.intro}>
             <h2>커뮤니티</h2>
-            <p>키엘골드의 새로운 소식과 안내를 확인하세요.</p>
+            <p>골드리안의 새로운 소식과 안내를 확인하세요.</p>
           </header>
           {boards.length ? (
             <div className={styles.boardGrid}>

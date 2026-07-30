@@ -39,7 +39,7 @@ export async function generateMetadata({
     description:
       product?.active && product.basic
         ? product.basic
-        : "키엘골드 상품정보",
+        : "골드리안 상품정보",
   };
 }
 

@@ -67,6 +67,7 @@ export interface ContentWriteOptions {
 }
 
 const SETTINGS_SEED_MARKER = "__content_defaults_seeded_v3";
+const GOLDRIAN_BUSINESS_MIGRATION_MARKER = "__goldrian_business_migrated_v1";
 const schemaInitializations = new WeakMap<object, Promise<void>>();
 const contentIdPattern = /^(?:page|faq)-[A-Za-z0-9][A-Za-z0-9._-]{0,89}$/u;
 const pageSlugPattern = /^[a-z0-9][a-z0-9-]{0,79}$/u;
@@ -130,6 +131,21 @@ export const defaultContentPages: ReadonlyArray<ContentEntry> = [
     sortOrder: 30,
     showInMenu: true,
     seoTitle: "서비스 이용약관",
+    seoDescription: "",
+    createdAt: "",
+    updatedAt: "",
+  },
+  {
+    id: "page-noemail",
+    entryType: "page",
+    slug: "noemail",
+    title: "이메일무단수집거부",
+    body: legacyPoliciesSource.noemail,
+    category: "policy",
+    status: "published",
+    sortOrder: 40,
+    showInMenu: true,
+    seoTitle: "이메일무단수집거부",
     seoDescription: "",
     createdAt: "",
     updatedAt: "",
@@ -206,56 +222,108 @@ async function initializeSchema(database: D1Database): Promise<void> {
     .prepare("SELECT value FROM site_settings WHERE key = ? LIMIT 1")
     .bind(SETTINGS_SEED_MARKER)
     .first<{ value: string }>();
-  if (marker) return;
+  if (!marker) {
+    const seedStatements = defaultContentPages.map((entry) =>
+      database
+        .prepare(`INSERT INTO content_entries(
+          id, entry_type, slug, title, body, category, status, sort_order,
+          show_in_menu, seo_title, seo_description
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          entry_type = excluded.entry_type,
+          slug = excluded.slug,
+          title = excluded.title,
+          body = excluded.body,
+          category = excluded.category,
+          status = excluded.status,
+          sort_order = excluded.sort_order,
+          show_in_menu = excluded.show_in_menu,
+          seo_title = excluded.seo_title,
+          seo_description = excluded.seo_description,
+          updated_at = CURRENT_TIMESTAMP`)
+        .bind(
+          entry.id,
+          entry.entryType,
+          entry.slug,
+          entry.title,
+          entry.body,
+          entry.category,
+          entry.status,
+          entry.sortOrder,
+          entry.showInMenu ? 1 : 0,
+          entry.seoTitle,
+          entry.seoDescription,
+        ),
+    );
+    seedStatements.push(
+      database
+        .prepare(
+          "INSERT OR REPLACE INTO site_settings(key, value, updated_at) VALUES (?, '1', CURRENT_TIMESTAMP)",
+        )
+        .bind(SETTINGS_SEED_MARKER),
+    );
+    await database.batch(seedStatements);
+  }
 
-  const seedStatements = defaultContentPages.map((entry) =>
-    database
-      .prepare(`INSERT INTO content_entries(
-        id, entry_type, slug, title, body, category, status, sort_order,
-        show_in_menu, seo_title, seo_description
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-        entry_type = excluded.entry_type,
-        slug = excluded.slug,
-        title = excluded.title,
-        body = excluded.body,
-        category = excluded.category,
-        status = excluded.status,
-        sort_order = excluded.sort_order,
-        show_in_menu = excluded.show_in_menu,
-        seo_title = excluded.seo_title,
-        seo_description = excluded.seo_description,
-        updated_at = CURRENT_TIMESTAMP`)
-      .bind(
-        entry.id,
-        entry.entryType,
-        entry.slug,
-        entry.title,
-        entry.body,
-        entry.category,
-        entry.status,
-        entry.sortOrder,
-        entry.showInMenu ? 1 : 0,
-        entry.seoTitle,
-        entry.seoDescription,
-      ),
+  const noEmailPage = defaultContentPages.find(
+    (entry) => entry.slug === "noemail",
   );
-  seedStatements.unshift(
-    database.prepare(
-      `DELETE FROM content_entries
-       WHERE id = 'page-noemail'
-         AND slug = 'noemail'
-         AND title = '이메일무단수집거부'`,
-    ),
-  );
-  seedStatements.push(
-    database
-      .prepare(
-        "INSERT OR REPLACE INTO site_settings(key, value, updated_at) VALUES (?, '1', CURRENT_TIMESTAMP)",
-      )
-      .bind(SETTINGS_SEED_MARKER),
-  );
-  await database.batch(seedStatements);
+  if (noEmailPage) {
+    await database.batch([
+      database
+        .prepare(`INSERT OR IGNORE INTO content_entries(
+          id, entry_type, slug, title, body, category, status, sort_order,
+          show_in_menu, seo_title, seo_description
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(
+          noEmailPage.id,
+          noEmailPage.entryType,
+          noEmailPage.slug,
+          noEmailPage.title,
+          noEmailPage.body,
+          noEmailPage.category,
+          noEmailPage.status,
+          noEmailPage.sortOrder,
+          noEmailPage.showInMenu ? 1 : 0,
+          noEmailPage.seoTitle,
+          noEmailPage.seoDescription,
+        ),
+    ]);
+  }
+
+  const businessMarker = await database
+    .prepare("SELECT value FROM site_settings WHERE key = ? LIMIT 1")
+    .bind(GOLDRIAN_BUSINESS_MIGRATION_MARKER)
+    .first<{ value: string }>();
+  if (!businessMarker) {
+    const businessKeys = [
+      "companyName",
+      "representative",
+      "businessNumber",
+      "mailOrderNumber",
+      "address",
+      "email",
+    ] as const;
+    const businessStatements = businessKeys.map((key) =>
+      database
+        .prepare(
+          `INSERT INTO site_settings(key, value, updated_at)
+           VALUES (?, ?, CURRENT_TIMESTAMP)
+           ON CONFLICT(key) DO UPDATE SET
+             value = excluded.value,
+             updated_at = CURRENT_TIMESTAMP`,
+        )
+        .bind(key, serializeSiteSetting(defaultSiteSettings[key])),
+    );
+    businessStatements.push(
+      database
+        .prepare(
+          "INSERT OR REPLACE INTO site_settings(key, value, updated_at) VALUES (?, '1', CURRENT_TIMESTAMP)",
+        )
+        .bind(GOLDRIAN_BUSINESS_MIGRATION_MARKER),
+    );
+    await database.batch(businessStatements);
+  }
 }
 
 export async function getEffectiveSiteSettings(

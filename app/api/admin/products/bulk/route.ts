@@ -26,7 +26,7 @@ export async function GET(request: Request): Promise<Response> {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition":
-          'attachment; filename="kiel-products.csv"',
+          'attachment; filename="goldrian-products.csv"',
         "Cache-Control": "no-store, max-age=0",
         "X-Content-Type-Options": "nosniff",
       },

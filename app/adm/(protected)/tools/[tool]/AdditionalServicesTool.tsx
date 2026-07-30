@@ -100,7 +100,7 @@ export function AdditionalServicesTool({
       <div className={`local_desc01 local_desc ${styles.notice}`}>
         <p>
           필요한 부가서비스를 선택하여 새 사이트의 해당 설정 화면에서
-          연결하세요. 기존 키엘골드 서버나 도메인으로 연결되지 않습니다.
+          연결하세요. 기존 골드리안 서버나 도메인으로 연결되지 않습니다.
         </p>
       </div>
 

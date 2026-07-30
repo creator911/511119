@@ -268,15 +268,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  max-width: 360px;
+  width: 350px;
+  height: 70px;
+  overflow: hidden;
+}
+
+.logoLink picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .logoLink img {
   display: block;
-  width: auto;
-  max-width: 100%;
-  height: 50px;
-  object-fit: contain;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  transform: translateY(-25%);
 }
 
 .mobileHeaderButtons {
@@ -3852,7 +3860,8 @@
   }
 
   :global(html[data-site-theme="kiel-mobile"]) .logoLink img {
-    height: 42px;
+    width: 100%;
+    height: auto;
   }
 
   :global(html[data-site-theme="kiel-mobile"]) .navWrap,
@@ -3942,11 +3951,13 @@
   }
 
   .logoLink {
-    max-width: calc(100% - 110px);
+    width: min(260px, calc(100% - 110px));
+    height: 52px;
   }
 
   .logoLink img {
-    height: 40px;
+    width: 100%;
+    height: auto;
   }
 
   .mobileHeaderButtons {
@@ -4524,7 +4535,8 @@
   }
 
   .logoLink img {
-    height: 40px;
+    width: 100%;
+    height: auto;
   }
 
   .searchOverlay {

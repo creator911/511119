@@ -103,7 +103,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               id: banner.id,
               image: banner.image as LocalAssetPath,
               mobileImage: banner.mobileImage as LocalAssetPath,
-              alt: "키엘골드 컬렉션",
+              alt: "골드리안 컬렉션",
               href: banner.href,
             }))}
           />

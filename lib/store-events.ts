@@ -308,7 +308,7 @@ async function ensureSourceEventSeed(): Promise<void> {
       await listLegacyAdminToolRecords("events", 1);
       const database = commerceDb();
       const details = JSON.stringify({
-        content: "키엘골드 1주년 무료나눔 이벤트",
+        content: "골드리안 1주년 무료나눔 이벤트",
         href: "/shop",
         startsAt: "",
         endsAt: "",

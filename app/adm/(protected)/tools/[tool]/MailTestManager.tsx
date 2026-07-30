@@ -26,7 +26,7 @@ export function MailTestManager({
 }) {
   const [runs, setRuns] = useState(initialState.runs);
   const [recipient, setRecipient] = useState("");
-  const [subject, setSubject] = useState("KIEL GOLD 테스트 메일");
+  const [subject, setSubject] = useState("GOLDRIAN 테스트 메일");
   const [body, setBody] = useState(
     "관리자 메일 공급자 연결을 확인하기 위한 테스트 메일입니다.",
   );

@@ -321,7 +321,7 @@ export function CouponAdminManager({
                       onClick={() =>
                         change(
                           "code",
-                          `KIEL-${crypto.randomUUID().replace(/-/gu, "").slice(0, 10).toUpperCase()}`,
+                          `RIAN-${crypto.randomUUID().replace(/-/gu, "").slice(0, 10).toUpperCase()}`,
                         )
                       }
                     >

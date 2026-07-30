@@ -123,7 +123,7 @@ export const legacyConfigSections: readonly LegacyConfigSection[] = [
     tabLabel: "기본환경",
     title: "홈페이지 기본환경 설정",
     rows: [
-      { id: "cf_title", label: "홈페이지 제목", height: 45.921875, controls: [input("cf_title", 272, "키엘골드(KIEL-GOLD)", { required: true, maxLength: 120, siteField: "companyName" })] },
+      { id: "cf_title", label: "홈페이지 제목", height: 45.921875, controls: [input("cf_title", 272, "골드리안(GOLDRIAN)", { required: true, maxLength: 120, siteField: "companyName" })] },
       { id: "cf_admin", label: "최고관리자", height: 56, controls: [select("cf_admin", 70, "admin", [{ value: "admin", label: "admin" }], { required: true })] },
       { id: "cf_admin_email", label: "관리자 메일 주소", height: 121.921875, controls: [input("cf_admin_email", 272, "", { kind: "email", required: true, maxLength: 200, siteField: "email", help: "관리자 메일 주소는 새 서버의 안전한 주소를 사용합니다." })] },
       { id: "cf_admin_email_name", label: "관리자 메일 발송이름", height: 72.921875, controls: [input("cf_admin_email_name", 272, "", { required: true, maxLength: 80, siteField: "representative" })] },

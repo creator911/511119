@@ -204,9 +204,21 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin #logo a {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 136px;
   height: 20px;
+}
+
+.kiel-legacy-admin #logo .adminBrandLogo {
+  display: block;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  line-height: 20px;
+  white-space: nowrap;
 }
 
 .kiel-legacy-admin #logo img {

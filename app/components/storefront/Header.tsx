@@ -74,7 +74,7 @@ export interface StorefrontHeaderProps {
 export function StorefrontHeader({
   logo,
   mobileLogo,
-  brandName = "키엘골드(KIEL-GOLD)",
+  brandName = "골드리안(GOLDRIAN)",
   homeHref = "/shop",
   navigation,
   quickProductLinks = [],
@@ -364,7 +364,7 @@ export function StorefrontHeader({
                 </button>
               </div>
             ) : (
-              <span className={styles.topHeaderWelcome}>KIEL GOLD JEWELRY</span>
+              <span className={styles.topHeaderWelcome}>GOLDRIAN JEWELRY</span>
             )}
             <nav className={styles.utilityNav} aria-label="회원 메뉴">
               {adminSession.status === "admin" ? (

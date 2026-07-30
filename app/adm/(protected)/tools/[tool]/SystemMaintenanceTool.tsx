@@ -331,7 +331,7 @@ function runtimeInformationTables(
       rows: systemRows,
     },
     {
-      title: "KIEL Safe Runtime Report",
+      title: "RIAN Safe Runtime Report",
       kind: "compactTable",
       rows: [
         [
@@ -363,8 +363,8 @@ function runtimeInformationSections(
     {
       title: "General",
       rows: [
-        ["애플리케이션", "KIEL GOLD 독립 쇼핑몰"],
-        ["관리 화면", "KIEL 통합 관리자"],
+        ["애플리케이션", "GOLDRIAN 독립 쇼핑몰"],
+        ["관리 화면", "RIAN 통합 관리자"],
         ["실행 환경", "Cloudflare Workers 호환 런타임"],
         ["프레임워크", "vinext / React Server Components"],
         ["언어", "TypeScript / JavaScript"],

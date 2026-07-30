@@ -224,7 +224,7 @@ export async function ensureM3CronSchema(
         'sample',
         '요청 제한·로그 정리',
         'completed',
-        '기존 KIEL m3cron 실행 기록을 이어받았습니다.',
+        '기존 RIAN m3cron 실행 기록을 이어받았습니다.',
         0, 0, '36.48.137.187', 'admin', '2023-03-28 22:56:58'
       )`),
       database.prepare(`INSERT OR IGNORE INTO m3cron_runs (
@@ -236,7 +236,7 @@ export async function ensureM3CronSchema(
         'gr_sample/sample',
         '방문통계 보관기한 정리',
         'completed',
-        '기존 KIEL m3cron 실행 기록을 이어받았습니다.',
+        '기존 RIAN m3cron 실행 기록을 이어받았습니다.',
         0, 0, '222.162.79.55', 'admin', '2023-03-28 22:56:49'
       )`),
       ...jobSeeds.map((seed) =>
@@ -288,7 +288,7 @@ export async function ensureM3CronSchema(
             seed.description,
             seed.sortOrder,
             seed.legacyLastRunAt,
-            "기존 KIEL m3cron 실행 기록을 이어받았습니다.",
+            "기존 RIAN m3cron 실행 기록을 이어받았습니다.",
           ),
       ),
     ];

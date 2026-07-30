@@ -209,7 +209,7 @@ const definitions = [
         label: "사이트 제목",
         type: "text",
         required: true,
-        defaultValue: "키엘골드 | KIEL GOLD",
+        defaultValue: "골드리안 | GOLDRIAN",
       },
       {
         key: "description",
@@ -380,7 +380,7 @@ const definitions = [
         key: "feedName",
         label: "피드 이름",
         type: "text",
-        defaultValue: "KIEL 상품 피드",
+        defaultValue: "RIAN 상품 피드",
       },
       {
         key: "memo",

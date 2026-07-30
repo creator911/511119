@@ -95,7 +95,7 @@ export function ProductBulkManager({
       const href = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = href;
-      anchor.download = "kiel-products.csv";
+      anchor.download = "goldrian-products.csv";
       anchor.click();
       URL.revokeObjectURL(href);
     } catch (cause) {
