@@ -51,6 +51,9 @@ export default defineConfig(async () => {
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
+    preview: {
+      allowedHosts: ["goldrian.co.kr", "www.goldrian.co.kr"],
+    },
     plugins: [
       vinext(),
       cloudflare({
