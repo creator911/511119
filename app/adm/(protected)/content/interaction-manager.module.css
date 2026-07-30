@@ -1,0 +1,330 @@
+.manager {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  gap: 16px;
+}
+
+.classicManager {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.summary {
+  height: 30px;
+  min-height: 30px;
+  margin: 10px 0 !important;
+  padding: 0 !important;
+}
+
+.messageSuccess,
+.messageError {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #b8ddc8;
+  background: #f2fbf6;
+  color: #257348;
+  font-size: 13px;
+}
+
+.listControls {
+  display: grid;
+  grid-template-columns: minmax(180px, 360px) auto auto minmax(0, 1fr);
+  align-items: end;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #e1e5e9;
+  background: #fff;
+}
+
+.classicManager .listControls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  gap: 4.21875px;
+}
+
+.classicManager .listControls select:first-of-type {
+  width: 124px;
+  margin-right: 3px;
+}
+
+.classicManager .listControls select:nth-of-type(2) {
+  width: 70px;
+  margin-right: 3px;
+}
+
+.classicManager .listControls > input[type="text"] {
+  width: 152px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0 5px;
+  line-height: 22px;
+}
+
+.classicManager .listControls > input[type="submit"] {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+}
+
+.listControls > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.listControls > input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #cfd5db;
+  color: #424a57;
+  font: inherit;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.pagination span {
+  color: #6f7984;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.messageError {
+  border-color: #efc4c0;
+  background: #fff6f5;
+  color: #b42318;
+}
+
+.empty {
+  margin: 0;
+  padding: 42px 16px;
+  color: #7b8492;
+  text-align: center;
+}
+
+.tableWrap {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tableForm {
+  width: 100%;
+  margin: 0;
+}
+
+.classicManager .tableWrap {
+  margin: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr) .classicManager .table thead input[type="checkbox"] {
+  position: relative;
+  top: -2.171875px;
+}
+
+.classicManager .table {
+  table-layout: fixed;
+}
+
+.table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th,
+.table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #e6e9ee;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  background: #f7f8fa;
+  color: #596273;
+  font-weight: 600;
+}
+
+.table a {
+  color: #315c9f;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.editor {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #dfe3e8;
+  background: #fff;
+}
+
+.originalText {
+  margin: 0;
+  color: #424a57;
+  white-space: pre-wrap;
+}
+
+.answerInput {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.editorActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .listControls {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .pagination {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-content-page) .summary .ov_listall {
+  display: inline-block;
+  height: 30px;
+  padding: 0 7px;
+  border-radius: 5px;
+  background: #565e8c;
+  color: #fff;
+  font-size: 0.92em;
+  line-height: 30px;
+  vertical-align: top;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-content-page > nav) {
+  display: none !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .listControls {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  gap: 4.21875px;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .listControls select:first-of-type {
+  width: 124px !important;
+  margin-right: 3px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .listControls select:nth-of-type(2) {
+  width: 70px !important;
+  margin-right: 3px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .listControls > input[type="text"] {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin: 0 !important;
+  padding: 0 5px !important;
+  line-height: 22px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .listControls > input[type="submit"] {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .table thead tr,
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .table thead th {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 30px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .table td.empty {
+  height: 223px !important;
+  padding: 0 !important;
+  vertical-align: middle;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-content-page) .classicManager .tableForm > .tableWrap {
+  margin: 0 !important;
+}
+
+:global(html[data-admin-dark]) .listControls,
+:global(html[data-admin-dark]) .listControls > input,
+:global(html[data-admin-dark]) .editor {
+  border-color: var(--admin-border);
+  background: var(--admin-dark-surface);
+  color: var(--admin-dark-text);
+}
+
+:global(html[data-admin-dark]) .pagination span,
+:global(html[data-admin-dark]) .empty,
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .originalText {
+  color: var(--admin-dark-text-soft);
+}
+
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .table td {
+  border-color: var(--admin-border);
+}
+
+:global(html[data-admin-dark]) .table th {
+  background: var(--admin-dark-surface-subtle);
+}
+
+:global(html[data-admin-dark]) .table a {
+  color: #9ec5ff;
+}
+
+:global(html[data-admin-dark]) .messageSuccess {
+  border-color: #39765a;
+  background: #204634;
+  color: #9ee3c0;
+}
+
+:global(html[data-admin-dark]) .messageError {
+  border-color: #87494e;
+  background: #512c2f;
+  color: #f4a8ad;
+}
