@@ -1,0 +1,193 @@
+.page {
+  width: 1005px;
+  min-width: 1005px;
+}
+
+.fixedAction {
+  right: 10px !important;
+}
+
+:global(.kiel-legacy-admin) .fixedAction .addCtl {
+  box-sizing: border-box;
+  width: 98.484375px !important;
+  min-width: 98.484375px !important;
+  padding: 0 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .summary {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 30px;
+  min-height: 30px;
+  margin: 10px 0 !important;
+  padding: 0 !important;
+  line-height: 30px;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .tableWrap {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+  max-width: 1005px !important;
+  height: 256px;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible;
+  border: 0 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table {
+  box-sizing: border-box;
+  clear: both;
+  width: 1004px !important;
+  min-width: 1004px !important;
+  max-width: 1004px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table thead tr,
+:global(.kiel-legacy-admin) :global(#container_wr) .table thead th {
+  box-sizing: border-box;
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 0 3px !important;
+  line-height: 31px !important;
+  white-space: nowrap;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table tbody td {
+  box-sizing: border-box;
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 5px 3px !important;
+  color: #000;
+  line-height: 21px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table tbody .emptyCell {
+  height: 222px !important;
+  min-height: 222px !important;
+  padding: 0 !important;
+  color: #777;
+  line-height: 222px !important;
+}
+
+.colNumber,
+.colTitle {
+  width: 75.140625px;
+}
+
+.colDevice,
+.colStart,
+.colEnd {
+  width: 125.28125px;
+}
+
+.colHours {
+  width: 75.140625px;
+}
+
+.colLeft {
+  width: 67.515625px;
+}
+
+.colTop {
+  width: 65.671875px;
+}
+
+.colWidth {
+  width: 93.3125px;
+}
+
+.colHeight {
+  width: 100.984375px;
+}
+
+.colManage {
+  width: 75.25px;
+}
+
+.titleCell {
+  overflow: hidden;
+  text-align: left !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.manageCell {
+  white-space: nowrap;
+}
+
+.manageCell button {
+  height: 23px;
+  margin: 0 1px;
+  padding: 0 3px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  font-size: 11px;
+  line-height: 21px;
+  cursor: pointer;
+}
+
+.form {
+  width: 1005px;
+  margin-top: 30px;
+}
+
+.form h2 {
+  margin: 0 0 10px;
+  font-size: 1.2em;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .formTableWrap {
+  width: 1005px !important;
+  margin: 0 !important;
+  overflow: visible;
+}
+
+.formTableWrap table {
+  table-layout: fixed;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .formTableWrap th {
+  box-sizing: border-box;
+  width: 120px;
+  padding: 8px 10px !important;
+  text-align: left;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .formTableWrap td {
+  box-sizing: border-box;
+  padding: 8px 10px !important;
+}
+
+.wideInput {
+  width: min(660px, 95%);
+}
+
+.numberInput {
+  width: 75px;
+  margin-right: 10px;
+}
+
+.contentInput {
+  box-sizing: border-box;
+  width: 98%;
+  min-height: 150px;
+  padding: 8px;
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
+}

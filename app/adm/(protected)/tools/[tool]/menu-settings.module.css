@@ -1,0 +1,142 @@
+.page {
+  width: 1005px;
+  min-width: 1005px;
+}
+
+.fixedActions {
+  right: 10px !important;
+  display: flex;
+  gap: 4.21875px;
+}
+
+:global(.kiel-legacy-admin) .fixedActions .addButton {
+  box-sizing: border-box;
+  width: 72.328125px !important;
+  min-width: 72.328125px !important;
+  padding: 0 !important;
+}
+
+:global(.kiel-legacy-admin) .fixedActions .saveButton {
+  box-sizing: border-box;
+  width: 46.171875px !important;
+  min-width: 46.171875px !important;
+  padding: 0 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .notice {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 40px;
+  min-height: 40px;
+  margin: 10px 0 !important;
+  padding: 10px 20px !important;
+  border: 1px solid #f2f2f2 !important;
+  background: #eaeaea !important;
+  line-height: 18px;
+}
+
+.notice p {
+  margin: 0;
+  line-height: 18px;
+}
+
+.addButton::before {
+  margin-right: 4px;
+  content: "\f055";
+  font-family: "Font Awesome 5 Free", "FontAwesome", sans-serif;
+  font-weight: 900;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .tableWrap {
+  box-sizing: border-box;
+  width: 1005px !important;
+  min-width: 1005px !important;
+  max-width: 1005px !important;
+  height: 256px;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible;
+  border: 0 !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table {
+  box-sizing: border-box;
+  clear: both;
+  width: 1004px !important;
+  min-width: 1004px !important;
+  max-width: 1004px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table thead tr,
+:global(.kiel-legacy-admin) :global(#container_wr) .table thead th {
+  box-sizing: border-box;
+  height: 31px !important;
+  min-height: 31px !important;
+  padding: 0 5px !important;
+  line-height: 31px !important;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table tbody td {
+  box-sizing: border-box;
+  height: 35px !important;
+  min-height: 35px !important;
+  padding: 5px !important;
+  color: #000;
+  line-height: 21px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .table tbody .emptyCell {
+  height: 222px !important;
+  min-height: 222px !important;
+  padding: 0 !important;
+  color: #777;
+  line-height: 222px !important;
+}
+
+.colMenu,
+.colLink,
+.colWindow,
+.colOrder {
+  width: 119.484375px;
+}
+
+.colPc {
+  width: 167.5px;
+}
+
+.colMobile {
+  width: 239.03125px;
+}
+
+.colManage {
+  width: 119.53125px;
+}
+
+.textCell,
+.linkCell {
+  overflow: hidden;
+  text-align: left !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.manageCell {
+  white-space: nowrap;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .manageCell button {
+  height: 25px !important;
+  min-height: 25px !important;
+  margin: 0 1px;
+  padding: 0 6px !important;
+  border-radius: 0 !important;
+  font-size: 12px !important;
+  line-height: 25px !important;
+}

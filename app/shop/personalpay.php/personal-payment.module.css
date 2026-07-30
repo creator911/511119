@@ -1,0 +1,282 @@
+.page {
+  width: min(1170px, calc(100% - 30px));
+  min-height: 300px;
+  margin: 0 auto;
+  padding: 55px 0 95px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.card {
+  border: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.card a {
+  display: block;
+  padding: 10px;
+  color: #333;
+  text-decoration: none;
+}
+
+.cardMark {
+  display: grid;
+  min-height: 180px;
+  margin-bottom: 15px;
+  place-items: center;
+  background: linear-gradient(145deg, #f8f8f8, #ececec);
+  color: #b69a63;
+  font-family: Georgia, serif;
+  font-size: 30px;
+  letter-spacing: 0.16em;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  overflow: hidden;
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardPrice {
+  margin: 0 0 10px;
+  color: #cc2300;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.card span {
+  color: #777;
+  font-size: 13px;
+}
+
+.empty {
+  display: grid;
+  min-height: 230px;
+  place-items: center;
+  align-content: center;
+  color: #929292;
+  text-align: center;
+}
+
+.empty > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 8px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  place-items: center;
+  font-weight: 700;
+}
+
+.empty p {
+  margin: 0 0 12px;
+}
+
+.empty a,
+.backLink {
+  color: #555;
+  text-decoration: underline;
+}
+
+.detailCard {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.detailCard > header {
+  padding: 30px;
+  border-bottom: 1px solid #ececec;
+  text-align: center;
+}
+
+.detailCard > header span {
+  color: #999;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+
+.detailCard h2 {
+  margin: 8px 0 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.priceRows {
+  margin: 0;
+  padding: 22px 30px;
+}
+
+.priceRows > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.priceRows dt,
+.priceRows dd {
+  margin: 0;
+}
+
+.priceRows dd {
+  font-weight: 600;
+}
+
+.priceRows .outstanding {
+  margin: 7px 0;
+  padding: 15px 0;
+  border-top: 1px solid #ececec;
+  border-bottom: 1px solid #ececec;
+}
+
+.priceRows .outstanding dd {
+  color: #cc2300;
+  font-size: 20px;
+}
+
+.description {
+  margin: 0 30px 20px;
+  padding: 18px;
+  background: #f7f7f7;
+  color: #666;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.noticeForm,
+.providerNotice {
+  margin: 0 30px 25px;
+  padding: 22px;
+  border: 1px solid #e5e5e5;
+}
+
+.noticeForm h3,
+.providerNotice strong {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.noticeForm > p,
+.providerNotice p {
+  margin: 0 0 16px;
+  color: #777;
+  line-height: 1.55;
+}
+
+.noticeForm label {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+  color: #555;
+  font-size: 13px;
+}
+
+.noticeForm input,
+.noticeForm textarea {
+  width: 100%;
+  padding: 10px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 0;
+  font: inherit;
+}
+
+.noticeForm textarea {
+  resize: vertical;
+}
+
+.noticeForm button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border: 0;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+.noticeForm button:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.noticeForm .successMessage,
+.noticeForm .errorMessage {
+  margin: 14px 0 0;
+  padding: 10px;
+}
+
+.successMessage {
+  background: #eff8f2;
+  color: #26754a !important;
+}
+
+.errorMessage {
+  background: #fff1f2;
+  color: #b3323d !important;
+}
+
+.backLink {
+  display: block;
+  margin: 0 30px 30px;
+  text-align: center;
+}
+
+@media (max-width: 1199px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .page {
+    width: calc(100% - 20px);
+    padding-top: 35px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (max-width: 767px) {
+  .page {
+    width: calc(100% - 12px);
+  }
+
+  .grid {
+    gap: 4px;
+  }
+
+  .card a {
+    padding: 5px 2px;
+  }
+
+  .cardMark {
+    min-height: 130px;
+  }
+
+  .detailCard > header,
+  .priceRows {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .description,
+  .noticeForm,
+  .providerNotice {
+    margin-right: 18px;
+    margin-left: 18px;
+  }
+}

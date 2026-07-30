@@ -1,0 +1,183 @@
+.page {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 492.59375px;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .notice {
+  box-sizing: border-box;
+  width: 1005px;
+  height: 41.59375px;
+  min-height: 41.59375px;
+  margin: 10px 0 !important;
+  padding: 10px 20px !important;
+}
+
+.notice p {
+  margin: 0;
+  line-height: 20px;
+}
+
+.grid {
+  display: grid;
+  box-sizing: border-box;
+  width: 965px;
+  height: 431px;
+  grid-template-columns: 310px 310px 319px;
+  grid-template-rows: 323px 108px;
+  column-gap: 13px;
+  row-gap: 0;
+}
+
+.card {
+  position: relative;
+  box-sizing: border-box;
+  padding: 22px 20px;
+  border: 1px solid #d6dce7;
+  background: #fff;
+}
+
+.paymentCard {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.identityCard {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.card h2 {
+  margin: 0 0 14px;
+  color: #3f51b5;
+  font-size: 16px;
+}
+
+.card p {
+  margin: 0;
+  color: #555;
+  line-height: 1.8;
+}
+
+.card strong {
+  display: block;
+  margin-top: 16px;
+  color: #777;
+  font-size: 12px;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .card a {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  height: 27px !important;
+  min-height: 27px !important;
+  border-radius: 0 !important;
+  font-size: 12px !important;
+  line-height: 27px !important;
+}
+
+.smsCard {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 965px;
+  height: 108px;
+  padding: 15px 20px 0;
+}
+
+.smsCard h2 {
+  margin-bottom: 6px;
+}
+
+.smsCard p {
+  max-width: 650px;
+  line-height: 20px;
+}
+
+.smsCard strong {
+  margin-top: 4px;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .smsCard a {
+  right: 18px;
+  bottom: 15px;
+}
+
+.manageCtl {
+  position: absolute;
+  right: 108px;
+  bottom: 15px;
+  box-sizing: border-box;
+  height: 27px;
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  color: #333;
+  font-size: 12px;
+  line-height: 25px;
+  cursor: pointer;
+}
+
+.success,
+.error {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+}
+
+.dialogOverlay {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: grid;
+  background: rgb(0 0 0 / 45%);
+  place-items: center;
+}
+
+:global(.kiel-legacy-admin) :global(#container_wr) .operation {
+  position: relative !important;
+  inset: auto !important;
+  box-sizing: border-box !important;
+  width: 620px !important;
+  padding: 20px !important;
+  border: 1px solid #333 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 30%) !important;
+}
+
+.operation h2 {
+  margin: 0 0 18px;
+  font-size: 16px;
+}
+
+.useChoice {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.memoLabel {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: start;
+}
+
+.memoLabel textarea {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100px;
+  min-height: 100px;
+  padding: 7px;
+  resize: vertical;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 15px;
+}

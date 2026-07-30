@@ -1,0 +1,636 @@
+.manager {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  gap: 14px;
+}
+
+.message {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #c9ead9;
+  background: #edf8f2;
+  color: #287f54;
+  font-size: 12px;
+}
+
+.messageError {
+  border-color: #efcece;
+  background: #fff2f2;
+  color: #a74444;
+}
+
+.listControls {
+  display: grid;
+  grid-template-columns: minmax(180px, 360px) auto auto minmax(0, 1fr);
+  align-items: end;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #e1e5e9;
+  background: #fff;
+}
+
+.listControls > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.listControls > input {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid #cfd5db;
+  color: #424c57;
+  font: inherit;
+}
+
+.listPagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.listPagination span {
+  color: #6f7984;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.tableWrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  color: #3d4651;
+  font-size: 11px;
+}
+
+.table th,
+.table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5e8ec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  background: #f7f8fa;
+  color: #65707c;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tableInput,
+.tableSelect {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  line-height: 25px !important;
+}
+
+.leftCell {
+  text-align: left !important;
+}
+
+.inputCell {
+  min-width: 90px;
+}
+
+.numberCell {
+  width: 60px;
+  text-align: center !important;
+}
+
+.smallNumberCell {
+  width: 40px;
+  text-align: center !important;
+}
+
+.manageCell {
+  width: 70px;
+  text-align: center !important;
+}
+
+.smallManageCell {
+  width: 60px;
+  text-align: center !important;
+}
+
+.mediumManageCell {
+  width: 100px;
+  text-align: center !important;
+}
+
+.groupDescription {
+  order: 4;
+}
+
+.groupListForm {
+  order: 3;
+  width: 100%;
+  margin: 0;
+}
+
+.boardListForm {
+  order: 3;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 20px;
+}
+
+.boardFooterSpacer {
+  width: 100%;
+  height: 10px;
+}
+
+.titleCell {
+  min-width: 180px;
+}
+
+.summary {
+  max-width: 360px;
+  overflow: hidden;
+  color: #77818c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowActions,
+.formActions,
+.inlineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.field {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.field > label,
+.fieldLabel {
+  color: #58636f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.fieldHelp {
+  margin: 0;
+  color: #8a939d;
+  font-size: 10px;
+}
+
+.bodyInput {
+  min-height: 180px;
+  line-height: 1.6;
+}
+
+.answerInput {
+  min-height: 130px;
+  line-height: 1.6;
+}
+
+.empty {
+  margin: 0;
+  padding: 32px 12px;
+  color: #8b949e;
+  font-size: 12px;
+  text-align: center;
+}
+
+.inquiryGrid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  gap: 14px;
+}
+
+.inquiryList {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.inquiryButton {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 10px 11px;
+  border: 1px solid #dce0e5;
+  background: #fff;
+  color: #424c57;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.inquiryButton:hover,
+.inquiryButtonActive {
+  border-color: #8fa1b5;
+  background: #f6f8fa;
+}
+
+.inquiryMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  color: #89929c;
+  font-size: 10px;
+}
+
+.detailBlock {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #e3e6ea;
+  background: #fafbfc;
+  color: #4b5560;
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.categoryEditor {
+  min-height: 110px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .inquiryGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .listControls {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .listPagination {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+
+  .formGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .table {
+    min-width: 680px;
+  }
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager),
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager) {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > .legacy-group-summary) {
+  order: 1;
+  display: flex !important;
+  align-items: center;
+  height: 30px;
+  min-height: 30px;
+  margin: 10px 0 !important;
+  padding: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="listControls"]) {
+  order: 2;
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  gap: 4.21875px;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="listControls"] select) {
+  width: 82px !important;
+  height: 30px !important;
+  margin-right: 3px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="listControls"] input) {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 0 !important;
+  line-height: 22px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="listControls"] > button) {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  overflow: hidden;
+  padding: 0 !important;
+  border: 1px solid #dcdcdc !important;
+  border-radius: 0 !important;
+  background: #eee url("/adm-assets/img/sch_btn.png") no-repeat 50% 50% !important;
+  color: transparent !important;
+  text-indent: -9999px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="listControls"] [class*="listPagination"]) {
+  display: none !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="tableWrap"]) {
+  order: 3;
+  margin: 0 0 10px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager) .groupListForm > .tableWrap {
+  margin: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager) .boardListForm > .tableWrap {
+  margin: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager > [class*="panel"]) {
+  order: 5;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager .ov_listall) {
+  display: inline-block;
+  height: 30px;
+  padding: 0 7px;
+  border-radius: 5px;
+  background: #565e8c;
+  color: #fff;
+  font-size: 0.92em;
+  line-height: 30px;
+  vertical-align: top;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager table th:first-child),
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager table td:first-child),
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager table th:first-child),
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager table td:first-child) {
+  width: 30px;
+  text-align: center !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager table tbody td),
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager table tbody td) {
+  vertical-align: middle;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager table tbody tr),
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager table tbody td),
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager table tbody tr),
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager table tbody td) {
+  height: 39px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager table tbody td),
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager table tbody td) {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager table),
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager table) {
+  table-layout: fixed;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager > [class*="listControls"]) {
+  width: 100%;
+  gap: 4.21875px;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager > [class*="listControls"] select) {
+  width: 58px !important;
+  margin-right: 3px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager > [class*="listControls"] input) {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 0 !important;
+  line-height: 22px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager > [class*="listControls"] input) {
+  width: 152px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-right: 0 !important;
+  line-height: 22px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager) .tableInput,
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager) .tableSelect,
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager) .tableInput,
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager) .tableSelect {
+  box-sizing: border-box;
+  height: 27px !important;
+  min-height: 27px !important;
+  line-height: 25px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager) .inputCell .tableInput {
+  width: 100% !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-group-manager table thead input[type="checkbox"]),
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager table thead input[type="checkbox"]) {
+  position: relative;
+  top: 4.828125px;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-group-manager) .smallManageCell > :global(.btn) {
+  width: 38.5625px;
+  min-width: 38.5625px;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  line-height: 26px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-board-manager) .mediumManageCell {
+  white-space: nowrap;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager) .mediumManageCell :global(.btn) {
+  width: 38.5625px;
+  min-width: 38.5625px;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 !important;
+  font-size: 1em !important;
+  line-height: 26px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager) .mediumManageCell > :global(.btn:first-child) {
+  position: relative;
+  left: -0.328125px;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-board-manager) .mediumManageCell > :global(.btn:last-child) {
+  position: relative;
+  left: 0.328125px;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="listControls"]) {
+  order: 1;
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  height: 24px;
+  margin: 10px 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  gap: 4.21875px;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-post-manager > [class*="listControls"] select),
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-post-manager > [class*="listControls"] input) {
+  height: 24px !important;
+  min-height: 24px !important;
+  margin: 0 !important;
+  padding: 0 5px !important;
+  line-height: 22px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="listControls"] select:nth-of-type(1)) {
+  width: 82px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="listControls"] select:nth-of-type(2)) {
+  width: 65px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="listControls"] select:nth-of-type(3)) {
+  width: 82px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr#container_wr .legacy-post-manager > [class*="listControls"] input[type="submit"]) {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 5px !important;
+  border: 1px solid #dcdcdc !important;
+  border-radius: 0 !important;
+  background: #eee !important;
+  color: #000 !important;
+  text-indent: 0 !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="listControls"] [class*="listPagination"]) {
+  display: none !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="tableWrap"]) {
+  order: 2;
+  margin: 0 0 10px !important;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager > [class*="panel"]) {
+  order: 3;
+}
+
+:global(.kiel-legacy-admin #container_wr .legacy-post-manager-empty)::after {
+  order: 2;
+  display: block;
+  height: 134px;
+  content: "";
+}
+
+:global(html[data-admin-dark]) .listControls,
+:global(html[data-admin-dark]) .listControls > input,
+:global(html[data-admin-dark]) .inquiryButton {
+  border-color: var(--admin-border);
+  background: var(--admin-dark-surface);
+  color: var(--admin-dark-text);
+}
+
+:global(html[data-admin-dark]) .listPagination span,
+:global(html[data-admin-dark]) .table,
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .summary,
+:global(html[data-admin-dark]) .field > label,
+:global(html[data-admin-dark]) .fieldLabel,
+:global(html[data-admin-dark]) .detailBlock {
+  color: var(--admin-dark-text-soft);
+}
+
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .table td {
+  border-color: var(--admin-border);
+}
+
+:global(html[data-admin-dark]) .table th,
+:global(html[data-admin-dark]) .detailBlock {
+  background: var(--admin-dark-surface-subtle);
+}
+
+:global(html[data-admin-dark]) .detailBlock {
+  border-color: var(--admin-border);
+}
+
+:global(html[data-admin-dark]) .inquiryButton:hover,
+:global(html[data-admin-dark]) .inquiryButtonActive {
+  border-color: #687584;
+  background: var(--admin-dark-surface-hover);
+  color: var(--admin-dark-text-strong);
+}
+
+:global(html[data-admin-dark]) .message {
+  border-color: #39765a;
+  background: #204634;
+  color: #9ee3c0;
+}
+
+:global(html[data-admin-dark]) .messageError {
+  border-color: #87494e;
+  background: #512c2f;
+  color: #f4a8ad;
+}
