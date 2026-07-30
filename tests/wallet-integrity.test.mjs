@@ -146,6 +146,10 @@ test("member management exposes editable wallet history down to seconds", async 
     css,
     /div\[role="presentation"\]:has\(\.legacy-member-wallet-editor\) \{[\s\S]*?z-index: 1100/,
   );
+  assert.match(
+    css,
+    /section\[role="dialog"\]:has\(\.legacy-member-wallet-editor\) > header \{[\s\S]*?display: flex !important/,
+  );
 });
 
 test("SQLite guards roll back duplicate and insufficient balance approvals", () => {
