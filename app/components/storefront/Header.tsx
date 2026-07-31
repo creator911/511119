@@ -18,8 +18,6 @@ const defaultExtraLinks: HeaderUtilityLink[] = [
   { label: "장바구니", href: "/shop/cart.php", icon: "cart" },
   { label: "위시리스트", href: "/shop/wishlist.php", icon: "heart" },
   { label: "주문/배송조회", href: "/shop/orderinquiry.php", icon: "order" },
-  { label: "커뮤니티", href: "/bbs/board.php", icon: "order" },
-  { label: "1:1 문의", href: "/bbs/inquiry.php", icon: "user" },
   { label: "충전신청", href: "/bbs/writecz.php", icon: "wallet" },
   { label: "출금신청", href: "/bbs/cashtx.php", icon: "wallet" },
   { label: "출금내역", href: "/bbs/withdrawal_list.php", icon: "wallet" },
@@ -321,16 +319,6 @@ export function StorefrontHeader({
     }
   }
 
-  function extraLinkLabel(link: HeaderUtilityLink) {
-    if (link.href === "/shop/cart.php") {
-      return `${link.label} (${cartCount})`;
-    }
-    if (link.href === "/shop/wishlist.php") {
-      return `${link.label} (${wishCount})`;
-    }
-    return link.label;
-  }
-
   function toggleMobileItem(id: string) {
     setExpandedMobileItems((current) => {
       const next = new Set(current);
@@ -425,7 +413,7 @@ export function StorefrontHeader({
                 <div className={styles.extraMenuList}>
                   {extraLinks.map((link) => (
                     <a href={link.href} key={`${link.label}-${link.href}`}>
-                      {extraLinkLabel(link)}
+                      {link.label}
                     </a>
                   ))}
                 </div>
@@ -563,9 +551,6 @@ export function StorefrontHeader({
               </button>
             </div>
             <div className={styles.drawerMemberArea}>
-              <a className={styles.drawerCommunityButton} href="/bbs/board.php">
-                커뮤니티 <span aria-hidden="true">▣</span>
-              </a>
               <div className={styles.drawerMemberGrid}>
                 <a href="/shop/cart.php">
                   장바구니 {cartCount > 0 ? `(${cartCount})` : ""}
