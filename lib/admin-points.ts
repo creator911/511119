@@ -777,7 +777,7 @@ function recalculateAdminPointBalancesStatement(
     .bind(currentPoints, userId, userId);
 }
 
-function pointBalanceTimelineSql(): string {
+export function pointBalanceTimelineSql(): string {
   return `
     SELECT sort_key, user_id, delta, occurred_at
     FROM (

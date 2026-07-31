@@ -5666,7 +5666,24 @@
   }
 
   .myPagePointTable {
-    min-width: 560px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .myPagePointTable > div {
+    grid-template-columns:
+      minmax(100px, 1.3fr)
+      minmax(55px, 0.8fr)
+      minmax(70px, 1fr)
+      minmax(70px, 1fr);
+    font-size: 9px;
+  }
+
+  .myPagePointTable > div > * {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .myPageDialog > div {

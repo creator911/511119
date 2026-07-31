@@ -453,8 +453,8 @@ export async function editAdminWalletRequest(
         .prepare(
           `INSERT INTO wallet_ledger (
              id, request_type, request_id, user_id, delta, balance_after,
-             admin_username
-           ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+             admin_username, created_at
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .bind(
           crypto.randomUUID(),
@@ -464,6 +464,7 @@ export async function editAdminWalletRequest(
           nextEffect,
           nextPoints,
           adminUsername.slice(0, 128),
+          edit.createdAt,
         ),
     );
   }

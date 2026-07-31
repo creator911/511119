@@ -68,6 +68,8 @@ test("protects wallet mutations and records a single atomic balance change", asy
   assert.match(service, /balanceAdjustment/);
   assert.match(service, /expectedUpdatedAt/);
   assert.match(service, /wallet\.request\.edit/);
+  assert.match(service, /admin_username, created_at/);
+  assert.match(service, /edit\.createdAt/);
   assert.match(service, /database\.batch/);
   assert.match(schema, /walletRequestRateLimits/);
   assert.match(schema, /walletProcessingGuards/);

@@ -16,7 +16,10 @@ import {
   getCustomerSession,
   verifyCustomerPassword,
 } from "@/lib/customer-auth";
-import { ensureAdminPointSchema } from "@/lib/admin-points";
+import {
+  ensureAdminPointSchema,
+  pointBalanceTimelineSql,
+} from "@/lib/admin-points";
 import {
   HttpBoundaryError,
   isJsonObject,
@@ -46,6 +49,7 @@ export async function GET(request: Request) {
   try {
     await ensureAdminPointSchema();
     const database = commerceDb();
+    const pointTimeline = pointBalanceTimelineSql();
     const [currentUser, orders, couponCount, pointHistory] = await Promise.all([
       database
         .prepare(
@@ -79,10 +83,51 @@ export async function GET(request: Request) {
       countAvailableCustomerCoupons(session.userId),
       database
         .prepare(
-          `SELECT id, delta, balance_after, reason, created_at
-           FROM admin_point_ledger
-           WHERE user_id = ? AND deleted_at IS NULL
-           ORDER BY created_at DESC, id DESC
+          `WITH point_timeline AS (${pointTimeline}),
+           visible_history AS (
+             SELECT
+               '6:admin:' || entry.id AS sort_key,
+               'admin:' || entry.id AS id,
+               entry.user_id,
+               entry.delta,
+               entry.reason,
+               entry.created_at
+             FROM admin_point_ledger entry
+             WHERE entry.deleted_at IS NULL
+             UNION ALL
+             SELECT
+               '5:wallet:' || ledger.id AS sort_key,
+               'wallet:' || ledger.id AS id,
+               ledger.user_id,
+               ledger.delta,
+               CASE ledger.request_type
+                 WHEN 'charge' THEN '충전 승인'
+                 ELSE '출금 승인'
+               END AS reason,
+               ledger.created_at
+             FROM wallet_ledger ledger
+           )
+           SELECT
+             history.id,
+             history.delta,
+             user.points - COALESCE((
+               SELECT SUM(later.delta)
+               FROM point_timeline later
+               WHERE later.user_id = history.user_id
+                 AND (
+                   later.occurred_at > history.created_at
+                   OR (
+                     later.occurred_at = history.created_at
+                     AND later.sort_key > history.sort_key
+                   )
+                 )
+             ), 0) AS balance_after,
+             history.reason,
+             history.created_at
+           FROM visible_history history
+           JOIN users user ON user.id = history.user_id
+           WHERE history.user_id = ?
+           ORDER BY history.created_at DESC, history.sort_key DESC
            LIMIT 50`,
         )
         .bind(session.userId)

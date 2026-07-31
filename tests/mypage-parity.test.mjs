@@ -115,6 +115,11 @@ test("mypage APIs return complete member, wishlist, and memo data without weaken
     assert.match(client, new RegExp(field));
   }
   assert.match(session, /ensureAdminPointSchema/);
+  assert.match(session, /pointBalanceTimelineSql/);
+  assert.match(session, /FROM wallet_ledger ledger/);
+  assert.match(session, /WHEN 'charge' THEN '충전 승인'/);
+  assert.match(session, /ELSE '출금 승인'/);
+  assert.match(session, /history\.created_at DESC/);
   assert.match(session, /deleted_at IS NULL/);
   assert.doesNotMatch(session, /expires_at|expiresAt/u);
   assert.doesNotMatch(client, /expiresAt/u);
