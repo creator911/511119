@@ -33,6 +33,11 @@ test("admin point mutations are authenticated, same-origin, guarded, and auditab
   assert.match(service, /'point\.create'/);
   assert.match(service, /'point\.update'/);
   assert.match(service, /'point\.delete'/);
+  assert.match(service, /recalculateAdminPointBalancesStatement/);
+  assert.match(service, /function pointBalanceTimelineSql/);
+  assert.match(service, /FROM wallet_ledger wallet/);
+  assert.match(service, /FROM order_point_debits debit/);
+  assert.match(service, /revision = revision \+ 1/);
   assert.match(service, /deleted_at IS NULL/);
   assert.match(service, /balanceAfter = balanceBefore \+ values\.delta/);
   assert.match(service, /after = before - \(deltaByUser\.get\(userId\)/);
@@ -142,7 +147,7 @@ test("editing an issued point entry updates history, later balances, and allows 
          id, user_id, delta, balance_before, balance_after, reason, created_at
        ) VALUES
          ('p1', 'u1', 1000000, 0, 1000000, '기존 지급', '2026-07-30 12:00:00'),
-         ('p2', 'u1', 500000, 1000000, 1500000, '후속 지급', '2026-07-30 13:00:00')`,
+         ('p2', 'u1', -999800, 1000000, 200, '후속 차감', '2026-07-30 13:00:00')`,
     )
     .run();
 
@@ -187,10 +192,79 @@ test("editing an issued point entry updates history, later balances, and allows 
     },
     {
       balance_before: 500000,
-      balance_after: 1000000,
+      balance_after: -499800,
       revision: 2,
     },
   );
+  database.close();
+});
+
+test("moving an issued point into the past keeps it visible and recalculates chronological balances", () => {
+  const database = createPointDatabase();
+  database
+    .prepare(
+      "INSERT INTO users (id, login_id, points) VALUES ('u1', 'member1', 12000000)",
+    )
+    .run();
+  database
+    .prepare(
+      `INSERT INTO wallet_ledger (
+         id, user_id, delta, created_at
+       ) VALUES ('wallet-1', 'u1', 1000000, '2026-07-31 06:01:05')`,
+    )
+    .run();
+  database
+    .prepare(
+      `INSERT INTO admin_point_ledger (
+         id, user_id, delta, balance_before, balance_after, reason, created_at
+       ) VALUES
+         ('p1', 'u1', 1000000, 11000000, 12000000, '과거로 이동', '2026-07-31 06:20:23'),
+         ('p2', 'u1', 10000000, 1000000, 11000000, '후속 지급', '2026-07-31 06:15:55')`,
+    )
+    .run();
+
+  updatePoint(database, {
+    id: "p1",
+    revision: 1,
+    expectedPoints: 12000000,
+    oldDelta: 1000000,
+    newDelta: 1000000,
+    reason: "과거로 이동",
+    occurredAt: "2026-05-29 06:20:23",
+  });
+
+  assert.deepEqual(
+    {
+      ...database
+        .prepare(
+          `SELECT balance_before, balance_after, revision, created_at
+           FROM admin_point_ledger WHERE id = 'p1'`,
+        )
+        .get(),
+    },
+    {
+      balance_before: 0,
+      balance_after: 1000000,
+      revision: 2,
+      created_at: "2026-05-29 06:20:23",
+    },
+  );
+  assert.deepEqual(
+    {
+      ...database
+        .prepare(
+          `SELECT balance_before, balance_after, revision
+           FROM admin_point_ledger WHERE id = 'p2'`,
+        )
+        .get(),
+    },
+    {
+      balance_before: 2000000,
+      balance_after: 12000000,
+      revision: 2,
+    },
+  );
+  assert.equal(readPoints(database, "u1"), 12000000);
   database.close();
 });
 
@@ -473,6 +547,12 @@ function createPointDatabase() {
       target_id TEXT NOT NULL,
       guard_value INTEGER NOT NULL CHECK(guard_value = 1)
     );
+    CREATE TABLE wallet_ledger (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      delta INTEGER NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
   return database;
 }
@@ -608,44 +688,16 @@ function updatePoint(
          VALUES (?, 'u1', CASE WHEN changes() = 1 THEN 1 ELSE 0 END)`,
       )
       .run(`update-user:${id}`);
-    const current = database
-      .prepare(
-        `SELECT balance_before, created_at
-         FROM admin_point_ledger WHERE id = ?`,
-      )
-      .get(id);
     database
       .prepare(
         `UPDATE admin_point_ledger
-         SET balance_before = balance_before + ?,
-             balance_after = balance_after + ?,
-             revision = revision + 1
-         WHERE user_id = 'u1'
-           AND id <> ?
-           AND deleted_at IS NULL
-           AND (
-             created_at > ?
-             OR (created_at = ? AND id > ?)
-           )`,
-      )
-      .run(
-        difference,
-        difference,
-        id,
-        current.created_at,
-        current.created_at,
-        id,
-      );
-    database
-      .prepare(
-        `UPDATE admin_point_ledger
-         SET delta = ?, balance_after = ?, reason = ?, expires_at = NULL,
-             created_at = ?, revision = revision + 1
+         SET delta = ?, balance_before = 0, balance_after = ?,
+             reason = ?, expires_at = NULL, created_at = ?
          WHERE id = ? AND revision = ? AND deleted_at IS NULL`,
       )
       .run(
         newDelta,
-        current.balance_before + newDelta,
+        newDelta,
         reason,
         occurredAt,
         id,
@@ -657,6 +709,58 @@ function updatePoint(
          VALUES (?, ?, CASE WHEN changes() = 1 THEN 1 ELSE 0 END)`,
       )
       .run(`update-entry:${id}`, id);
+    database
+      .prepare(
+        `WITH point_timeline AS (
+           SELECT
+             '5:wallet:' || wallet.id AS sort_key,
+             wallet.user_id,
+             wallet.delta,
+             wallet.created_at AS occurred_at
+           FROM wallet_ledger wallet
+           UNION ALL
+           SELECT
+             '6:admin:' || entry.id AS sort_key,
+             entry.user_id,
+             entry.delta,
+             entry.created_at AS occurred_at
+           FROM admin_point_ledger entry
+           WHERE entry.deleted_at IS NULL
+         ),
+         point_snapshots AS (
+           SELECT
+             entry.id,
+             ? - COALESCE(SUM(event.delta), 0) AS balance_after
+           FROM admin_point_ledger entry
+           LEFT JOIN point_timeline event
+             ON event.user_id = entry.user_id
+            AND (
+              event.occurred_at > entry.created_at
+              OR (
+                event.occurred_at = entry.created_at
+                AND event.sort_key > '6:admin:' || entry.id
+              )
+            )
+           WHERE entry.user_id = 'u1'
+             AND entry.deleted_at IS NULL
+           GROUP BY entry.id
+         )
+         UPDATE admin_point_ledger
+         SET balance_after = (
+               SELECT balance_after
+               FROM point_snapshots
+               WHERE id = admin_point_ledger.id
+             ),
+             balance_before = (
+               SELECT balance_after
+               FROM point_snapshots
+               WHERE id = admin_point_ledger.id
+             ) - delta,
+             revision = revision + 1
+         WHERE user_id = 'u1'
+           AND deleted_at IS NULL`,
+      )
+      .run(expectedPoints + difference);
     database
       .prepare(
         "DELETE FROM admin_point_write_guards WHERE operation_id IN (?, ?)",

@@ -255,15 +255,10 @@ export async function updateAdminPointEntry(
   const difference = values.delta - oldDelta;
   const memberPointsBefore = Number(user.points);
   const memberPointsAfter = memberPointsBefore + difference;
-  const balanceBefore = Number(row.balance_before);
-  const balanceAfter = balanceBefore + values.delta;
   if (
     !Number.isSafeInteger(memberPointsAfter) ||
     memberPointsAfter < -MAX_POINTS ||
-    memberPointsAfter > MAX_POINTS ||
-    !Number.isSafeInteger(balanceAfter) ||
-    balanceAfter < -MAX_POINTS ||
-    balanceAfter > MAX_POINTS
+    memberPointsAfter > MAX_POINTS
   ) {
     throw new AdminApiError(
       409,
@@ -289,48 +284,23 @@ export async function updateAdminPointEntry(
     const userGuardId = `${operationId}:user`;
     guardIds.push(userGuardId);
     statements.push(pointGuardStatement(database, userGuardId, user.id));
-    statements.push(
-      database
-        .prepare(
-          `UPDATE admin_point_ledger
-           SET balance_before = balance_before + ?,
-               balance_after = balance_after + ?,
-               revision = revision + 1
-           WHERE user_id = ?
-             AND id <> ?
-             AND deleted_at IS NULL
-             AND (
-               created_at > ?
-               OR (created_at = ? AND id > ?)
-             )`,
-        )
-        .bind(
-          difference,
-          difference,
-          user.id,
-          row.id,
-          row.created_at,
-          row.created_at,
-          row.id,
-        ),
-    );
   }
   statements.push(
     database
       .prepare(
         `UPDATE admin_point_ledger
          SET delta = ?,
+             balance_before = 0,
              balance_after = ?,
              reason = ?,
              expires_at = NULL,
              created_at = ?,
-             revision = revision + 1,
              admin_username = ?
          WHERE id = ? AND revision = ? AND deleted_at IS NULL`,
       )
       .bind(
         values.delta,
-        balanceAfter,
+        values.delta,
         values.reason,
         values.occurredAt,
         normalizedAdmin,
@@ -341,6 +311,13 @@ export async function updateAdminPointEntry(
   const entryGuardId = `${operationId}:entry`;
   guardIds.push(entryGuardId);
   statements.push(pointGuardStatement(database, entryGuardId, row.id));
+  statements.push(
+    recalculateAdminPointBalancesStatement(
+      database,
+      user.id,
+      memberPointsAfter,
+    ),
+  );
   statements.push(
     database
       .prepare(
@@ -389,6 +366,27 @@ export async function updateAdminPointEntry(
     throw error;
   }
 
+  const updatedRow = await database
+    .prepare(
+      `SELECT balance_before, balance_after, revision, created_at
+       FROM admin_point_ledger
+       WHERE id = ? AND deleted_at IS NULL
+       LIMIT 1`,
+    )
+    .bind(row.id)
+    .first<{
+      balance_before: number;
+      balance_after: number;
+      revision: number;
+      created_at: string;
+    }>();
+  if (!updatedRow) {
+    throw new AdminApiError(
+      409,
+      "수정한 포인트 내역을 다시 확인할 수 없습니다. 목록을 새로고침해 주세요.",
+    );
+  }
+
   return {
     entry: {
       id: row.id,
@@ -396,11 +394,11 @@ export async function updateAdminPointEntry(
       loginId: user.login_id,
       name: user.name,
       delta: values.delta,
-      balanceBefore,
-      balanceAfter,
+      balanceBefore: Number(updatedRow.balance_before),
+      balanceAfter: Number(updatedRow.balance_after),
       reason: values.reason,
-      revision: values.revision + 1,
-      createdAt: values.occurredAt,
+      revision: Number(updatedRow.revision),
+      createdAt: updatedRow.created_at,
     },
     memberPoints: memberPointsAfter,
   };
@@ -732,6 +730,136 @@ function parseDeleteInput(input: unknown): {
     return { id, revision };
   });
   return { entries: normalized, reason };
+}
+
+function recalculateAdminPointBalancesStatement(
+  database: D1Database,
+  userId: string,
+  currentPoints: number,
+): D1PreparedStatement {
+  const timeline = pointBalanceTimelineSql();
+  return database
+    .prepare(
+      `WITH point_timeline AS (${timeline}),
+       point_snapshots AS (
+         SELECT
+           entry.id,
+           ? - COALESCE(SUM(event.delta), 0) AS balance_after
+         FROM admin_point_ledger entry
+         LEFT JOIN point_timeline event
+           ON event.user_id = entry.user_id
+          AND (
+            event.occurred_at > entry.created_at
+            OR (
+              event.occurred_at = entry.created_at
+              AND event.sort_key > '6:admin:' || entry.id
+            )
+          )
+         WHERE entry.user_id = ?
+           AND entry.deleted_at IS NULL
+         GROUP BY entry.id
+       )
+       UPDATE admin_point_ledger
+       SET balance_after = (
+             SELECT snapshot.balance_after
+             FROM point_snapshots snapshot
+             WHERE snapshot.id = admin_point_ledger.id
+           ),
+           balance_before = (
+             SELECT snapshot.balance_after
+             FROM point_snapshots snapshot
+             WHERE snapshot.id = admin_point_ledger.id
+           ) - delta,
+           revision = revision + 1
+       WHERE user_id = ?
+         AND deleted_at IS NULL`,
+    )
+    .bind(currentPoints, userId, userId);
+}
+
+function pointBalanceTimelineSql(): string {
+  return `
+    SELECT sort_key, user_id, delta, occurred_at
+    FROM (
+      SELECT
+        '1:order-debit:' || debit.order_id AS sort_key,
+        debit.user_id,
+        -debit.points_used AS delta,
+        debit.created_at AS occurred_at
+      FROM order_point_debits debit
+      UNION ALL
+      SELECT
+        '2:order-restore:' || adjustment.order_id AS sort_key,
+        debit.user_id,
+        debit.points_used AS delta,
+        adjustment.created_at AS occurred_at
+      FROM order_inventory_adjustments adjustment
+      JOIN order_point_debits debit ON debit.order_id = adjustment.order_id
+      WHERE adjustment.adjustment_type = 'points_restore'
+      UNION ALL
+      SELECT
+        '3:order-credit:' || adjustment.order_id AS sort_key,
+        credit.user_id,
+        credit.points_earned AS delta,
+        adjustment.created_at AS occurred_at
+      FROM order_inventory_adjustments adjustment
+      JOIN order_point_credits credit ON credit.order_id = adjustment.order_id
+      WHERE adjustment.adjustment_type = 'points_credit'
+      UNION ALL
+      SELECT
+        '4:order-reversal:' || reversal.order_id AS sort_key,
+        reversal.user_id,
+        -reversal.points_reversed AS delta,
+        reversal.created_at AS occurred_at
+      FROM order_point_reversals reversal
+    ) order_events
+    UNION ALL
+    SELECT sort_key, user_id, delta, occurred_at
+    FROM (
+      SELECT
+        '5:wallet:' || wallet.id AS sort_key,
+        wallet.user_id,
+        wallet.delta,
+        wallet.created_at AS occurred_at
+      FROM wallet_ledger wallet
+      UNION ALL
+      SELECT
+        '6:admin:' || entry.id AS sort_key,
+        entry.user_id,
+        entry.delta,
+        entry.created_at AS occurred_at
+      FROM admin_point_ledger entry
+      WHERE entry.deleted_at IS NULL
+      UNION ALL
+      SELECT
+        '7:member:' || adjustment.id AS sort_key,
+        adjustment.user_id,
+        adjustment.after_points - adjustment.before_points AS delta,
+        adjustment.created_at AS occurred_at
+      FROM (
+        SELECT
+          id,
+          entity_id AS user_id,
+          created_at,
+          CASE
+            WHEN json_valid(details) = 1
+            THEN CAST(json_extract(details, '$.before.points') AS INTEGER)
+            ELSE NULL
+          END AS before_points,
+          CASE
+            WHEN json_valid(details) = 1
+            THEN CAST(json_extract(details, '$.after.points') AS INTEGER)
+            ELSE NULL
+          END AS after_points
+        FROM admin_audit_logs
+        WHERE action = 'member.update'
+          AND entity_type = 'member'
+      ) adjustment
+      WHERE adjustment.before_points IS NOT NULL
+        AND adjustment.after_points IS NOT NULL
+        AND adjustment.after_points <> adjustment.before_points
+    ) account_events
+  `;
 }
 
 function pointGuardStatement(
