@@ -4,6 +4,7 @@ import {
 } from "@/lib/auth-rate";
 import {
   authenticateAdminCredentials,
+  clearAdminSessionCookie,
   createAdminSessionCookie,
   getPrimaryAdminUsername,
 } from "@/lib/auth";
@@ -223,6 +224,10 @@ export async function POST(request: Request) {
           adminIdentity,
         ),
       );
+      response.headers.append(
+        "set-cookie",
+        clearCustomerSessionCookie(request),
+      );
       await clearAuthRateLimit(request, "customer-login", database);
       return response;
     }
@@ -288,6 +293,7 @@ export async function POST(request: Request) {
         remember: payload.remember === true,
       }, { remember: payload.remember === true }),
     );
+    expireAdminSessionCookies(response);
     await clearAuthRateLimit(request, "customer-login", database);
     return response;
   } catch (error) {
@@ -334,7 +340,13 @@ export async function DELETE(request: Request) {
     { status: invalidated ? 200 : 503 },
   );
   response.headers.set("set-cookie", clearCustomerSessionCookie(request));
+  expireAdminSessionCookies(response);
   return response;
+}
+
+function expireAdminSessionCookies(response: Response) {
+  response.headers.append("set-cookie", clearAdminSessionCookie(true));
+  response.headers.append("set-cookie", clearAdminSessionCookie(false));
 }
 
 async function waitForMinimumResponseTime(startedAt: number) {

@@ -57,6 +57,7 @@ type SessionPayload = LegacySessionPayload | CurrentSessionPayload;
 
 const SESSION_COOKIE_NAME = "__Host-admin_session";
 const DEVELOPMENT_SESSION_COOKIE_NAME = "admin_session";
+const CUSTOMER_SESSION_COOKIE_NAME = "kg_customer";
 const SESSION_DURATION_SECONDS = 8 * 60 * 60;
 const SESSION_CLOCK_SKEW_SECONDS = 60;
 const MAX_USERNAME_LENGTH = 128;
@@ -232,18 +233,24 @@ export async function getAdminSession(
   envOverride?: AdminAuthEnv,
   databaseOverride?: D1Database,
 ): Promise<AdminSession | null> {
-  const token = source
-    ? readCookieFromHeader(cookieHeaderFrom(source), SESSION_COOKIE_NAME) ??
-      readCookieFromHeader(
-        cookieHeaderFrom(source),
-        DEVELOPMENT_SESSION_COOKIE_NAME,
-      )
-    : (await (await import("next/headers")).cookies()).get(
-        SESSION_COOKIE_NAME,
-      )?.value ??
-      (await (await import("next/headers")).cookies()).get(
-        DEVELOPMENT_SESSION_COOKIE_NAME,
-      )?.value;
+  let token: string | undefined;
+  if (source) {
+    const cookieHeader = cookieHeaderFrom(source);
+    if (readCookieFromHeader(cookieHeader, CUSTOMER_SESSION_COOKIE_NAME)) {
+      return null;
+    }
+    token =
+      readCookieFromHeader(cookieHeader, SESSION_COOKIE_NAME) ??
+      readCookieFromHeader(cookieHeader, DEVELOPMENT_SESSION_COOKIE_NAME);
+  } else {
+    const cookieStore = await (await import("next/headers")).cookies();
+    if (cookieStore.get(CUSTOMER_SESSION_COOKIE_NAME)?.value) {
+      return null;
+    }
+    token =
+      cookieStore.get(SESSION_COOKIE_NAME)?.value ??
+      cookieStore.get(DEVELOPMENT_SESSION_COOKIE_NAME)?.value;
+  }
   if (!token || token.length > 4_096) return null;
 
   const env = readAuthEnv(envOverride);

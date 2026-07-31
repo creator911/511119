@@ -4,6 +4,7 @@ import {
   createAdminSessionCookie,
   getAdminSession,
 } from "@/lib/auth";
+import { clearCustomerSessionCookie } from "@/lib/customer-auth";
 import {
   checkAuthRateLimit,
   clearAuthRateLimit,
@@ -84,11 +85,16 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     await clearAuthRateLimit(request, "admin-login");
-    return jsonResponse(
+    const response = jsonResponse(
       { ok: true, authenticated: true },
       200,
       { "Set-Cookie": cookie },
     );
+    response.headers.append(
+      "Set-Cookie",
+      clearCustomerSessionCookie(request),
+    );
+    return response;
   } catch (error) {
     await waitForMinimumResponseTime(startedAt);
     if (error instanceof HttpBoundaryError) {
@@ -103,7 +109,7 @@ export async function DELETE(request: Request): Promise<Response> {
     return jsonResponse({ ok: false }, 403);
   }
 
-  return jsonResponse(
+  const response = jsonResponse(
     { ok: true, authenticated: false },
     200,
     {
@@ -112,6 +118,9 @@ export async function DELETE(request: Request): Promise<Response> {
       ),
     },
   );
+  response.headers.append("Set-Cookie", clearAdminSessionCookie(true));
+  response.headers.append("Set-Cookie", clearAdminSessionCookie(false));
+  return response;
 }
 
 async function readCredentials(
