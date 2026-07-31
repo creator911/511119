@@ -2,7 +2,7 @@
 
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import styles from "./Storefront.module.css";
-import { Panel } from "./StorefrontPrimitives";
+import { PageHeading } from "./StorefrontPrimitives";
 import { classNames } from "./utils";
 import { openPostcodeSearch } from "@/app/components/daum-postcode";
 
@@ -113,6 +113,8 @@ export interface RegisterPayload {
   userId: string;
   password: string;
   name: string;
+  nickname: string;
+  birthYear: string;
   email: string;
   phone: string;
   postcode: string;
@@ -121,6 +123,7 @@ export interface RegisterPayload {
   agreeTerms: boolean;
   agreePrivacy: boolean;
   agreeMarketing: boolean;
+  publicProfile: boolean;
 }
 
 export interface RegisterPanelProps {
@@ -140,19 +143,76 @@ export function RegisterPanel({
   onSubmit,
   onPostcodeSearch,
 }: RegisterPanelProps) {
+  const [step, setStep] = useState<"agreements" | "information">(
+    "agreements",
+  );
   const [agreements, setAgreements] = useState({
     terms: false,
     privacy: false,
-    marketing: false,
   });
+  const [emailOptIn, setEmailOptIn] = useState(true);
+  const [publicProfile, setPublicProfile] = useState(true);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [agreementError, setAgreementError] = useState("");
+  const [availabilityMessage, setAvailabilityMessage] = useState("");
+  const [availabilityChecks, setAvailabilityChecks] = useState({
+    userId: "",
+    nickname: "",
+    email: "",
+  });
   const formRef = useRef<HTMLFormElement>(null);
 
-  const allChecked =
-    agreements.terms && agreements.privacy && agreements.marketing;
+  const allChecked = agreements.terms && agreements.privacy;
+  const currentYear = new Date().getFullYear();
 
   function toggleAll(checked: boolean) {
-    setAgreements({ terms: checked, privacy: checked, marketing: checked });
+    setAgreements({ terms: checked, privacy: checked });
+    if (checked) setAgreementError("");
+  }
+
+  function continueToInformation() {
+    if (!agreements.terms || !agreements.privacy) {
+      setAgreementError("회원가입약관과 개인정보처리방침에 동의해 주세요.");
+      return;
+    }
+    setAgreementError("");
+    setStep("information");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function checkAvailability(
+    field: "userId" | "nickname" | "email",
+  ) {
+    const element = formRef.current?.elements.namedItem(field);
+    if (!(element instanceof HTMLInputElement)) return;
+    const rawValue = element.value.trim();
+    const value = field === "email" ? rawValue.toLowerCase() : rawValue;
+    if (!value) {
+      setAvailabilityMessage("확인할 내용을 먼저 입력해 주세요.");
+      return;
+    }
+    setAvailabilityMessage("중복 여부를 확인하고 있습니다.");
+    try {
+      const response = await fetch(
+        `/api/customer/register?field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`,
+        { cache: "no-store" },
+      );
+      const result = (await response.json()) as {
+        available?: boolean;
+        error?: string;
+      };
+      if (!response.ok || !result.available) {
+        setAvailabilityChecks((current) => ({ ...current, [field]: "" }));
+        setAvailabilityMessage(
+          result.error ?? "이미 사용 중인 정보입니다.",
+        );
+        return;
+      }
+      setAvailabilityChecks((current) => ({ ...current, [field]: value }));
+      setAvailabilityMessage("사용 가능한 정보입니다.");
+    } catch {
+      setAvailabilityMessage("중복 여부를 확인하지 못했습니다.");
+    }
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -164,57 +224,66 @@ export function RegisterPanel({
       setPasswordMismatch(true);
       return;
     }
+    const userId = String(form.get("userId") ?? "").trim();
+    const nickname = String(form.get("nickname") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim().toLowerCase();
+    if (
+      availabilityChecks.userId !== userId ||
+      availabilityChecks.nickname !== nickname ||
+      availabilityChecks.email !== email
+    ) {
+      setAvailabilityMessage(
+        "아이디·닉네임·이메일 중복체크를 모두 완료해 주세요.",
+      );
+      return;
+    }
     setPasswordMismatch(false);
     onSubmit?.({
-      userId: String(form.get("userId") ?? ""),
+      userId,
       password,
       name: String(form.get("name") ?? ""),
-      email: String(form.get("email") ?? ""),
+      nickname,
+      birthYear: String(form.get("birthYear") ?? ""),
+      email,
       phone: String(form.get("phone") ?? ""),
       postcode: String(form.get("postcode") ?? ""),
       address1: String(form.get("address1") ?? ""),
       address2: String(form.get("address2") ?? ""),
       agreeTerms: agreements.terms,
       agreePrivacy: agreements.privacy,
-      agreeMarketing: agreements.marketing,
+      agreeMarketing: emailOptIn,
+      publicProfile,
     });
   }
 
   return (
-    <main id="main-content" className={styles.formPage}>
-      <div className={styles.container}>
-        <header className={styles.formPageHeader}>
-          <h1>회원가입</h1>
-          <p>골드리안 회원이 되어 다양한 서비스를 이용해 보세요.</p>
-        </header>
+    <>
+      <PageHeading
+        title={step === "agreements" ? "약관동의" : "정보입력"}
+        breadcrumbs={[
+          { label: "Home", href: "/shop" },
+          { label: "회원가입", href: "/bbs/register.php" },
+          { label: step === "agreements" ? "약관동의" : "정보입력" },
+        ]}
+      />
+      <main id="main-content" className={styles.legacyRegisterPage}>
+        <div className={styles.container}>
         <form
           ref={formRef}
-          className={styles.registerForm}
+          className={styles.legacyRegisterForm}
           onSubmit={submit}
           aria-busy={submitting}
         >
-          <Panel
-            title="약관동의"
-            description="필수 약관을 확인한 후 동의해 주세요."
-          >
-            <label className={styles.agreeAll}>
-              <input
-                type="checkbox"
-                checked={allChecked}
-                onChange={(event) => toggleAll(event.target.checked)}
-              />
-              <span>
-                <strong>전체 약관에 동의합니다.</strong>
-                <small>선택 동의 항목을 포함합니다.</small>
-              </span>
-            </label>
-            <div className={styles.agreementBlock}>
-              <div className={styles.agreementTitle}>
-                <strong>회원가입약관</strong>
-                <label className={styles.checkboxLabel}>
+          {step === "agreements" ? (
+            <>
+              <section className={styles.legacyAgreementSection}>
+                <h2>회원가입약관</h2>
+                <div className={styles.legacyAgreementContent}>
+                  {termsContent}
+                </div>
+                <label className={styles.legacyAgreementCheck}>
                   <input
                     type="checkbox"
-                    required
                     checked={agreements.terms}
                     onChange={(event) =>
                       setAgreements((current) => ({
@@ -223,18 +292,18 @@ export function RegisterPanel({
                       }))
                     }
                   />
-                  <span>동의합니다. (필수)</span>
+                  <span>회원가입약관의 내용에 동의합니다.</span>
                 </label>
-              </div>
-              <div className={styles.agreementScroll}>{termsContent}</div>
-            </div>
-            <div className={styles.agreementBlock}>
-              <div className={styles.agreementTitle}>
-                <strong>개인정보처리방침안내</strong>
-                <label className={styles.checkboxLabel}>
+              </section>
+
+              <section className={styles.legacyAgreementSection}>
+                <h2>개인정보처리방침안내</h2>
+                <div className={styles.legacyAgreementContent}>
+                  {privacyContent}
+                </div>
+                <label className={styles.legacyAgreementCheck}>
                   <input
                     type="checkbox"
-                    required
                     checked={agreements.privacy}
                     onChange={(event) =>
                       setAgreements((current) => ({
@@ -243,46 +312,67 @@ export function RegisterPanel({
                       }))
                     }
                   />
-                  <span>동의합니다. (필수)</span>
+                  <span>개인정보처리방침안내의 내용에 동의합니다.</span>
                 </label>
-              </div>
-              <div className={styles.agreementScroll}>{privacyContent}</div>
-            </div>
-            <label className={styles.marketingAgreement}>
-              <input
-                type="checkbox"
-                checked={agreements.marketing}
-                onChange={(event) =>
-                  setAgreements((current) => ({
-                    ...current,
-                    marketing: event.target.checked,
-                  }))
-                }
-              />
-              <span>
-                이벤트 및 혜택 알림 수신에 동의합니다. <em>(선택)</em>
-              </span>
-            </label>
-          </Panel>
+              </section>
 
-          <Panel
-            title="회원정보 입력"
-            description="별표가 표시된 항목은 필수 입력입니다."
-          >
-            <div className={styles.fieldTable}>
+              <div className={styles.legacyAgreementActions}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={allChecked}
+                    onChange={(event) => toggleAll(event.target.checked)}
+                  />
+                  <span>전체 약관에 동의합니다.</span>
+                </label>
+                {agreementError ? (
+                  <p className={styles.fieldError} role="alert">
+                    {agreementError}
+                  </p>
+                ) : null}
+                <button
+                  type="button"
+                  className={styles.legacyJoinButton}
+                  onClick={continueToInformation}
+                >
+                  회원가입
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <section className={styles.legacyInfoSection}>
+                <h2>사이트 이용정보 입력</h2>
+                <div className={styles.fieldTable}>
               <label className={styles.formRow}>
                 <span>
                   아이디 <em>*</em>
                 </span>
                 <div>
-                  <input
-                    name="userId"
-                    type="text"
-                    minLength={4}
-                    autoComplete="username"
-                    required
-                  />
-                  <small>영문자·숫자 조합 4자 이상</small>
+                  <div className={styles.inlineField}>
+                    <input
+                      name="userId"
+                      type="text"
+                      minLength={4}
+                      autoComplete="username"
+                      required
+                      onChange={() =>
+                        setAvailabilityChecks((current) => ({
+                          ...current,
+                          userId: "",
+                        }))
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void checkAvailability("userId")}
+                    >
+                      중복체크
+                    </button>
+                  </div>
+                  <small>
+                    <strong>Note:</strong> 아이디 입력 후 중복체크 필수
+                  </small>
                 </div>
               </label>
               <label className={styles.formRow}>
@@ -319,6 +409,12 @@ export function RegisterPanel({
                   ) : null}
                 </div>
               </label>
+                </div>
+              </section>
+
+              <section className={styles.legacyInfoSection}>
+                <h2>개인정보 입력</h2>
+                <div className={styles.fieldTable}>
               <label className={styles.formRow}>
                 <span>
                   이름 <em>*</em>
@@ -329,10 +425,80 @@ export function RegisterPanel({
               </label>
               <label className={styles.formRow}>
                 <span>
+                  닉네임 <em>*</em>
+                </span>
+                <div>
+                  <div className={styles.inlineField}>
+                    <input
+                      name="nickname"
+                      type="text"
+                      minLength={2}
+                      required
+                      onChange={() =>
+                        setAvailabilityChecks((current) => ({
+                          ...current,
+                          nickname: "",
+                        }))
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void checkAvailability("nickname")}
+                    >
+                      중복체크
+                    </button>
+                  </div>
+                  <small>
+                    <strong>Note:</strong> 공백 없이 한글·영문·숫자만 입력 가능
+                  </small>
+                </div>
+              </label>
+              <label className={styles.formRow}>
+                <span>
+                  생년월일 <em>*</em>
+                </span>
+                <div>
+                  <select name="birthYear" required defaultValue="">
+                    <option value="">년</option>
+                    {Array.from(
+                      { length: currentYear - 1959 },
+                      (_, index) => 1960 + index,
+                    ).map((year) => (
+                      <option value={year} key={year}>
+                        {year}년
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </label>
+              <label className={styles.formRow}>
+                <span>
                   이메일 <em>*</em>
                 </span>
                 <div>
-                  <input name="email" type="email" autoComplete="email" required />
+                  <div className={styles.inlineField}>
+                    <input
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      onChange={() =>
+                        setAvailabilityChecks((current) => ({
+                          ...current,
+                          email: "",
+                        }))
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void checkAvailability("email")}
+                    >
+                      중복체크
+                    </button>
+                  </div>
+                  <small>
+                    <strong>Note:</strong> 이메일 입력 후 중복체크 필수
+                  </small>
                 </div>
               </label>
               <label className={styles.formRow}>
@@ -411,22 +577,58 @@ export function RegisterPanel({
                 </div>
               </div>
             </div>
-          </Panel>
+              </section>
 
-          <div className={styles.formActions}>
-            <a href={loginHref} className={styles.secondaryFormButton}>
-              취소
-            </a>
-            <button
-              type="submit"
-              className={styles.primaryFormButton}
-              disabled={submitting}
-            >
-              {submitting ? "가입 처리 중" : "회원가입"}
-            </button>
-          </div>
+              <section className={styles.legacyInfoSection}>
+                <h2>기타 개인설정</h2>
+                <div className={styles.legacyPreferenceRows}>
+                  <label>
+                    <span>메일링서비스</span>
+                    <input
+                      type="checkbox"
+                      checked={emailOptIn}
+                      onChange={(event) =>
+                        setEmailOptIn(event.target.checked)
+                      }
+                    />
+                    <strong>정보 메일을 받겠습니다.</strong>
+                  </label>
+                  <label>
+                    <span>정보공개</span>
+                    <input
+                      type="checkbox"
+                      checked={publicProfile}
+                      onChange={(event) =>
+                        setPublicProfile(event.target.checked)
+                      }
+                    />
+                    <strong>다른분들이 나의 정보를 볼 수 있도록 합니다.</strong>
+                  </label>
+                </div>
+              </section>
+
+              {availabilityMessage ? (
+                <p className={styles.legacyAvailabilityMessage} role="status">
+                  {availabilityMessage}
+                </p>
+              ) : null}
+              <div className={styles.formActions}>
+                <a href={loginHref} className={styles.secondaryFormButton}>
+                  취소
+                </a>
+                <button
+                  type="submit"
+                  className={styles.primaryFormButton}
+                  disabled={submitting}
+                >
+                  {submitting ? "가입 처리 중" : "회원가입"}
+                </button>
+              </div>
+            </>
+          )}
         </form>
       </div>
     </main>
+    </>
   );
 }

@@ -132,7 +132,7 @@ const anonymousApiChecks = [
   {
     method: "POST",
     path: "/api/orders",
-    expected: [400],
+    expected: [401],
     body: {},
     headers: { "idempotency-key": `qa-invalid-${Date.now()}` },
   },

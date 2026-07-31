@@ -3224,6 +3224,143 @@
   margin: 0 auto;
 }
 
+.legacyRegisterPage {
+  min-height: 540px;
+  padding: 29px 0 90px;
+  background: #fff;
+}
+
+.legacyRegisterForm {
+  max-width: 1102px;
+  margin: 0 auto;
+}
+
+.legacyAgreementSection,
+.legacyInfoSection {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.legacyAgreementSection > h2,
+.legacyInfoSection > h2 {
+  min-height: 58px;
+  margin: 0;
+  padding: 18px 16px;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+  background: #fafafa;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.legacyAgreementContent {
+  height: 276px;
+  padding: 16px;
+  overflow-y: auto;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.legacyAgreementContent :first-child {
+  margin-top: 0;
+}
+
+.legacyAgreementCheck {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 0 18px;
+  border-top: 1px solid #ddd;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.legacyAgreementCheck input,
+.legacyAgreementActions input,
+.legacyPreferenceRows input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--kiel-red);
+}
+
+.legacyAgreementActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.legacyAgreementActions > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.legacyAgreementActions > p {
+  margin: 0;
+  color: var(--kiel-red);
+  font-size: 12px;
+}
+
+.legacyJoinButton {
+  min-width: 118px;
+  min-height: 44px;
+  border: 1px solid #333;
+  color: #fff;
+  background: #333;
+  font: 600 13px "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+  cursor: pointer;
+}
+
+.legacyInfoSection .fieldTable {
+  margin: 18px;
+}
+
+.legacyPreferenceRows {
+  margin: 18px;
+  border-top: 1px solid #333;
+}
+
+.legacyPreferenceRows label {
+  display: grid;
+  min-height: 58px;
+  grid-template-columns: 180px 24px minmax(0, 1fr);
+  align-items: center;
+  padding-right: 18px;
+  border-bottom: 1px solid var(--kiel-line);
+  color: #555;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.legacyPreferenceRows label > span {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: #f8f8f8;
+}
+
+.legacyPreferenceRows strong {
+  font-weight: 400;
+}
+
+.legacyAvailabilityMessage {
+  margin: 0 0 15px;
+  color: #555;
+  font-size: 12px;
+  text-align: center;
+}
+
 .agreeAll {
   display: flex;
   align-items: center;
@@ -3304,9 +3441,9 @@
 
 .checkoutSteps {
   display: flex;
-  max-width: 640px;
-  justify-content: center;
-  margin: 0 auto 38px;
+  width: 100%;
+  justify-content: space-between;
+  margin: 0 auto 44px;
   padding: 0;
   list-style: none;
 }
@@ -3314,44 +3451,51 @@
 .checkoutSteps li {
   position: relative;
   display: flex;
-  min-width: 170px;
+  min-width: 0;
+  flex: 1 1 25%;
+  flex-direction: column;
   align-items: center;
-  gap: 9px;
-  color: #aaa;
+  gap: 12px;
+  color: #b8b8b8;
+  text-align: center;
 }
 
 .checkoutSteps li + li::before {
   position: absolute;
-  top: 18px;
-  right: calc(100% + 12px);
-  width: 52px;
+  z-index: 0;
+  top: 40px;
+  right: 50%;
+  width: 100%;
   height: 1px;
   background: #ddd;
   content: "";
 }
 
 .checkoutSteps span {
+  position: relative;
+  z-index: 1;
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 82px;
+  height: 82px;
   place-items: center;
-  border: 1px solid #ccc;
+  border: 4px solid currentcolor;
   border-radius: 50%;
-  font-size: 12px;
+  background: #fff;
+  font: 900 28px "Font Awesome 5 Free";
 }
 
 .checkoutSteps strong {
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .checkoutSteps .checkoutStepActive {
-  color: var(--kiel-red);
+  color: #222;
 }
 
 .checkoutSteps .checkoutStepActive span {
-  color: #fff;
-  border-color: var(--kiel-red);
-  background: var(--kiel-red);
+  color: #222;
+  border-color: #222;
+  background: #fff;
 }
 
 .cartTable {
@@ -3500,6 +3644,101 @@
 
 /* Checkout */
 
+.legacyCheckoutPage {
+  min-height: 540px;
+  padding: 30px 0 90px;
+  color: #444;
+  background: #fff;
+}
+
+.legacyCheckoutForm {
+  width: 100%;
+}
+
+.legacyCheckoutProducts {
+  margin-bottom: 30px;
+  border-top: 2px solid #444;
+  border-bottom: 1px solid #ddd;
+}
+
+.legacyCheckoutProductHeader,
+.legacyCheckoutProductRow {
+  display: grid;
+  grid-template-columns:
+    minmax(360px, 1fr)
+    100px
+    100px
+    100px
+    100px
+    100px;
+  align-items: stretch;
+}
+
+.legacyCheckoutProductHeader {
+  min-height: 49px;
+  border-bottom: 2px solid #444;
+  background: #f7f7f7;
+}
+
+.legacyCheckoutProductHeader > * {
+  display: grid;
+  place-items: center;
+  border-right: 1px solid #ddd;
+  font-size: 13px;
+}
+
+.legacyCheckoutProductHeader > :last-child {
+  border-right: 0;
+}
+
+.legacyCheckoutProductRow {
+  min-height: 104px;
+}
+
+.legacyCheckoutProductRow > * {
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  border-right: 1px solid #e3e3e3;
+  color: #444;
+  font-size: 13px;
+}
+
+.legacyCheckoutProductRow > :first-child {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.legacyCheckoutProductRow > :last-child {
+  border-right: 0;
+}
+
+.legacyCheckoutProductRow img {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  object-fit: cover;
+}
+
+.legacyCheckoutProductRow > div > span > strong,
+.legacyCheckoutProductRow > div > span > small {
+  display: block;
+}
+
+.legacyCheckoutProductRow > div > span > strong {
+  color: #222;
+  font-size: 14px;
+}
+
+.legacyCheckoutProductRow > div > span > small {
+  margin-top: 5px;
+  color: #888;
+  font-size: 11px;
+}
+
 .checkoutLayout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 350px;
@@ -3594,7 +3833,21 @@
 
 .checkoutAside .primaryFormButton {
   width: 100%;
-  min-height: 58px;
+  min-height: 52px;
+  border-color: #333;
+  background: #333;
+}
+
+.legacyCheckoutCancel {
+  display: grid;
+  min-height: 42px;
+  margin-top: 7px;
+  place-items: center;
+  border: 1px solid #aaa;
+  color: #555;
+  background: #fff;
+  font-size: 12px;
+  text-decoration: none;
 }
 
 .paymentMethods {
@@ -4788,20 +5041,65 @@
   }
 
   .checkoutSteps li {
-    min-width: 110px;
+    min-width: 0;
     flex-direction: column;
-    gap: 5px;
+    gap: 7px;
     text-align: center;
   }
 
   .checkoutSteps li + li::before {
-    top: 17px;
-    right: calc(100% - 14px);
-    width: 28px;
+    top: 29px;
+    right: 50%;
+    width: 100%;
+  }
+
+  .checkoutSteps span {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+    font-size: 20px;
   }
 
   .checkoutSteps strong {
     font-size: 10px;
+  }
+
+  .legacyCheckoutProductHeader {
+    display: none;
+  }
+
+  .legacyCheckoutProductRow {
+    display: grid;
+    min-height: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 10px 0;
+  }
+
+  .legacyCheckoutProductRow > :first-child {
+    grid-column: 1 / -1;
+    padding: 5px 8px 13px;
+    border-right: 0;
+  }
+
+  .legacyCheckoutProductRow > :not(:first-child) {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    border-top: 1px dotted #ddd;
+    border-right: 0;
+    font-size: 11px;
+  }
+
+  .legacyCheckoutProductRow > :not(:first-child)::before {
+    color: #888;
+    content: attr(data-label);
+    font-weight: 400;
+  }
+
+  .legacyCheckoutProductRow img {
+    width: 64px;
+    height: 64px;
+    flex-basis: 64px;
   }
 
   .cartTable {
@@ -5142,6 +5440,67 @@
     padding: 0;
   }
 
+  .legacyRegisterPage {
+    padding: 15px 0 55px;
+  }
+
+  .legacyAgreementSection > h2,
+  .legacyInfoSection > h2 {
+    min-height: 50px;
+    padding: 15px 13px;
+    font-size: 15px;
+  }
+
+  .legacyAgreementContent {
+    height: 220px;
+    padding: 13px;
+    font-size: 12px;
+  }
+
+  .legacyAgreementCheck {
+    min-height: 54px;
+    justify-content: flex-start;
+    padding: 10px 13px;
+    font-size: 11px;
+  }
+
+  .legacyAgreementActions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .legacyAgreementActions > label {
+    justify-content: center;
+  }
+
+  .legacyAgreementActions > p {
+    text-align: center;
+  }
+
+  .legacyJoinButton {
+    width: 100%;
+  }
+
+  .legacyInfoSection .fieldTable {
+    margin: 10px 13px;
+  }
+
+  .legacyPreferenceRows {
+    margin: 10px 13px;
+  }
+
+  .legacyPreferenceRows label {
+    min-height: 68px;
+    grid-template-columns: minmax(90px, 34%) 24px minmax(0, 1fr);
+    padding-right: 8px;
+    font-size: 10px;
+  }
+
+  .legacyPreferenceRows label > span {
+    padding: 0 9px;
+  }
+
   .inlineField {
     width: 100%;
   }
@@ -5156,7 +5515,17 @@
   }
 
   .checkoutSteps li {
-    min-width: 88px;
+    min-width: 0;
+  }
+
+  .checkoutSteps li + li::before {
+    top: 26px;
+  }
+
+  .checkoutSteps span {
+    width: 54px;
+    height: 54px;
+    font-size: 18px;
   }
 
   .cartActions {

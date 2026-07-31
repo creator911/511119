@@ -482,3 +482,33 @@ test("source guards cleanup availability and stale tracking updates", async () =
   assert.match(operations, /points_restore_pending/);
   assert.match(reports, /restore_pending/);
 });
+
+test("guest checkout is blocked at both the page and order API boundaries", async () => {
+  const [orderPage, orderRoute, checkout] = await Promise.all([
+    readFile(
+      new URL("../app/shop/orderform.php/page.tsx", import.meta.url),
+      "utf8",
+    ),
+    readFile(new URL("../app/api/orders/route.ts", import.meta.url), "utf8"),
+    readFile(
+      new URL(
+        "../app/components/storefront/CartCheckoutPanels.tsx",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  ]);
+
+  assert.match(orderPage, /getCustomerSession/);
+  assert.match(orderPage, /if \(!session\)/);
+  assert.match(orderPage, /redirect\(/);
+  assert.match(orderPage, /\/bbs\/login\.php\?return_url=/);
+  assert.match(orderRoute, /if \(!session\)/);
+  assert.match(orderRoute, /로그인 후 구매할 수 있습니다/);
+  assert.match(checkout, /label: "상품선택"/);
+  assert.match(checkout, /label: "장바구니"/);
+  assert.match(checkout, /label: "주문\/결제"/);
+  assert.match(checkout, /label: "주문완료"/);
+  assert.match(checkout, /legacyCheckoutProductHeader/);
+  assert.match(checkout, /submitLabel \?\? "주문하기"/);
+});

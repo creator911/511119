@@ -34,6 +34,17 @@ const orderColumnMigrations = [
   },
 ] as const;
 
+const userColumnMigrations = [
+  {
+    name: "public_profile",
+    sql: "ALTER TABLE users ADD COLUMN public_profile INTEGER NOT NULL DEFAULT 0",
+  },
+  {
+    name: "extra1",
+    sql: "ALTER TABLE users ADD COLUMN extra1 TEXT NOT NULL DEFAULT ''",
+  },
+] as const;
+
 export function commerceEnvironment(): CommerceEnvironment {
   return env as unknown as CommerceEnvironment;
 }
@@ -60,6 +71,8 @@ export async function ensureCommerceSchema() {
           postcode TEXT NOT NULL DEFAULT '',
           address1 TEXT NOT NULL DEFAULT '',
           address2 TEXT NOT NULL DEFAULT '',
+          public_profile INTEGER NOT NULL DEFAULT 0,
+          extra1 TEXT NOT NULL DEFAULT '',
           points INTEGER NOT NULL DEFAULT 0,
           level INTEGER NOT NULL DEFAULT 1,
           email_opt_in INTEGER NOT NULL DEFAULT 0,
@@ -491,15 +504,24 @@ export async function ensureCommerceSchema() {
 }
 
 async function ensureMissingCommerceColumns(database: D1Database): Promise<void> {
-  const result = await database
-    .prepare("PRAGMA table_info(orders)")
-    .all<{ name: string }>();
-  const existingColumns = new Set(
-    (result.results ?? []).map((column) => column.name),
+  const [orderResult, userResult] = await Promise.all([
+    database.prepare("PRAGMA table_info(orders)").all<{ name: string }>(),
+    database.prepare("PRAGMA table_info(users)").all<{ name: string }>(),
+  ]);
+  const existingOrderColumns = new Set(
+    (orderResult.results ?? []).map((column) => column.name),
   );
-  const statements = orderColumnMigrations
-    .filter((migration) => !existingColumns.has(migration.name))
-    .map((migration) => database.prepare(migration.sql));
+  const existingUserColumns = new Set(
+    (userResult.results ?? []).map((column) => column.name),
+  );
+  const statements = [
+    ...orderColumnMigrations.filter(
+      (migration) => !existingOrderColumns.has(migration.name),
+    ),
+    ...userColumnMigrations.filter(
+      (migration) => !existingUserColumns.has(migration.name),
+    ),
+  ].map((migration) => database.prepare(migration.sql));
   if (statements.length > 0) {
     await database.batch(statements);
   }

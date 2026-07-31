@@ -6,7 +6,6 @@ import {
   CouponApplicationError,
   couponRedemptionStatement,
   customerClaimantKey,
-  guestClaimantKey,
   validateCouponForOrder,
 } from "@/lib/commerce-promotions";
 import {
@@ -103,6 +102,13 @@ export async function POST(request: Request) {
   try {
     if (!isSameOrigin(request)) {
       return orderJson({ error: "잘못된 주문 요청입니다." }, { status: 400 });
+    }
+    const session = await getCustomerSession(request);
+    if (!session) {
+      return orderJson(
+        { error: "로그인 후 구매할 수 있습니다." },
+        { status: 401 },
+      );
     }
     const body = normalizeIncomingOrder(await readOrderJson(request));
     const buyer = body.buyer;
@@ -407,22 +413,19 @@ export async function POST(request: Request) {
     }
     const subtotal = resolved.reduce((sum, line) => sum + line.lineTotal, 0);
     const shopSettings = await getEffectiveSiteSettings({ strict: true });
-    const session = await getCustomerSession(request);
     const shippingQuote = await calculateShippingQuote({
       baseFee: shopSettings.defaultShippingFee,
       postcode: recipient.postcode,
       address: recipient.address1,
     });
     const shippingFee = shippingQuote.totalFee;
-    const claimantKey = session
-      ? customerClaimantKey(session.userId)
-      : guestClaimantKey(email);
+    const claimantKey = customerClaimantKey(session.userId);
     const couponApplication = body.couponCode
       ? await validateCouponForOrder({
           code: body.couponCode,
           subtotal,
           claimantKey,
-          userId: session?.userId,
+          userId: session.userId,
         })
       : null;
     const couponDiscount = couponApplication?.discount ?? 0;
@@ -433,27 +436,24 @@ export async function POST(request: Request) {
     const pointsUsed = body.pointsUsed;
 
     const id = orderNumber();
-    let availablePoints = 0;
-    if (session) {
-      const pointAccount = await database
-        .prepare(
-          `SELECT points
-           FROM users
-           WHERE id = ? AND active = 1
-           LIMIT 1`,
-        )
-        .bind(session.userId)
-        .first<{ points: number }>();
-      availablePoints = Math.max(
-        0,
-        Math.trunc(Number(pointAccount?.points) || 0),
-      );
-    }
+    const pointAccount = await database
+      .prepare(
+        `SELECT points
+         FROM users
+         WHERE id = ? AND active = 1
+         LIMIT 1`,
+      )
+      .bind(session.userId)
+      .first<{ points: number }>();
+    const availablePoints = Math.max(
+      0,
+      Math.trunc(Number(pointAccount?.points) || 0),
+    );
     const pointValidation = validatePointUse({
       pointsUsed,
       orderTotal,
       availablePoints,
-      authenticated: Boolean(session),
+      authenticated: true,
       settings: shopSettings,
     });
     if (!pointValidation.ok && pointValidation.failure) {
@@ -505,7 +505,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    attemptedUserId = session?.userId ?? "";
+    attemptedUserId = session.userId;
     attemptedPointsUsed = pointsUsed;
 
     await ensureAdminProductSchema(database);
@@ -554,7 +554,7 @@ export async function POST(request: Request) {
               .bind(id, product.id, product.id, revision, source),
     );
     const pointStatements: D1PreparedStatement[] =
-      pointsUsed > 0 && session
+      pointsUsed > 0
         ? [
             database
               .prepare(
@@ -582,7 +582,7 @@ export async function POST(request: Request) {
             application: couponApplication,
             orderId: id,
             claimantKey,
-            userId: session?.userId,
+            userId: session.userId,
             subtotal,
           }),
         ]
@@ -663,7 +663,7 @@ export async function POST(request: Request) {
         )
         .bind(
           id,
-          session?.userId ?? null,
+          session.userId,
           email,
           buyer.name,
           buyer.phone,

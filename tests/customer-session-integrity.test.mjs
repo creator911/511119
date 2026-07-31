@@ -156,6 +156,10 @@ test("session cookies sign an explicit guarded version and preserve persistence"
   assert.match(register, /sessionVersion: 1/);
   assert.match(register, /isUserIdentityConflict\(error\)/);
   assert.match(register, /users\\\.\(\?:login_id\|email\)/);
+  assert.match(register, /export async function GET\(request: Request\)/);
+  assert.match(register, /nickname: "nickname"/);
+  assert.match(register, /public_profile, extra1/);
+  assert.match(register, /body\.publicProfile \? 1 : 0/);
   assert.match(rate, /customer-profile-reauth/);
   const clientKey = rate.slice(rate.indexOf("async function authRateClientKey"));
   assert.match(clientKey, /cf-connecting-ip/);

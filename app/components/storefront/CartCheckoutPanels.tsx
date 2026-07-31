@@ -24,11 +24,12 @@ function cartLineKey(line: CartLine): string {
   return line.lineKey ?? line.id;
 }
 
-function CheckoutSteps({ active }: { active: 1 | 2 | 3 }) {
+function CheckoutSteps({ active }: { active: 1 | 2 | 3 | 4 }) {
   const steps = [
-    { number: 1, label: "장바구니" },
-    { number: 2, label: "주문/결제" },
-    { number: 3, label: "주문완료" },
+    { number: 1, label: "상품선택", icon: "\uf25a" },
+    { number: 2, label: "장바구니", icon: "\uf291" },
+    { number: 3, label: "주문/결제", icon: "\uf09d" },
+    { number: 4, label: "주문완료", icon: "\uf00c" },
   ];
 
   return (
@@ -39,7 +40,7 @@ function CheckoutSteps({ active }: { active: 1 | 2 | 3 }) {
           className={step.number === active ? styles.checkoutStepActive : undefined}
           aria-current={step.number === active ? "step" : undefined}
         >
-          <span>{step.number}</span>
+          <span aria-hidden="true">{step.icon}</span>
           <strong>{step.label}</strong>
         </li>
       ))}
@@ -114,7 +115,7 @@ export function CartPanel({
         <header className={styles.formPageHeader}>
           <h1>장바구니</h1>
         </header>
-        <CheckoutSteps active={1} />
+        <CheckoutSteps active={2} />
 
         <Panel
           title="상품 전체"
@@ -402,10 +403,6 @@ export function CheckoutPanel({
   const shippingRuleName = hasShippingDestination
     ? shippingQuote.ruleName
     : "";
-  const rewardTotal = items.reduce(
-    (sum, line) => sum + (line.points ?? 0) * line.quantity,
-    0,
-  );
   const couponDiscount = Math.min(
     productTotal,
     Math.max(0, appliedCoupon?.discount ?? 0),
@@ -613,7 +610,7 @@ export function CheckoutPanel({
       cashReceiptNumber: String(form.get("cashReceiptNumber") ?? ""),
       couponCode: appliedCoupon?.code ?? "",
       pointsUsed: appliedPoints,
-      agreePurchase: form.get("agreePurchase") === "on",
+      agreePurchase: true,
     });
   }
 
@@ -722,30 +719,54 @@ export function CheckoutPanel({
   );
 
   return (
-    <main id="main-content" className={styles.formPage}>
+    <main id="main-content" className={styles.legacyCheckoutPage}>
       <div className={styles.container}>
-        <header className={styles.formPageHeader}>
-          <h1>주문/결제</h1>
-        </header>
-        <CheckoutSteps active={2} />
-        <form onSubmit={submit} className={styles.checkoutLayout}>
-          <div className={styles.checkoutMain}>
-            <Panel title={`주문상품 ${items.length}개`}>
-              <div className={styles.checkoutItems}>
-                {items.map((line) => (
-                  <article key={cartLineKey(line)}>
-                    <img src={line.image} alt="" />
-                    <div>
-                      <strong>{line.name}</strong>
-                      {line.option ? <small>{line.option}</small> : null}
-                      <span>수량 {line.quantity}개</span>
-                    </div>
-                    <strong>{formatKRW(line.unitPrice * line.quantity)}</strong>
-                  </article>
-                ))}
-              </div>
-            </Panel>
+        <CheckoutSteps active={3} />
+        <form onSubmit={submit} className={styles.legacyCheckoutForm}>
+          <section
+            className={styles.legacyCheckoutProducts}
+            aria-label={`주문상품 ${items.length}개`}
+          >
+            <div className={styles.legacyCheckoutProductHeader}>
+              <strong>상품명</strong>
+              <strong>총수량</strong>
+              <strong>판매가</strong>
+              <strong>소계</strong>
+              <strong>포인트</strong>
+              <strong>배송비</strong>
+            </div>
+            {items.map((line) => (
+              <article
+                className={styles.legacyCheckoutProductRow}
+                key={cartLineKey(line)}
+              >
+                <div>
+                  <img src={line.image} alt="" />
+                  <span>
+                    <strong>{line.name}</strong>
+                    {line.option ? <small>{line.option}</small> : null}
+                    <small>
+                      {line.name} {line.quantity}개 (+0원)
+                    </small>
+                  </span>
+                </div>
+                <span data-label="총수량">{line.quantity}</span>
+                <span data-label="판매가">
+                  {line.unitPrice.toLocaleString("ko-KR")}
+                </span>
+                <strong data-label="소계">
+                  {(line.unitPrice * line.quantity).toLocaleString("ko-KR")}
+                </strong>
+                <span data-label="포인트">
+                  {((line.points ?? 0) * line.quantity).toLocaleString("ko-KR")}
+                </span>
+                <span data-label="배송비">선불</span>
+              </article>
+            ))}
+          </section>
 
+          <div className={styles.checkoutLayout}>
+          <div className={styles.checkoutMain}>
             <Panel title="주문하시는 분">{renderContactFields("buyer", buyer)}</Panel>
             <Panel
               title="받으시는 분"
@@ -957,8 +978,14 @@ export function CheckoutPanel({
                   <label className={styles.formRow}>
                     <span>입금계좌</span>
                     <div>
-                      <select name="bankCode" required defaultValue="">
-                        <option value="">계좌를 선택해 주세요.</option>
+                      <select
+                        name="bankCode"
+                        required
+                        defaultValue={banks.length === 1 ? banks[0].value : ""}
+                      >
+                        {banks.length > 1 ? (
+                          <option value="">계좌를 선택해 주세요.</option>
+                        ) : null}
                         {banks.map((bank) => (
                           <option key={bank.value} value={bank.value}>
                             {bank.label}
@@ -970,7 +997,12 @@ export function CheckoutPanel({
                   <label className={styles.formRow}>
                     <span>입금자명</span>
                     <div>
-                      <input name="depositor" type="text" required />
+                      <input
+                        name="depositor"
+                        type="text"
+                        defaultValue={buyer.name}
+                        required
+                      />
                     </div>
                   </label>
                   <label className={styles.formRow}>
@@ -992,43 +1024,32 @@ export function CheckoutPanel({
             <div className={styles.checkoutAsideSticky}>
               <PriceSummary
                 rows={[
-                  { label: "상품금액", value: productTotal },
+                  { label: "주문", value: productTotal },
+                  { label: "쿠폰할인", value: -couponDiscount },
                   { label: "배송비", value: shippingTotal },
-                  ...(couponDiscount > 0
-                    ? [{ label: "쿠폰 할인", value: -couponDiscount }]
-                    : []),
-                  ...(appliedPoints > 0
-                    ? [{ label: "포인트 사용", value: -appliedPoints }]
-                    : []),
-                  { label: "회원 적립 예정", value: rewardTotal, muted: true },
+                  { label: "포인트", value: -appliedPoints },
+                  {
+                    label: "보유 포인트",
+                    value: availablePoints,
+                    muted: true,
+                  },
                 ]}
                 total={amountDue}
+                totalLabel="총계"
               />
-              <label className={styles.purchaseAgreement}>
-                <input type="checkbox" name="agreePurchase" required />
-                <span>
-                  주문 상품과 결제 정보를 확인했으며 구매 진행에 동의합니다.
-                  <em>(필수)</em>
-                </span>
-              </label>
               <button
                 type="submit"
                 className={styles.primaryFormButton}
                 disabled={submitting || !hasAvailablePaymentMethod}
               >
-                {submitting
-                  ? "주문 접수 중…"
-                  : submitLabel ??
-                    `${formatKRW(amountDue)} ${
-                      effectivePaymentMethod === "points"
-                        ? appliedPoints > 0
-                          ? "포인트 결제하기"
-                          : "주문하기"
-                        : "결제하기"
-                    }`}
+                {submitting ? "주문 접수 중…" : submitLabel ?? "주문하기"}
               </button>
+              <a className={styles.legacyCheckoutCancel} href="/shop/cart.php">
+                취소
+              </a>
             </div>
           </aside>
+          </div>
         </form>
       </div>
     </main>
