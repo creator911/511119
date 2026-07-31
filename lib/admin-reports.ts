@@ -427,7 +427,7 @@ export async function getPointReport(
   await ensureAdminPointSchema();
   const database = commerceDb();
   const pageSize = normalizePageSize(options.pageSize);
-  const dateRange = normalizeDateRange(options);
+  const dateRange = normalizePointDateRange(options);
   const q = cleanQuery(options.q);
   const eventType = isPointLedgerEventType(options.eventType)
     ? options.eventType
@@ -846,6 +846,31 @@ function normalizeDateRange(options: DateOptions): {
     dateEnd,
     startUtc: formatSqlUtc(start),
     endUtc: formatSqlUtc(end),
+  };
+}
+
+function normalizePointDateRange(options: DateOptions): {
+  dateStart: string;
+  dateEnd: string;
+  startUtc: string;
+  endUtc: string;
+} {
+  const requestedStart = cleanDate(options.dateStart);
+  const requestedEnd = cleanDate(options.dateEnd);
+  if (requestedStart || requestedEnd) {
+    return normalizeDateRange(options);
+  }
+  const dateStart = "2000-01-01";
+  const dateEnd = "2100-12-31";
+  return {
+    dateStart,
+    dateEnd,
+    startUtc: formatSqlUtc(
+      Date.parse(`${dateStart}T00:00:00+09:00`),
+    ),
+    endUtc: formatSqlUtc(
+      Date.parse(`${dateEnd}T00:00:00+09:00`) + DAY_MS,
+    ),
   };
 }
 

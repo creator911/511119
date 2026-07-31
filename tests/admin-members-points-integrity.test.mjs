@@ -39,6 +39,14 @@ test("admin point mutations are authenticated, same-origin, guarded, and auditab
   assert.match(report, /FROM admin_point_ledger entry/);
   assert.match(report, /entry\.deleted_at IS NULL/);
   assert.match(report, /deletable: Boolean\(row\.deletable\)/);
+  assert.match(
+    report,
+    /const dateRange = normalizePointDateRange\(options\)/,
+  );
+  assert.match(
+    report,
+    /function normalizePointDateRange[\s\S]*const dateStart = "2000-01-01"[\s\S]*const dateEnd = "2100-12-31"/,
+  );
   assert.match(page, /editable: row\.deletable/);
   assert.match(manager, /method: "PATCH"/);
   assert.match(manager, /"수정"/);
