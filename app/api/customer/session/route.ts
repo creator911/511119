@@ -104,8 +104,18 @@ export async function GET(request: Request) {
                  WHEN 'charge' THEN '충전 승인'
                  ELSE '출금 승인'
                END AS reason,
-               ledger.created_at
+               COALESCE(
+                 charge.created_at,
+                 withdrawal.created_at,
+                 ledger.created_at
+               ) AS created_at
              FROM wallet_ledger ledger
+             LEFT JOIN charge_requests charge
+               ON ledger.request_type = 'charge'
+              AND charge.id = ledger.request_id
+             LEFT JOIN withdrawal_requests withdrawal
+               ON ledger.request_type = 'withdrawal'
+              AND withdrawal.id = ledger.request_id
            )
            SELECT
              history.id,

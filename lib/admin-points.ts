@@ -820,8 +820,18 @@ export function pointBalanceTimelineSql(): string {
         '5:wallet:' || wallet.id AS sort_key,
         wallet.user_id,
         wallet.delta,
-        wallet.created_at AS occurred_at
+        COALESCE(
+          charge.created_at,
+          withdrawal.created_at,
+          wallet.created_at
+        ) AS occurred_at
       FROM wallet_ledger wallet
+      LEFT JOIN charge_requests charge
+        ON wallet.request_type = 'charge'
+       AND charge.id = wallet.request_id
+      LEFT JOIN withdrawal_requests withdrawal
+        ON wallet.request_type = 'withdrawal'
+       AND withdrawal.id = wallet.request_id
       UNION ALL
       SELECT
         '6:admin:' || entry.id AS sort_key,
