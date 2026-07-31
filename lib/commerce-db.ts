@@ -46,7 +46,14 @@ const userColumnMigrations = [
 ] as const;
 
 export function commerceEnvironment(): CommerceEnvironment {
-  return env as unknown as CommerceEnvironment;
+  const workerEnvironment = env as unknown as CommerceEnvironment;
+  const runtimeEnvironment =
+    typeof process === "undefined" ? undefined : process.env;
+  return {
+    DB: workerEnvironment.DB,
+    SESSION_SECRET:
+      workerEnvironment.SESSION_SECRET ?? runtimeEnvironment?.SESSION_SECRET,
+  };
 }
 
 export function commerceDb(): D1Database {

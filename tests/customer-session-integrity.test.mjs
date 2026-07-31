@@ -101,7 +101,17 @@ test("a stale profile request cannot undo a password reset or adopt its session"
 });
 
 test("session cookies sign an explicit guarded version and preserve persistence", async () => {
-  const [auth, profile, login, register, rate, loginClient, strength, authPanels] = await Promise.all([
+  const [
+    auth,
+    profile,
+    login,
+    register,
+    rate,
+    loginClient,
+    strength,
+    authPanels,
+    commerceDb,
+  ] = await Promise.all([
     readFile(new URL("../lib/customer-auth.ts", import.meta.url), "utf8"),
     readFile(
       new URL("../app/api/customer/profile/route.ts", import.meta.url),
@@ -125,6 +135,7 @@ test("session cookies sign an explicit guarded version and preserve persistence"
       new URL("../app/components/storefront/AuthPanels.tsx", import.meta.url),
       "utf8",
     ),
+    readFile(new URL("../lib/commerce-db.ts", import.meta.url), "utf8"),
   ]);
   const cookieFactory = auth.slice(
     auth.indexOf("export async function createCustomerSessionCookie"),
@@ -171,6 +182,10 @@ test("session cookies sign an explicit guarded version and preserve persistence"
   assert.match(strength, /"아주강함"/);
   assert.match(authPanels, /passwordStrengthMeter/);
   assert.match(authPanels, /비밀번호의 강도는 보통 이상이어야 합니다/);
+  assert.match(
+    commerceDb,
+    /workerEnvironment\.SESSION_SECRET \?\? runtimeEnvironment\?\.SESSION_SECRET/,
+  );
   assert.match(rate, /customer-profile-reauth/);
   const clientKey = rate.slice(rate.indexOf("async function authRateClientKey"));
   assert.match(clientKey, /cf-connecting-ip/);
