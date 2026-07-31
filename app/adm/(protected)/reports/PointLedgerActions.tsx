@@ -153,7 +153,6 @@ export function PointLedgerCreateForm() {
     const loginId = String(formData.get("mb_id") ?? "").trim();
     const reason = String(formData.get("po_content") ?? "").trim();
     const pointText = String(formData.get("po_point") ?? "").trim();
-    const expiresAt = String(formData.get("po_expire_date") ?? "").trim();
     if (!/^-?\d+$/u.test(pointText)) {
       setFailed(true);
       setMessage("포인트는 0이 아닌 정수로 입력해 주세요.");
@@ -184,7 +183,6 @@ export function PointLedgerCreateForm() {
           loginId,
           reason,
           delta,
-          expiresAt,
         }),
       });
       const result = await readPointResult(response);
@@ -245,14 +243,6 @@ export function PointLedgerCreateForm() {
             inputMode="numeric"
             placeholder="차감은 -1000처럼 입력"
             required
-          />
-        </label>
-        <label>
-          <span>만료일</span>
-          <input
-            className="frm_input"
-            name="po_expire_date"
-            type="date"
           />
         </label>
         <button className="btn_submit btn" type="submit" disabled={busy}>

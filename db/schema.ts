@@ -613,11 +613,11 @@ export const adminPointLedger = sqliteTable(
     check("admin_point_ledger_delta_check", sql`${table.delta} <> 0`),
     check(
       "admin_point_ledger_before_check",
-      sql`${table.balanceBefore} >= 0 AND ${table.balanceBefore} <= 9007199254740991`,
+      sql`${table.balanceBefore} >= -9007199254740991 AND ${table.balanceBefore} <= 9007199254740991`,
     ),
     check(
       "admin_point_ledger_after_check",
-      sql`${table.balanceAfter} >= 0 AND ${table.balanceAfter} <= 9007199254740991`,
+      sql`${table.balanceAfter} >= -9007199254740991 AND ${table.balanceAfter} <= 9007199254740991`,
     ),
     check(
       "admin_point_ledger_balance_check",

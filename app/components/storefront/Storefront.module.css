@@ -4198,7 +4198,7 @@
 .myPagePointTable > div {
   display: grid;
   min-height: 44px;
-  grid-template-columns: 150px minmax(180px, 1fr) 100px 100px 100px;
+  grid-template-columns: 170px minmax(180px, 1fr) 110px 110px;
   align-items: center;
   border-bottom: 1px solid #ddd;
   font-size: 11px;
@@ -4948,7 +4948,7 @@
   }
 
   .myPagePointTable {
-    min-width: 640px;
+    min-width: 560px;
   }
 
   .myPageDialog > div {

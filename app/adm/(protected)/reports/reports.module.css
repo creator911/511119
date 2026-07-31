@@ -464,7 +464,6 @@
     minmax(130px, 0.8fr)
     minmax(220px, 1.6fr)
     minmax(140px, 0.8fr)
-    minmax(145px, 0.8fr)
     auto;
   gap: 8px;
   align-items: end;
@@ -504,6 +503,89 @@
   margin: 10px 0 0;
   color: #7a8490;
   font-size: 10px;
+}
+
+.pointToolbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pointEditTable {
+  width: 100%;
+  min-width: 1005px;
+  table-layout: fixed;
+}
+
+.pointEditTable th:nth-child(1) {
+  width: 28px;
+}
+
+.pointEditTable th:nth-child(2) {
+  width: 120px;
+}
+
+.pointEditTable th:nth-child(3) {
+  width: 80px;
+}
+
+.pointEditTable th:nth-child(4) {
+  width: 100px;
+}
+
+.pointEditTable th:nth-child(6) {
+  width: 125px;
+}
+
+.pointEditTable th:nth-child(7) {
+  width: 180px;
+}
+
+.pointEditTable th:nth-child(8) {
+  width: 105px;
+}
+
+.pointEditTable th:nth-child(9) {
+  width: 72px;
+}
+
+.pointEditTable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pointEditTable input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.pointEditInput {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 5px !important;
+  border: 1px solid #9eacc6 !important;
+  border-radius: 0 !important;
+  background: #fff;
+  color: #222;
+  font-size: 11px;
+}
+
+.pointReasonInput {
+  min-width: 180px;
+}
+
+.pointAmountInput {
+  text-align: right;
+}
+
+.pointDateInput {
+  min-width: 168px;
+  font-variant-numeric: tabular-nums;
 }
 
 .twoColumn {

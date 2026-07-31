@@ -7,7 +7,6 @@ import {
   getPointReport,
   getProductRankingReport,
   getSalesReport,
-  type PointLedgerEventType,
   type PointReportResult,
   type SalesReportResult,
 } from "@/lib/admin-reports";
@@ -22,8 +21,8 @@ import styles from "./reports.module.css";
 import { IncompleteOrdersManager } from "./IncompleteOrdersManager";
 import {
   PointLedgerCreateForm,
-  PointLedgerDeleteButton,
 } from "./PointLedgerActions";
+import { PointLedgerManager } from "./PointLedgerManager";
 
 export const metadata: Metadata = {
   title: "운영 리포트",
@@ -909,7 +908,6 @@ function PointsReport({ report }: { report: PointReportResult }) {
   );
   return (
     <>
-      <PointLedgerDeleteButton />
       <div className="local_ov legacy-point-summary">
         <span className="legacy-summary-label">전체목록</span>
         <span className="legacy-summary-count">
@@ -940,60 +938,22 @@ function PointsReport({ report }: { report: PointReportResult }) {
         <button type="submit">검색</button>
       </form>
       <div className="legacy-point-table">
-        <ReportTable
-          headers={[
-            "",
-            "회원아이디",
-            "이름",
-            "닉네임",
-            "포인트 내용",
-            "포인트",
-            "일시",
-            "만료일",
-            "포인트합",
-          ]}
-          rows={report.ledger.rows.map((row) => [
-            <input
-              key={`${row.eventType}-${row.orderId}-${row.occurredAt}-check`}
-              type="checkbox"
-              data-admin-point-entry={row.deletable ? "true" : undefined}
-              data-entry-id={row.entryId ?? undefined}
-              data-revision={row.revision ?? undefined}
-              disabled={!row.deletable}
-              title={
-                row.deletable
-                  ? "관리자 조정 내역 선택"
-                  : "주문·충전 정산 내역은 직접 삭제할 수 없습니다."
-              }
-              aria-label={`${row.loginId} 포인트 내역 선택`}
-            />,
-            <a
-              key={`${row.userId}-member`}
-              className={styles.primaryLink}
-              href={`/adm/users?q=${encodeURIComponent(row.loginId)}`}
-            >
-              {row.loginId}
-            </a>,
-            row.name,
-            row.loginId,
-            row.reason ||
-            (row.orderId
-              ? `주문번호 ${row.orderId} ${pointEventLabel(row.eventType)}`
-              : pointEventLabel(row.eventType)),
-            <strong
-              key={`${row.eventType}-${row.orderId}-points`}
-              className={row.points >= 0 ? styles.positive : styles.negative}
-            >
-              {row.points > 0 ? "+" : ""}
-              {formatNumber(row.points)}
-            </strong>,
-            formatKoreaDateTime(row.occurredAt),
-            row.expiresAt ?? "-",
-            formatNumber(
+        <PointLedgerManager
+          rows={report.ledger.rows.map((row) => ({
+            eventType: row.eventType,
+            orderId: row.orderId,
+            entryId: row.entryId,
+            userId: row.userId,
+            loginId: row.loginId,
+            name: row.name,
+            points: row.points,
+            reason: row.reason,
+            balanceAfter:
               row.balanceAfter ?? balanceByUser.get(row.userId) ?? 0,
-            ),
-          ])}
-          empty="자료가 없습니다."
+            revision: row.revision,
+            editable: row.deletable,
+            occurredAt: row.occurredAt,
+          }))}
         />
         <Pagination
           page={report.ledger.page}
@@ -1233,35 +1193,6 @@ function pageWindow(page: number, totalPages: number): Array<number | "gap"> {
     result.push(value);
   });
   return result;
-}
-
-function pointEventLabel(eventType: PointLedgerEventType): string {
-  return {
-    used: "주문 사용",
-    restored: "취소 복원",
-    restore_pending: "취소 복원 대기",
-    earned: "배송완료 적립",
-    reversed: "환불 회수",
-    charged: "충전 승인",
-    withdrawn: "출금 승인",
-    adjusted: "관리자 조정",
-  }[eventType];
-}
-
-function formatKoreaDateTime(value: string): string {
-  const date = new Date(
-    value.includes("T") ? value : `${value.replace(" ", "T")}Z`,
-  );
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(date);
 }
 
 function formatMoney(value: number): string {

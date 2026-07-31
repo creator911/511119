@@ -11,9 +11,13 @@ export interface AdminPointLedgerEntry {
   balanceBefore: number;
   balanceAfter: number;
   reason: string;
-  expiresAt: string | null;
   revision: number;
   createdAt: string;
+}
+
+export interface AdminPointUpdateResult {
+  entry: AdminPointLedgerEntry;
+  memberPoints: number;
 }
 
 export interface AdminPointDeletionResult {
@@ -61,9 +65,9 @@ export async function ensureAdminPointSchema(): Promise<void> {
           user_id TEXT NOT NULL,
           delta INTEGER NOT NULL CHECK(delta <> 0),
           balance_before INTEGER NOT NULL
-            CHECK(balance_before >= 0 AND balance_before <= ${MAX_POINTS}),
+            CHECK(balance_before >= -${MAX_POINTS} AND balance_before <= ${MAX_POINTS}),
           balance_after INTEGER NOT NULL
-            CHECK(balance_after >= 0 AND balance_after <= ${MAX_POINTS}),
+            CHECK(balance_after >= -${MAX_POINTS} AND balance_after <= ${MAX_POINTS}),
           reason TEXT NOT NULL,
           expires_at TEXT,
           revision INTEGER NOT NULL DEFAULT 1 CHECK(revision >= 1),
@@ -89,7 +93,7 @@ export async function ensureAdminPointSchema(): Promise<void> {
           created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )`),
       ])
-      .then(() => undefined)
+      .then(() => ensureSignedPointBalances(database))
       .catch((error) => {
         schemaInitialization = null;
         throw error;
@@ -122,14 +126,12 @@ export async function createAdminPointEntry(
   const balanceAfter = balanceBefore + values.delta;
   if (
     !Number.isSafeInteger(balanceAfter) ||
-    balanceAfter < 0 ||
+    balanceAfter < -MAX_POINTS ||
     balanceAfter > MAX_POINTS
   ) {
     throw new AdminApiError(
       409,
-      values.delta < 0
-        ? "회원의 현재 포인트보다 많이 차감할 수 없습니다."
-        : "회원 포인트 한도를 초과할 수 없습니다.",
+      "회원 포인트 한도를 초과할 수 없습니다.",
       { points: "현재 포인트 잔액을 확인해 주세요." },
     );
   }
@@ -144,7 +146,6 @@ export async function createAdminPointEntry(
     balanceBefore,
     balanceAfter,
     reason: values.reason,
-    expiresAt: values.expiresAt,
   });
   try {
     await database.batch([
@@ -161,7 +162,7 @@ export async function createAdminPointEntry(
           `INSERT INTO admin_point_ledger (
              id, user_id, delta, balance_before, balance_after, reason,
              expires_at, admin_username
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+           ) VALUES (?, ?, ?, ?, ?, ?, NULL, ?)`,
         )
         .bind(
           id,
@@ -170,7 +171,6 @@ export async function createAdminPointEntry(
           balanceBefore,
           balanceAfter,
           values.reason,
-          values.expiresAt,
           normalizedAdmin,
         ),
       database
@@ -205,9 +205,204 @@ export async function createAdminPointEntry(
     balanceBefore,
     balanceAfter,
     reason: values.reason,
-    expiresAt: values.expiresAt,
     revision: 1,
     createdAt: new Date().toISOString(),
+  };
+}
+
+export async function updateAdminPointEntry(
+  input: unknown,
+  adminUsername: string,
+): Promise<AdminPointUpdateResult> {
+  const values = parseUpdateInput(input);
+  await ensureAdminPointSchema();
+  const database = commerceDb();
+  const row = await database
+    .prepare(
+      `SELECT id, user_id, delta, balance_before, balance_after, reason,
+              expires_at, revision, deleted_at, created_at
+       FROM admin_point_ledger
+       WHERE id = ? LIMIT 1`,
+    )
+    .bind(values.id)
+    .first<PointEntryRow>();
+  if (
+    !row ||
+    row.deleted_at ||
+    Number(row.revision) !== values.revision
+  ) {
+    throw new AdminApiError(
+      409,
+      "수정할 포인트 내역이 이미 변경되었습니다. 목록을 새로고침해 주세요.",
+    );
+  }
+
+  const user = await database
+    .prepare(
+      `SELECT id, login_id, name, points
+       FROM users WHERE id = ? LIMIT 1`,
+    )
+    .bind(row.user_id)
+    .first<PointUserRow>();
+  if (!user) {
+    throw new AdminApiError(
+      409,
+      "포인트 내역의 회원 정보를 찾을 수 없습니다.",
+    );
+  }
+
+  const oldDelta = Number(row.delta);
+  const difference = values.delta - oldDelta;
+  const memberPointsBefore = Number(user.points);
+  const memberPointsAfter = memberPointsBefore + difference;
+  const balanceBefore = Number(row.balance_before);
+  const balanceAfter = balanceBefore + values.delta;
+  if (
+    !Number.isSafeInteger(memberPointsAfter) ||
+    memberPointsAfter < -MAX_POINTS ||
+    memberPointsAfter > MAX_POINTS ||
+    !Number.isSafeInteger(balanceAfter) ||
+    balanceAfter < -MAX_POINTS ||
+    balanceAfter > MAX_POINTS
+  ) {
+    throw new AdminApiError(
+      409,
+      "변경 후 포인트가 허용 범위를 벗어납니다.",
+      { points: "포인트 금액을 확인해 주세요." },
+    );
+  }
+
+  const normalizedAdmin = adminUsername.trim().slice(0, 128);
+  const operationId = crypto.randomUUID();
+  const guardIds: string[] = [];
+  const statements: D1PreparedStatement[] = [];
+  if (difference !== 0) {
+    statements.push(
+      database
+        .prepare(
+          `UPDATE users
+           SET points = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ? AND points = ?`,
+        )
+        .bind(memberPointsAfter, user.id, memberPointsBefore),
+    );
+    const userGuardId = `${operationId}:user`;
+    guardIds.push(userGuardId);
+    statements.push(pointGuardStatement(database, userGuardId, user.id));
+    statements.push(
+      database
+        .prepare(
+          `UPDATE admin_point_ledger
+           SET balance_before = balance_before + ?,
+               balance_after = balance_after + ?,
+               revision = revision + 1
+           WHERE user_id = ?
+             AND id <> ?
+             AND deleted_at IS NULL
+             AND (
+               created_at > ?
+               OR (created_at = ? AND id > ?)
+             )`,
+        )
+        .bind(
+          difference,
+          difference,
+          user.id,
+          row.id,
+          row.created_at,
+          row.created_at,
+          row.id,
+        ),
+    );
+  }
+  statements.push(
+    database
+      .prepare(
+        `UPDATE admin_point_ledger
+         SET delta = ?,
+             balance_after = ?,
+             reason = ?,
+             expires_at = NULL,
+             created_at = ?,
+             revision = revision + 1,
+             admin_username = ?
+         WHERE id = ? AND revision = ? AND deleted_at IS NULL`,
+      )
+      .bind(
+        values.delta,
+        balanceAfter,
+        values.reason,
+        values.occurredAt,
+        normalizedAdmin,
+        row.id,
+        values.revision,
+      ),
+  );
+  const entryGuardId = `${operationId}:entry`;
+  guardIds.push(entryGuardId);
+  statements.push(pointGuardStatement(database, entryGuardId, row.id));
+  statements.push(
+    database
+      .prepare(
+        `INSERT INTO admin_audit_logs (
+           admin_id, action, entity_type, entity_id, details
+         ) VALUES (NULL, 'point.update', 'point', ?, ?)`,
+      )
+      .bind(
+        row.id,
+        JSON.stringify({
+          adminUsername: normalizedAdmin,
+          loginId: user.login_id,
+          before: {
+            delta: oldDelta,
+            reason: row.reason,
+            occurredAt: row.created_at,
+            memberPoints: memberPointsBefore,
+          },
+          after: {
+            delta: values.delta,
+            reason: values.reason,
+            occurredAt: values.occurredAt,
+            memberPoints: memberPointsAfter,
+          },
+        }).slice(0, 10_000),
+      ),
+  );
+  statements.push(
+    database
+      .prepare(
+        `DELETE FROM admin_point_write_guards
+         WHERE operation_id IN (${guardIds.map(() => "?").join(", ")})`,
+      )
+      .bind(...guardIds),
+  );
+
+  try {
+    await database.batch(statements);
+  } catch (error) {
+    if (isPointWriteConflict(error)) {
+      throw new AdminApiError(
+        409,
+        "회원 잔액 또는 포인트 내역이 다른 작업에서 변경되었습니다. 최신 목록을 확인한 뒤 다시 저장해 주세요.",
+      );
+    }
+    throw error;
+  }
+
+  return {
+    entry: {
+      id: row.id,
+      userId: user.id,
+      loginId: user.login_id,
+      name: user.name,
+      delta: values.delta,
+      balanceBefore,
+      balanceAfter,
+      reason: values.reason,
+      revision: values.revision + 1,
+      createdAt: values.occurredAt,
+    },
+    memberPoints: memberPointsAfter,
   };
 }
 
@@ -275,7 +470,7 @@ export async function deleteAdminPointEntries(
     const after = before - (deltaByUser.get(userId) ?? 0);
     if (
       !Number.isSafeInteger(after) ||
-      after < 0 ||
+      after < -MAX_POINTS ||
       after > MAX_POINTS
     ) {
       throw new AdminApiError(
@@ -398,7 +593,6 @@ function parseCreateInput(input: unknown): {
   loginId: string;
   delta: number;
   reason: string;
-  expiresAt: string | null;
 } {
   const body = objectInput(input);
   const loginId =
@@ -406,10 +600,6 @@ function parseCreateInput(input: unknown): {
   const reason =
     typeof body.reason === "string" ? body.reason.trim() : "";
   const delta = body.delta;
-  const expiresAt =
-    typeof body.expiresAt === "string" && body.expiresAt.trim()
-      ? body.expiresAt.trim()
-      : null;
   const errors: Record<string, string> = {};
   if (!loginIdPattern.test(loginId)) {
     errors.loginId = "회원아이디를 확인해 주세요.";
@@ -425,18 +615,66 @@ function parseCreateInput(input: unknown): {
   if (reason.length < 2 || reason.length > 255) {
     errors.reason = "포인트 내용은 2자 이상 255자 이하로 입력해 주세요.";
   }
-  if (
-    expiresAt &&
-    (!/^\d{4}-\d{2}-\d{2}$/u.test(expiresAt) ||
-      !Number.isFinite(Date.parse(`${expiresAt}T00:00:00+09:00`)) ||
-      expiresAt < koreaToday())
-  ) {
-    errors.expiresAt = "만료일은 오늘 이후의 날짜로 입력해 주세요.";
-  }
   if (Object.keys(errors).length > 0) {
     throw new AdminApiError(400, "포인트 입력 내용을 확인해 주세요.", errors);
   }
-  return { loginId, delta: delta as number, reason, expiresAt };
+  return { loginId, delta: delta as number, reason };
+}
+
+function parseUpdateInput(input: unknown): {
+  id: string;
+  revision: number;
+  delta: number;
+  reason: string;
+  occurredAt: string;
+} {
+  const body = objectInput(input);
+  const id = typeof body.id === "string" ? body.id.trim() : "";
+  const revision = body.revision;
+  const delta = body.delta;
+  const reason =
+    typeof body.reason === "string" ? body.reason.trim() : "";
+  const occurredAt = normalizeOccurredAt(body.occurredAt);
+  const errors: Record<string, string> = {};
+  if (!pointEntryIdPattern.test(id)) {
+    errors.id = "포인트 내역 번호를 확인해 주세요.";
+  }
+  if (
+    typeof revision !== "number" ||
+    !Number.isSafeInteger(revision) ||
+    revision < 1 ||
+    revision > 2_147_483_647
+  ) {
+    errors.revision = "포인트 내역 기준값을 확인해 주세요.";
+  }
+  if (
+    typeof delta !== "number" ||
+    !Number.isSafeInteger(delta) ||
+    delta === 0 ||
+    Math.abs(delta) > MAX_POINTS
+  ) {
+    errors.points = "포인트는 0이 아닌 정수로 입력해 주세요.";
+  }
+  if (reason.length < 2 || reason.length > 255) {
+    errors.reason = "포인트 내용은 2자 이상 255자 이하로 입력해 주세요.";
+  }
+  if (!occurredAt) {
+    errors.occurredAt = "포인트 일시를 확인해 주세요.";
+  }
+  if (Object.keys(errors).length > 0) {
+    throw new AdminApiError(
+      400,
+      "수정할 포인트 내용을 확인해 주세요.",
+      errors,
+    );
+  }
+  return {
+    id,
+    revision: revision as number,
+    delta: delta as number,
+    reason,
+    occurredAt: occurredAt!,
+  };
 }
 
 function parseDeleteInput(input: unknown): {
@@ -528,11 +766,87 @@ function isPointWriteConflict(error: unknown): boolean {
   );
 }
 
-function koreaToday(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+function normalizeOccurredAt(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  const match =
+    /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(?::(\d{2}))?$/u.exec(
+      normalized,
+    );
+  if (!match) return null;
+  const milliseconds = Date.parse(
+    `${match[1]}T${match[2]}:${match[3] ?? "00"}+09:00`,
+  );
+  if (
+    !Number.isFinite(milliseconds) ||
+    milliseconds < Date.parse("2000-01-01T00:00:00Z") ||
+    milliseconds > Date.parse("2100-12-31T23:59:59Z")
+  ) {
+    return null;
+  }
+  return new Date(milliseconds)
+    .toISOString()
+    .replace("T", " ")
+    .replace(/\.\d{3}Z$/u, "");
+}
+
+async function ensureSignedPointBalances(
+  database: D1Database,
+): Promise<void> {
+  const definition = await database
+    .prepare(
+      `SELECT sql FROM sqlite_master
+       WHERE type = 'table' AND name = 'admin_point_ledger'`,
+    )
+    .first<{ sql: string }>();
+  const sql = definition?.sql ?? "";
+  if (
+    !sql.includes("balance_before >= 0") &&
+    !sql.includes('"balance_before" >= 0')
+  ) {
+    return;
+  }
+  await database.batch([
+    database.prepare(
+      "ALTER TABLE admin_point_ledger RENAME TO admin_point_ledger_unsigned",
+    ),
+    database.prepare(`CREATE TABLE admin_point_ledger (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      delta INTEGER NOT NULL CHECK(delta <> 0),
+      balance_before INTEGER NOT NULL
+        CHECK(balance_before >= -${MAX_POINTS} AND balance_before <= ${MAX_POINTS}),
+      balance_after INTEGER NOT NULL
+        CHECK(balance_after >= -${MAX_POINTS} AND balance_after <= ${MAX_POINTS}),
+      reason TEXT NOT NULL,
+      expires_at TEXT,
+      revision INTEGER NOT NULL DEFAULT 1 CHECK(revision >= 1),
+      admin_username TEXT NOT NULL DEFAULT '',
+      deleted_at TEXT,
+      deleted_by TEXT NOT NULL DEFAULT '',
+      delete_reason TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CHECK(balance_after = balance_before + delta)
+    )`),
+    database.prepare(
+      `INSERT INTO admin_point_ledger (
+         id, user_id, delta, balance_before, balance_after, reason,
+         expires_at, revision, admin_username, deleted_at, deleted_by,
+         delete_reason, created_at
+       )
+       SELECT id, user_id, delta, balance_before, balance_after, reason,
+              NULL, revision, admin_username, deleted_at, deleted_by,
+              delete_reason, created_at
+       FROM admin_point_ledger_unsigned`,
+    ),
+    database.prepare("DROP TABLE admin_point_ledger_unsigned"),
+    database.prepare(
+      `CREATE INDEX admin_point_ledger_user_idx
+       ON admin_point_ledger(user_id, created_at)`,
+    ),
+    database.prepare(
+      `CREATE INDEX admin_point_ledger_active_idx
+       ON admin_point_ledger(deleted_at, created_at)`,
+    ),
+  ]);
 }

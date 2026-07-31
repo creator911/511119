@@ -73,6 +73,9 @@ test("mypage uses the legacy Eyoom information, order, and wishlist structure", 
   assert.match(panel, /wishlist\.slice\(0, 8\)/);
   assert.match(panel, /role="dialog"/);
   assert.match(panel, /aria-modal="true"/);
+  assert.doesNotMatch(panel, /만료일|expiresAt/u);
+  assert.match(panel, /timeZone: "Asia\/Seoul"/u);
+  assert.match(panel, /second: "2-digit"/u);
   assert.doesNotMatch(panel, /주문\/배송조회|충전신청|쇼핑 계속하기/);
 
   assert.match(styles, /\.myPageMemberPanel/);
@@ -113,6 +116,10 @@ test("mypage APIs return complete member, wishlist, and memo data without weaken
   }
   assert.match(session, /ensureAdminPointSchema/);
   assert.match(session, /deleted_at IS NULL/);
+  assert.doesNotMatch(session, /expires_at|expiresAt/u);
+  assert.doesNotMatch(client, /expiresAt/u);
+  assert.match(session, /points: Math\.trunc/u);
+  assert.match(client, /\? Math\.trunc\(user\.points\)/u);
   assert.match(wishlist, /rows\.slice\(0, 8\)/);
   assert.match(wishlist, /wishedAt: row\.created_at/);
 

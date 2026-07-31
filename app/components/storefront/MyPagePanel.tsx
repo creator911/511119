@@ -10,7 +10,6 @@ interface PointHistoryEntry {
   delta: number;
   balanceAfter: number;
   reason: string;
-  expiresAt: string;
   createdAt: string;
 }
 
@@ -365,7 +364,6 @@ export function MyPagePanel({
                   <span>내용</span>
                   <span>포인트</span>
                   <span>잔액</span>
-                  <span>만료일</span>
                 </div>
                 {pointHistory.map((entry) => (
                   <div key={entry.id}>
@@ -380,7 +378,6 @@ export function MyPagePanel({
                       {entry.delta.toLocaleString("ko-KR")}
                     </em>
                     <span>{entry.balanceAfter.toLocaleString("ko-KR")}</span>
-                    <span>{entry.expiresAt || "-"}</span>
                   </div>
                 ))}
               </div>
@@ -604,5 +601,18 @@ function MemoList({
 
 function displayDate(value: string) {
   if (!value) return "-";
-  return value.replace("T", " ").replace(/\.\d{3}Z$/u, "").replace(/Z$/u, "");
+  const date = new Date(
+    value.includes("T") ? value : `${value.replace(" ", "T")}Z`,
+  );
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).format(date);
 }

@@ -415,7 +415,6 @@ function ChargePointAdjustment() {
     const loginId = String(formData.get("mb_id") ?? "").trim();
     const reason = String(formData.get("po_content") ?? "").trim();
     const pointText = String(formData.get("po_point") ?? "").trim();
-    const expiresAt = String(formData.get("po_expire_date") ?? "").trim();
     if (!/^-?\d+$/u.test(pointText)) {
       setFailed(true);
       setMessage("포인트는 0이 아닌 정수로 입력해 주세요.");
@@ -442,7 +441,7 @@ function ChargePointAdjustment() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ loginId, reason, delta, expiresAt }),
+        body: JSON.stringify({ loginId, reason, delta }),
       });
       const result = (await response.json().catch(() => null)) as
         | PointAdjustmentResponse
@@ -546,17 +545,7 @@ function ChargePointAdjustment() {
                     required
                   />
                 </td>
-                <th scope="row">
-                  <label htmlFor="legacy-wallet-point-expiry">만료일</label>
-                </th>
-                <td>
-                  <input
-                    className="frm_input"
-                    id="legacy-wallet-point-expiry"
-                    name="po_expire_date"
-                    type="date"
-                  />
-                </td>
+                <td colSpan={2} />
               </tr>
             </tbody>
           </table>

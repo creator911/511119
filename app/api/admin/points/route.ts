@@ -8,6 +8,7 @@ import {
 import {
   createAdminPointEntry,
   deleteAdminPointEntries,
+  updateAdminPointEntry,
 } from "@/lib/admin-points";
 
 export async function POST(request: Request): Promise<Response> {
@@ -24,6 +25,22 @@ export async function POST(request: Request): Promise<Response> {
       },
       201,
     );
+  } catch (error) {
+    return adminApiErrorResponse(error);
+  }
+}
+
+export async function PATCH(request: Request): Promise<Response> {
+  try {
+    assertSameOrigin(request);
+    const session = await requireAdminApiSession(request);
+    const input = await readAdminJson(request, 20_000);
+    const result = await updateAdminPointEntry(input, session.username);
+    return adminJson({
+      ok: true,
+      ...result,
+      message: "포인트 내역과 회원 잔액을 저장했습니다.",
+    });
   } catch (error) {
     return adminApiErrorResponse(error);
   }

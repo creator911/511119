@@ -659,7 +659,6 @@ export function MyPageClient() {
       delta: number;
       balanceAfter: number;
       reason: string;
-      expiresAt: string;
       createdAt: string;
     }>
   >([]);
@@ -700,7 +699,7 @@ export function MyPageClient() {
           name: user.name || "회원",
           points:
             typeof user.points === "number" && Number.isFinite(user.points)
-              ? Math.max(0, Math.trunc(user.points))
+              ? Math.trunc(user.points)
               : 0,
           coupons:
             typeof user.coupons === "number" && Number.isFinite(user.coupons)

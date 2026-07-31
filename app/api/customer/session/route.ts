@@ -79,7 +79,7 @@ export async function GET(request: Request) {
       countAvailableCustomerCoupons(session.userId),
       database
         .prepare(
-          `SELECT id, delta, balance_after, reason, expires_at, created_at
+          `SELECT id, delta, balance_after, reason, created_at
            FROM admin_point_ledger
            WHERE user_id = ? AND deleted_at IS NULL
            ORDER BY created_at DESC, id DESC
@@ -91,7 +91,6 @@ export async function GET(request: Request) {
           delta: number;
           balance_after: number;
           reason: string;
-          expires_at: string | null;
           created_at: string;
         }>(),
     ]);
@@ -103,7 +102,7 @@ export async function GET(request: Request) {
         id: session.userId,
         loginId: session.loginId,
         name: session.name,
-        points: Math.max(0, Math.trunc(Number(currentUser.points) || 0)),
+        points: Math.trunc(Number(currentUser.points) || 0),
         coupons: couponCount,
         email: currentUser.email,
         phone: currentUser.phone,
@@ -116,12 +115,8 @@ export async function GET(request: Request) {
       pointHistory: (pointHistory.results ?? []).map((entry) => ({
         id: entry.id,
         delta: Math.trunc(Number(entry.delta) || 0),
-        balanceAfter: Math.max(
-          0,
-          Math.trunc(Number(entry.balance_after) || 0),
-        ),
+        balanceAfter: Math.trunc(Number(entry.balance_after) || 0),
         reason: entry.reason,
-        expiresAt: entry.expires_at ?? "",
         createdAt: entry.created_at,
       })),
       orders: (orders.results ?? []).map((order) => ({
