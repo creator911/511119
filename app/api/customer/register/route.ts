@@ -10,6 +10,7 @@ import {
   noStoreJson,
   readBoundedJson,
 } from "@/lib/http-boundary";
+import { scorePasswordStrength } from "@/lib/password-strength";
 
 interface RegistrationBody {
   userId?: string;
@@ -124,6 +125,12 @@ export async function POST(request: Request) {
     if (password.length < 8 || password.length > 128) {
       return noStoreJson(
         { error: "비밀번호는 8자 이상으로 입력해 주세요." },
+        { status: 400 },
+      );
+    }
+    if (scorePasswordStrength(password) < 2) {
+      return noStoreJson(
+        { error: "비밀번호의 강도는 보통 이상이어야 합니다." },
         { status: 400 },
       );
     }

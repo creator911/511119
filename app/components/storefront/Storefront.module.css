@@ -3231,7 +3231,7 @@
 }
 
 .legacyRegisterForm {
-  max-width: 1102px;
+  max-width: 1116px;
   margin: 0 auto;
 }
 
@@ -3240,6 +3240,10 @@
   margin-bottom: 20px;
   border: 1px solid #ddd;
   background: #fff;
+}
+
+.legacyRegisterForm > .legacyInfoSection:first-of-type {
+  margin-bottom: 10px;
 }
 
 .legacyAgreementSection > h2,
@@ -3322,7 +3326,302 @@
 }
 
 .legacyInfoSection .fieldTable {
-  margin: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  margin: 21px 17px 18px;
+  border-top: 0;
+}
+
+.legacyInfoSection .formRow {
+  display: block;
+  min-height: 0;
+  padding: 0 0 15px;
+  border-bottom: 0;
+}
+
+.legacyInfoSection .formRow > span {
+  display: block;
+  padding: 0 0 7px;
+  color: #555;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.legacyInfoSection .formRow > span em {
+  display: none;
+}
+
+.legacyInfoSection .formRow > div {
+  width: 100%;
+  max-width: none;
+  gap: 7px;
+  padding: 0;
+}
+
+.legacyInfoSection .formRow > div > input,
+.legacyInfoSection .formRow > div > select {
+  max-width: none;
+}
+
+.legacyInfoSection .formRow input,
+.legacyInfoSection .formRow select {
+  min-height: 38px;
+  height: 38px;
+}
+
+.legacyInfoSection .inlineField {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.legacyInputFrame {
+  position: relative;
+  width: 100%;
+}
+
+.legacyInputFrame input,
+.legacyInputFrame select,
+.legacyInfoSection .inlineField input {
+  width: 100%;
+  padding-left: 47px;
+}
+
+.legacyInfoSection .inlineField input {
+  padding-right: 128px;
+}
+
+.legacyInputIcon {
+  position: absolute;
+  z-index: 2;
+  top: 1px;
+  left: 1px;
+  display: grid;
+  width: 37px;
+  height: 36px;
+  place-items: center;
+  border-right: 1px solid #ddd;
+  color: #555;
+  background: #f7f7f7;
+  font: 900 13px/1 "Font Awesome 5 Free";
+  pointer-events: none;
+}
+
+.legacyRequiredInput::after {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-top: 8px solid var(--kiel-red);
+  border-left: 8px solid transparent;
+  content: "";
+  pointer-events: none;
+}
+
+.legacyBirthInput {
+  width: 100px;
+}
+
+.legacyInfoSection .inlineField button {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  height: 36px;
+  min-width: 118px;
+  border: 0;
+  border-left: 1px solid #ddd;
+  color: #555;
+  background: #f7f7f7;
+}
+
+.legacyInfoSection .inlineField .legacyCheckButton::before {
+  margin-right: 5px;
+  color: var(--kiel-red);
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.legacyHalfOwnRow {
+  grid-column: 1 / -1;
+  width: calc(50% - 12px);
+}
+
+.legacyThirdOwnRow {
+  grid-column: 1 / -1;
+  width: calc(33.333% - 16px);
+}
+
+.legacyInfoSection select[name="birthYear"] {
+  width: 100px;
+}
+
+.legacyNicknameNotice {
+  grid-column: 1 / -1;
+  margin: -3px 0 15px;
+  padding: 10px 13px;
+  border: 1px solid #faebcc;
+  color: #8a6d3b;
+  background: #fcf8e3;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.legacyInfoSection .addressRow {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.legacyInfoSection .addressRow > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 24px;
+}
+
+.legacyInfoSection .addressRow .inlineField,
+.legacyInfoSection .addressRow input[name="address1"] {
+  grid-column: 1 / -1;
+}
+
+.legacyInfoSection .addressRow .inlineField {
+  width: calc(50% - 12px);
+}
+
+.legacyInfoSection .addressRow > div > input {
+  width: 100%;
+  max-width: none;
+}
+
+@media (min-width: 992px) {
+  .legacyInfoSection .legacyAccountIdRow {
+    padding-bottom: 25.5px;
+  }
+
+  .legacyInfoSection .legacyNameRow {
+    padding-bottom: 32.5px;
+  }
+
+  .legacyNicknameNotice {
+    min-height: 97.5px;
+  }
+
+  .legacyInfoSection .legacyBirthRow {
+    padding-bottom: 17.5px;
+  }
+
+  .legacyInfoSection .legacyEmailRow {
+    padding-bottom: 40.5px;
+  }
+
+  .legacyInfoSection .legacyPhoneRow {
+    padding-bottom: 32.5px;
+  }
+
+  .legacyInfoSection .addressRow > div {
+    row-gap: 30px;
+  }
+
+  .legacyInfoSection .addressRow input[name="address1"] {
+    margin-bottom: 15px;
+  }
+}
+
+.passwordStrengthMeter {
+  grid-column: 1 / -1;
+  padding: 15px 2px 0;
+  border-bottom: 0;
+  color: #777;
+  background: #fff;
+  font-size: 11px;
+}
+
+.passwordStrengthHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #555;
+  font-size: 13px;
+  line-height: 22.5px;
+}
+
+.passwordStrengthHeading,
+.passwordStrengthTrack,
+.passwordStrengthMeter p,
+.passwordStrengthMeter > small {
+  width: calc(50% - 7px);
+  max-width: 526px;
+}
+
+.passwordStrengthHeading strong {
+  color: #fb8c00;
+  font-weight: 500;
+}
+
+.passwordStrengthTrack {
+  height: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  background: #eee;
+}
+
+.passwordStrengthTrack span {
+  display: block;
+  width: var(--password-strength-width);
+  height: 100%;
+  background: var(--password-strength-color);
+  transition:
+    width 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.passwordStrengthMeter p {
+  margin: 0;
+  color: #999;
+}
+
+.passwordStrengthMeter p strong {
+  font-weight: 600;
+}
+
+.passwordStrengthMeter p em {
+  color: #d32f2f;
+  font-style: normal;
+}
+
+.passwordStrengthMeter > small {
+  display: block;
+  margin-top: 6px;
+}
+
+.passwordStrength0 {
+  --password-strength-color: #000;
+  --password-strength-width: 10%;
+}
+
+.passwordStrength1 {
+  --password-strength-color: #ff4848;
+  --password-strength-width: 25%;
+}
+
+.passwordStrength2 {
+  --password-strength-color: #ff6f42;
+  --password-strength-width: 50%;
+}
+
+.passwordStrength3 {
+  --password-strength-color: #fdab29;
+  --password-strength-width: 75%;
+}
+
+.passwordStrength4 {
+  --password-strength-color: #73b852;
+  --password-strength-width: 100%;
 }
 
 .legacyPreferenceRows {
@@ -3455,8 +3754,9 @@
   flex: 1 1 25%;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  color: #b8b8b8;
+  gap: 0;
+  padding-top: 1px;
+  color: #212529;
   text-align: center;
 }
 
@@ -3467,35 +3767,110 @@
   right: 50%;
   width: 100%;
   height: 1px;
-  background: #ddd;
+  background: #d5d5d5;
   content: "";
 }
 
-.checkoutSteps span {
+.checkoutStepIcon {
   position: relative;
   z-index: 1;
   display: grid;
-  width: 82px;
-  height: 82px;
+  width: 80px;
+  height: 80px;
   place-items: center;
-  border: 4px solid currentcolor;
+  border: 5px solid currentcolor;
   border-radius: 50%;
+  color: #b5b5b5;
   background: #fff;
-  font: 900 28px "Font Awesome 5 Free";
 }
 
-.checkoutSteps strong {
+.checkoutStepIcon i {
+  position: relative;
+  z-index: 1;
+  font: 900 30px/30px "Font Awesome 5 Free";
+  font-style: normal;
+}
+
+.checkoutStepMarker {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 0;
+  pointer-events: none;
+}
+
+.checkoutStepAlarm {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 26px;
+  height: 26px;
+  border: 5px solid #e53935;
+  border-radius: 70px;
+  animation: checkout-alarm-effect 1s ease infinite;
+}
+
+.checkoutStepPoint {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 6px;
+  height: 6px;
+  border-radius: 30px;
+  background: #e53935;
+}
+
+@keyframes checkout-alarm-effect {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  25% {
+    opacity: 0.1;
+    transform: scale(0.1);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: scale(0.5);
+  }
+
+  75% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.checkoutStepCaption {
+  display: block;
+  width: 100%;
+  padding: 10px 5px;
+  color: #b5b5b5;
   font-size: 15px;
+  font-weight: 700;
+  line-height: 22.5px;
 }
 
 .checkoutSteps .checkoutStepActive {
-  color: #222;
+  color: #212529;
 }
 
-.checkoutSteps .checkoutStepActive span {
-  color: #222;
-  border-color: #222;
+.checkoutSteps .checkoutStepActive .checkoutStepIcon {
+  color: #252525;
+  border-color: #252525;
   background: #fff;
+}
+
+.checkoutSteps .checkoutStepActive .checkoutStepCaption {
+  color: #252525;
 }
 
 .cartTable {
@@ -4582,6 +4957,31 @@
     max-width: 720px;
   }
 
+  .legacyInfoSection .fieldTable {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .legacyHalfOwnRow,
+  .legacyThirdOwnRow,
+  .legacyNicknameNotice,
+  .legacyInfoSection .addressRow,
+  .passwordStrengthMeter {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .legacyInfoSection .addressRow > div {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .legacyInfoSection .addressRow .inlineField,
+  .legacyInfoSection .addressRow input[name="address1"] {
+    grid-column: 1;
+    width: 100%;
+  }
+
   .navWrap {
     display: none;
   }
@@ -5043,25 +5443,45 @@
   .checkoutSteps li {
     min-width: 0;
     flex-direction: column;
-    gap: 7px;
+    gap: 0;
     text-align: center;
   }
 
   .checkoutSteps li + li::before {
-    top: 29px;
+    top: 30px;
     right: 50%;
     width: 100%;
   }
 
-  .checkoutSteps span {
+  .checkoutStepIcon {
     width: 60px;
     height: 60px;
     border-width: 3px;
     font-size: 20px;
   }
 
-  .checkoutSteps strong {
-    font-size: 10px;
+  .checkoutStepIcon i {
+    font-size: 20px;
+    line-height: 20px;
+  }
+
+  .checkoutStepMarker {
+    width: 54px;
+  }
+
+  .checkoutStepAlarm {
+    top: 0;
+    right: 0;
+  }
+
+  .checkoutStepPoint {
+    top: 10px;
+    right: 10px;
+  }
+
+  .checkoutStepCaption {
+    font-size: 14px;
+    line-height: 21px;
   }
 
   .legacyCheckoutProductHeader {
@@ -5483,7 +5903,57 @@
   }
 
   .legacyInfoSection .fieldTable {
-    margin: 10px 13px;
+    margin: 0 17px 10px;
+  }
+
+  .legacyRegisterForm > .legacyInfoSection:first-of-type {
+    margin-bottom: 20px;
+  }
+
+  .legacyInfoSection .legacyAccountIdRow {
+    padding-bottom: 25.5px;
+  }
+
+  .legacyInfoSection .legacyPasswordRow,
+  .legacyInfoSection .legacyNameRow {
+    padding-bottom: 32.5px;
+  }
+
+  .legacyNicknameNotice {
+    min-height: 166.5px;
+  }
+
+  .legacyInfoSection .legacyBirthRow {
+    padding-bottom: 17.5px;
+  }
+
+  .legacyInfoSection .legacyEmailRow {
+    padding-bottom: 40.5px;
+  }
+
+  .legacyInfoSection .legacyPhoneRow {
+    padding-bottom: 32.5px;
+  }
+
+  .legacyInfoSection .addressRow > div {
+    row-gap: 45px;
+  }
+
+  .legacyInfoSection .addressRow .inlineField {
+    margin-bottom: 22px;
+  }
+
+  .passwordStrengthMeter {
+    margin-top: -2px;
+    padding: 0 2px;
+  }
+
+  .passwordStrengthHeading,
+  .passwordStrengthTrack,
+  .passwordStrengthMeter p,
+  .passwordStrengthMeter > small {
+    width: 100%;
+    max-width: none;
   }
 
   .legacyPreferenceRows {
@@ -5519,12 +5989,12 @@
   }
 
   .checkoutSteps li + li::before {
-    top: 26px;
+    top: 30px;
   }
 
-  .checkoutSteps span {
-    width: 54px;
-    height: 54px;
+  .checkoutStepIcon {
+    width: 60px;
+    height: 60px;
     font-size: 18px;
   }
 

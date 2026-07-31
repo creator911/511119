@@ -40,8 +40,16 @@ function CheckoutSteps({ active }: { active: 1 | 2 | 3 | 4 }) {
           className={step.number === active ? styles.checkoutStepActive : undefined}
           aria-current={step.number === active ? "step" : undefined}
         >
-          <span aria-hidden="true">{step.icon}</span>
-          <strong>{step.label}</strong>
+          <div className={styles.checkoutStepIcon} aria-hidden="true">
+            {step.number === active ? (
+              <span className={styles.checkoutStepMarker}>
+                <span className={styles.checkoutStepAlarm} />
+                <span className={styles.checkoutStepPoint} />
+              </span>
+            ) : null}
+            <i>{step.icon}</i>
+          </div>
+          <strong className={styles.checkoutStepCaption}>{step.label}</strong>
         </li>
       ))}
     </ol>

@@ -5,6 +5,10 @@ import styles from "./Storefront.module.css";
 import { PageHeading } from "./StorefrontPrimitives";
 import { classNames } from "./utils";
 import { openPostcodeSearch } from "@/app/components/daum-postcode";
+import {
+  PASSWORD_STRENGTH_LABELS,
+  scorePasswordStrength,
+} from "@/lib/password-strength";
 
 export interface LoginPayload {
   userId: string;
@@ -152,7 +156,9 @@ export function RegisterPanel({
   });
   const [emailOptIn, setEmailOptIn] = useState(true);
   const [publicProfile, setPublicProfile] = useState(true);
+  const [passwordValue, setPasswordValue] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [passwordStrengthError, setPasswordStrengthError] = useState(false);
   const [agreementError, setAgreementError] = useState("");
   const [availabilityMessage, setAvailabilityMessage] = useState("");
   const [availabilityChecks, setAvailabilityChecks] = useState({
@@ -164,6 +170,16 @@ export function RegisterPanel({
 
   const allChecked = agreements.terms && agreements.privacy;
   const currentYear = new Date().getFullYear();
+  const passwordStrength = passwordValue
+    ? scorePasswordStrength(passwordValue)
+    : null;
+  const passwordStrengthClasses = [
+    styles.passwordStrength0,
+    styles.passwordStrength1,
+    styles.passwordStrength2,
+    styles.passwordStrength3,
+    styles.passwordStrength4,
+  ];
 
   function toggleAll(checked: boolean) {
     setAgreements({ terms: checked, privacy: checked });
@@ -220,6 +236,10 @@ export function RegisterPanel({
     const form = new FormData(event.currentTarget);
     const password = String(form.get("password") ?? "");
     const confirmPassword = String(form.get("confirmPassword") ?? "");
+    if (scorePasswordStrength(password) < 2) {
+      setPasswordStrengthError(true);
+      return;
+    }
     if (password !== confirmPassword) {
       setPasswordMismatch(true);
       return;
@@ -238,6 +258,7 @@ export function RegisterPanel({
       return;
     }
     setPasswordMismatch(false);
+    setPasswordStrengthError(false);
     onSubmit?.({
       userId,
       password,
@@ -344,12 +365,29 @@ export function RegisterPanel({
               <section className={styles.legacyInfoSection}>
                 <h2>사이트 이용정보 입력</h2>
                 <div className={styles.fieldTable}>
-              <label className={styles.formRow}>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyHalfOwnRow,
+                  styles.legacyAccountIdRow,
+                )}
+              >
                 <span>
                   아이디 <em>*</em>
                 </span>
                 <div>
-                  <div className={styles.inlineField}>
+                  <div
+                    className={classNames(
+                      styles.inlineField,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf007"}
+                    </i>
                     <input
                       name="userId"
                       type="text"
@@ -365,6 +403,7 @@ export function RegisterPanel({
                     />
                     <button
                       type="button"
+                      className={styles.legacyCheckButton}
                       onClick={() => void checkAvailability("userId")}
                     >
                       중복체크
@@ -375,19 +414,42 @@ export function RegisterPanel({
                   </small>
                 </div>
               </label>
-              <label className={styles.formRow}>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyPasswordRow,
+                )}
+              >
                 <span>
                   비밀번호 <em>*</em>
                 </span>
                 <div>
-                  <input
-                    name="password"
-                    type="password"
-                    minLength={8}
-                    autoComplete="new-password"
-                    required
-                  />
-                  <small>영문, 숫자, 특수문자를 조합해 8자 이상 입력해 주세요.</small>
+                  <div
+                    className={classNames(
+                      styles.legacyInputFrame,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf023"}
+                    </i>
+                    <input
+                      name="password"
+                      type="password"
+                      minLength={8}
+                      maxLength={20}
+                      autoComplete="new-password"
+                      required
+                      value={passwordValue}
+                      onChange={(event) => {
+                        setPasswordValue(event.target.value);
+                        setPasswordStrengthError(false);
+                      }}
+                    />
+                  </div>
                 </div>
               </label>
               <label className={styles.formRow}>
@@ -395,13 +457,27 @@ export function RegisterPanel({
                   비밀번호 확인 <em>*</em>
                 </span>
                 <div>
-                  <input
-                    name="confirmPassword"
-                    type="password"
-                    minLength={8}
-                    autoComplete="new-password"
-                    required
-                  />
+                  <div
+                    className={classNames(
+                      styles.legacyInputFrame,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf023"}
+                    </i>
+                    <input
+                      name="confirmPassword"
+                      type="password"
+                      minLength={8}
+                      maxLength={20}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
                   {passwordMismatch ? (
                     <small className={styles.fieldError} role="alert">
                       비밀번호가 일치하지 않습니다.
@@ -409,26 +485,94 @@ export function RegisterPanel({
                   ) : null}
                 </div>
               </label>
+              {passwordStrength !== null ? (
+                <div
+                  className={classNames(
+                    styles.passwordStrengthMeter,
+                    passwordStrengthClasses[passwordStrength],
+                  )}
+                  aria-live="polite"
+                >
+                  <div className={styles.passwordStrengthHeading}>
+                    <span>보안강도체크</span>
+                    <strong>
+                      {PASSWORD_STRENGTH_LABELS[passwordStrength]}
+                    </strong>
+                  </div>
+                  <div className={styles.passwordStrengthTrack}>
+                    <span />
+                  </div>
+                  <p>
+                    <strong>Note:</strong> 보안강도는 <em>보통</em> 이상이어야
+                    합니다.
+                  </p>
+                  {passwordStrengthError ? (
+                    <small className={styles.fieldError} role="alert">
+                      비밀번호의 강도는 보통 이상이어야 합니다.
+                    </small>
+                  ) : null}
+                </div>
+              ) : null}
                 </div>
               </section>
 
               <section className={styles.legacyInfoSection}>
                 <h2>개인정보 입력</h2>
                 <div className={styles.fieldTable}>
-              <label className={styles.formRow}>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyHalfOwnRow,
+                  styles.legacyNameRow,
+                )}
+              >
                 <span>
                   이름 <em>*</em>
                 </span>
                 <div>
-                  <input name="name" type="text" autoComplete="name" required />
+                  <div
+                    className={classNames(
+                      styles.legacyInputFrame,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf007"}
+                    </i>
+                    <input
+                      name="name"
+                      type="text"
+                      autoComplete="name"
+                      required
+                    />
+                  </div>
                 </div>
               </label>
-              <label className={styles.formRow}>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyHalfOwnRow,
+                )}
+              >
                 <span>
                   닉네임 <em>*</em>
                 </span>
                 <div>
-                  <div className={styles.inlineField}>
+                  <div
+                    className={classNames(
+                      styles.inlineField,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf118"}
+                    </i>
                     <input
                       name="nickname"
                       type="text"
@@ -443,40 +587,82 @@ export function RegisterPanel({
                     />
                     <button
                       type="button"
+                      className={styles.legacyCheckButton}
                       onClick={() => void checkAvailability("nickname")}
                     >
                       중복체크
                     </button>
                   </div>
                   <small>
-                    <strong>Note:</strong> 공백 없이 한글·영문·숫자만 입력 가능
+                    <strong>Note:</strong> 닉네임 입력 후 중복체크 필수
                   </small>
                 </div>
               </label>
-              <label className={styles.formRow}>
+              <div className={styles.legacyNicknameNotice}>
+                공백없이 한글,영문,숫자만 입력 가능 (한글2자, 영문4자 이상) |
+                닉네임을 바꾸시면 앞으로 60일 이내에는 변경 할 수 없습니다.
+              </div>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyHalfOwnRow,
+                  styles.legacyBirthRow,
+                )}
+              >
                 <span>
                   생년월일 <em>*</em>
                 </span>
                 <div>
-                  <select name="birthYear" required defaultValue="">
-                    <option value="">년</option>
-                    {Array.from(
-                      { length: currentYear - 1959 },
-                      (_, index) => 1960 + index,
-                    ).map((year) => (
-                      <option value={year} key={year}>
-                        {year}년
-                      </option>
-                    ))}
-                  </select>
+                  <div
+                    className={classNames(
+                      styles.legacyInputFrame,
+                      styles.legacyBirthInput,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf073"}
+                    </i>
+                    <select name="birthYear" required defaultValue="">
+                      <option value="">년</option>
+                      {Array.from(
+                        { length: currentYear - 1959 },
+                        (_, index) => 1960 + index,
+                      ).map((year) => (
+                        <option value={year} key={year}>
+                          {year}년
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </label>
-              <label className={styles.formRow}>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyHalfOwnRow,
+                  styles.legacyEmailRow,
+                )}
+              >
                 <span>
                   이메일 <em>*</em>
                 </span>
                 <div>
-                  <div className={styles.inlineField}>
+                  <div
+                    className={classNames(
+                      styles.inlineField,
+                      styles.legacyRequiredInput,
+                    )}
+                  >
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf0e0"}
+                    </i>
                     <input
                       name="email"
                       type="email"
@@ -491,6 +677,7 @@ export function RegisterPanel({
                     />
                     <button
                       type="button"
+                      className={styles.legacyCheckButton}
                       onClick={() => void checkAvailability("email")}
                     >
                       중복체크
@@ -501,25 +688,41 @@ export function RegisterPanel({
                   </small>
                 </div>
               </label>
-              <label className={styles.formRow}>
-                <span>
-                  휴대전화 <em>*</em>
-                </span>
+              <label
+                className={classNames(
+                  styles.formRow,
+                  styles.legacyThirdOwnRow,
+                  styles.legacyPhoneRow,
+                )}
+              >
+                <span>전화번호</span>
                 <div>
-                  <input
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    required
-                    placeholder="010-0000-0000"
-                  />
+                  <div className={styles.legacyInputFrame}>
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf095"}
+                    </i>
+                    <input
+                      name="phone"
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                    />
+                  </div>
                 </div>
               </label>
               <div className={classNames(styles.formRow, styles.addressRow)}>
                 <span>주소</span>
                 <div>
                   <div className={styles.inlineField}>
+                    <i
+                      className={styles.legacyInputIcon}
+                      aria-hidden="true"
+                    >
+                      {"\uf3c5"}
+                    </i>
                     <input
                       name="postcode"
                       type="text"
@@ -573,6 +776,13 @@ export function RegisterPanel({
                     type="text"
                     autoComplete="address-line2"
                     placeholder="상세주소"
+                  />
+                  <input
+                    name="address3"
+                    type="text"
+                    readOnly
+                    tabIndex={-1}
+                    placeholder="참고항목"
                   />
                 </div>
               </div>

@@ -122,6 +122,7 @@ const anonymousApiChecks = [
     path: "/api/customer/register",
     expected: [400],
     body: {},
+    headers: { "cf-connecting-ip": `qa-local-register-${Date.now()}` },
   },
   {
     method: "POST",
