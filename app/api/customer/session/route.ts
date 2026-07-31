@@ -299,6 +299,10 @@ export async function POST(request: Request) {
         { status: error.status },
       );
     }
+    console.error(
+      "[customer-session] login failed",
+      error instanceof Error ? error.message : "unknown error",
+    );
     return noStoreJson(
       { error: "로그인 처리 중 오류가 발생했습니다." },
       { status: 500 },
