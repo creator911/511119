@@ -7,6 +7,8 @@ import {
 } from "@/lib/storefront-admin-tools";
 import "./globals.css";
 
+const SOCIAL_PREVIEW_IMAGE = "/goldrian-og.png?v=20260801";
+
 export async function generateMetadata(): Promise<Metadata> {
   const [requestHeaders, metaSettings] = await Promise.all([
     headers(),
@@ -34,6 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(`${protocol}://${safeHost}`),
+    alternates: {
+      canonical: "/",
+    },
     title: {
       default: metaSettings.title,
       template: `%s | ${metaSettings.title}`,
@@ -49,12 +54,13 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "ko_KR",
+      url: "/",
       siteName: "GOLDRIAN",
       title: metaSettings.title,
       description: metaSettings.description,
       images: [
         {
-          url: "/goldrian-og.png",
+          url: SOCIAL_PREVIEW_IMAGE,
           width: 1983,
           height: 793,
           alt: "GOLDRIAN 골드리안",
@@ -65,7 +71,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: metaSettings.title,
       description: metaSettings.description,
-      images: ["/goldrian-og.png"],
+      images: [SOCIAL_PREVIEW_IMAGE],
     },
   };
 }
