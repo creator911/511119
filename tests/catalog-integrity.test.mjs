@@ -42,13 +42,14 @@ test("preserves the complete public catalog with local media only", async () => 
   );
   assert.equal(
     catalog.products.filter((product) => product.flags.sale).length,
-    6,
+    7,
   );
   const reverseHeartBearNecklace = catalog.products.find(
     (product) => product.id === "1762010733",
   );
   assert.equal(reverseHeartBearNecklace?.price, 980_000);
-  assert.equal(reverseHeartBearNecklace?.originalPrice, 980_000);
+  assert.equal(reverseHeartBearNecklace?.originalPrice, 1_300_000);
+  assert.equal(reverseHeartBearNecklace?.flags.sale, true);
 
   const pumaRing = catalog.products.find(
     (product) => product.id === "1762011422",

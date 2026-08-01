@@ -3240,7 +3240,7 @@
       "name": "리버스 하트 곰돌이 목걸이",
       "basic": "",
       "price": 980000,
-      "originalPrice": 980000,
+      "originalPrice": 1300000,
       "stock": 999,
       "maker": "",
       "origin": "",
@@ -3251,7 +3251,7 @@
         "recommend": false,
         "new": false,
         "popular": false,
-        "sale": false
+        "sale": true
       },
       "images": [
         "/legacy/products/1762010733/gallery-1.jpg",
