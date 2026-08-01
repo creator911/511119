@@ -72,3 +72,18 @@ test("protected admin layout loads the legacy skin and keeps mobile fixed-width"
   assert.match(legacyCss, /\.kiel-legacy-admin #hd_top,[\s\S]*min-width:\s*1200px !important/);
   assert.match(legacyCss, /min-width:\s*1200px !important/);
 });
+
+test("member rows keep compact checkbox columns and a two-by-two action grid", async () => {
+  const [manager, legacyCss] = await Promise.all([
+    source("app/adm/(protected)/users/UsersManager.tsx"),
+    source("app/adm/legacy-admin.css"),
+  ]);
+
+  assert.match(manager, /className="legacy-member-manage-grid"/);
+  assert.match(legacyCss, /\.legacy-member-col-flag \{[\s\S]*?width:\s*62px/);
+  assert.match(legacyCss, /\.legacy-member-col-manage \{[\s\S]*?width:\s*126px/);
+  assert.match(
+    legacyCss,
+    /\.legacy-member-manage-grid \{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*repeat\(2, 54px\)[\s\S]*?grid-auto-rows:\s*25px/,
+  );
+});

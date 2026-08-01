@@ -4826,11 +4826,11 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin .legacy-member-col-flag {
-  width: 100.046875px;
+  width: 62px;
 }
 
 .kiel-legacy-admin .legacy-member-table colgroup col:nth-child(5) {
-  width: 100.09375px;
+  width: 62px;
 }
 
 .kiel-legacy-admin .legacy-member-col-status {
@@ -4850,7 +4850,7 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin .legacy-member-col-manage {
-  width: 72px;
+  width: 126px;
 }
 
 .kiel-legacy-admin #container_wr .legacy-member-table thead th {
@@ -4947,9 +4947,20 @@ body:has(.kiel-legacy-admin) {
   text-decoration: underline;
 }
 
+.kiel-legacy-admin #container_wr .legacy-member-manage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 54px);
+  grid-auto-rows: 25px;
+  justify-content: center;
+  align-content: center;
+  gap: 3px;
+  width: 111px;
+  margin: 0 auto;
+}
+
 .kiel-legacy-admin #container_wr .legacy-member-manage {
-  width: 38px;
-  min-width: 38px;
+  width: 54px;
+  min-width: 54px;
   height: 25px !important;
   min-height: 25px !important;
   padding: 0 !important;
@@ -4963,12 +4974,11 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin #container_wr .legacy-member-group {
-  display: block;
-  width: 38px;
-  min-width: 38px;
+  width: 54px;
+  min-width: 54px;
   height: 25px !important;
   min-height: 25px !important;
-  margin: 3px auto 0;
+  margin: 0;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -4980,12 +4990,11 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin #container_wr .legacy-member-wallet {
-  display: block;
   width: 54px;
   min-width: 54px;
   height: 25px !important;
   min-height: 25px !important;
-  margin: 3px auto 0;
+  margin: 0;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -4997,12 +5006,11 @@ body:has(.kiel-legacy-admin) {
 }
 
 .kiel-legacy-admin #container_wr .legacy-member-order {
-  display: block;
   width: 54px;
   min-width: 54px;
   height: 25px !important;
   min-height: 25px !important;
-  margin: 3px auto 0;
+  margin: 0;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;

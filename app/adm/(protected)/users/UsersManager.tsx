@@ -2435,34 +2435,36 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                           )}
                     </td>
                     <td rowSpan={2}>
-                      <button
-                        type="button"
-                        className="legacy-member-manage"
-                        onClick={() => void openMember(record, "edit")}
-                      >
-                        수정
-                      </button>
-                      <button
-                        type="button"
-                        className="legacy-member-group"
-                        onClick={() => void openMemberGroups(record)}
-                      >
-                        그룹
-                      </button>
-                      <button
-                        type="button"
-                        className="legacy-member-wallet"
-                        onClick={() => void openMemberWallet(record)}
-                      >
-                        충환변경
-                      </button>
-                      <button
-                        type="button"
-                        className="legacy-member-order"
-                        onClick={() => void openMemberOrders(record)}
-                      >
-                        상품변경
-                      </button>
+                      <div className="legacy-member-manage-grid">
+                        <button
+                          type="button"
+                          className="legacy-member-manage"
+                          onClick={() => void openMember(record, "edit")}
+                        >
+                          수정
+                        </button>
+                        <button
+                          type="button"
+                          className="legacy-member-group"
+                          onClick={() => void openMemberGroups(record)}
+                        >
+                          그룹
+                        </button>
+                        <button
+                          type="button"
+                          className="legacy-member-wallet"
+                          onClick={() => void openMemberWallet(record)}
+                        >
+                          충환변경
+                        </button>
+                        <button
+                          type="button"
+                          className="legacy-member-order"
+                          onClick={() => void openMemberOrders(record)}
+                        >
+                          상품변경
+                        </button>
+                      </div>
                     </td>
                   </tr>,
                   <tr
