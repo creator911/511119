@@ -186,6 +186,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
   const [points, setPoints] = useState("0");
   const [active, setActive] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Set<RowKey>>(new Set());
+  const [cloningMemberId, setCloningMemberId] = useState("");
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
   const [groupLoading, setGroupLoading] = useState(false);
   const [groupSaving, setGroupSaving] = useState(false);
@@ -516,6 +517,49 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
       sortDirection,
       page: 1,
     });
+  };
+
+  const cloneMember = async (record: LegacyMemberRecord) => {
+    const id = String(record.id);
+    if (cloningMemberId) return;
+    setCloningMemberId(id);
+    try {
+      const response = await fetch(
+        `/api/admin/users/${encodeURIComponent(id)}/clone`,
+        {
+          method: "POST",
+          headers: { Accept: "application/json" },
+        },
+      );
+      const payload = await readMemberResponse(response);
+      if (response.status === 401) {
+        redirectToAdminLogin();
+        return;
+      }
+      if (!response.ok || !payload.member) {
+        throw new Error(
+          firstApiError(payload) ?? "회원 계정을 복제하지 못했습니다.",
+        );
+      }
+      pushToast({
+        title: "회원 계정을 복제했습니다.",
+        message: `${record.loginId} → ${payload.member.loginId}`,
+        tone: "success",
+      });
+      await loadMembers({ ...result.filters, page: 1 });
+      router.refresh();
+    } catch (cause) {
+      pushToast({
+        title: "회원 복제 실패",
+        message:
+          cause instanceof Error
+            ? cause.message
+            : "잠시 후 다시 시도해 주세요.",
+        tone: "danger",
+      });
+    } finally {
+      setCloningMemberId("");
+    }
   };
 
   const openMemberGroups = async (record: LegacyMemberRecord) => {
@@ -2463,6 +2507,17 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                           onClick={() => void openMemberOrders(record)}
                         >
                           상품변경
+                        </button>
+                        <button
+                          type="button"
+                          className="legacy-member-clone"
+                          onClick={() => void cloneMember(record)}
+                          disabled={Boolean(cloningMemberId)}
+                          aria-label={`${record.loginId} 계정 복제`}
+                        >
+                          {cloningMemberId === String(record.id)
+                            ? "복제중"
+                            : "복제"}
                         </button>
                       </div>
                     </td>

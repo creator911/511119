@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import "./admin-member-clone-integrity.test.mjs";
 
 const source = (path) =>
   readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -73,7 +74,7 @@ test("protected admin layout loads the legacy skin and keeps mobile fixed-width"
   assert.match(legacyCss, /min-width:\s*1200px !important/);
 });
 
-test("member rows keep compact checkbox columns and a two-by-two action grid", async () => {
+test("member rows keep compact checkbox columns and a compact action grid", async () => {
   const [manager, legacyCss] = await Promise.all([
     source("app/adm/(protected)/users/UsersManager.tsx"),
     source("app/adm/legacy-admin.css"),
@@ -84,6 +85,6 @@ test("member rows keep compact checkbox columns and a two-by-two action grid", a
   assert.match(legacyCss, /\.legacy-member-col-manage \{[\s\S]*?width:\s*126px/);
   assert.match(
     legacyCss,
-    /\.legacy-member-manage-grid \{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*repeat\(2, 54px\)[\s\S]*?grid-auto-rows:\s*25px/,
+    /\.legacy-member-manage-grid \{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*repeat\(2, 54px\)[\s\S]*?grid-auto-rows:\s*23px/,
   );
 });

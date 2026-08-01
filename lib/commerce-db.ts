@@ -70,7 +70,7 @@ export async function ensureCommerceSchema() {
         database.prepare(`CREATE TABLE IF NOT EXISTS users (
           id TEXT PRIMARY KEY,
           login_id TEXT NOT NULL UNIQUE,
-          email TEXT NOT NULL UNIQUE,
+          email TEXT NOT NULL,
           password_hash TEXT NOT NULL,
           name TEXT NOT NULL,
           nickname TEXT NOT NULL DEFAULT '',

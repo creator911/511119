@@ -915,6 +915,21 @@ export async function createAdminMember(
   const values = parseAdminMemberCreate(body);
   await ensureAdminOperationsSchema();
   const database = commerceDb();
+  const duplicate = await database
+    .prepare(
+      `SELECT id FROM users
+       WHERE login_id = ? OR email = ?
+       LIMIT 1`,
+    )
+    .bind(values.loginId, values.email)
+    .first<{ id: string }>();
+  if (duplicate) {
+    throw new AdminApiError(
+      409,
+      "이미 사용 중인 회원아이디 또는 이메일입니다.",
+      { loginId: "회원아이디와 이메일의 중복 여부를 확인해 주세요." },
+    );
+  }
   const id = crypto.randomUUID();
   const passwordHash = await hashCustomerPassword(values.password);
   const auditDetails = JSON.stringify({
@@ -1408,6 +1423,17 @@ export async function updateAdminMember(
   }
   if (Object.keys(errors).length > 0) {
     throw new AdminApiError(400, "회원 정보를 확인해 주세요.", errors);
+  }
+  if (updateEmail && email !== current.email) {
+    const duplicate = await database
+      .prepare("SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1")
+      .bind(email, id)
+      .first<{ id: string }>();
+    if (duplicate) {
+      throw new AdminApiError(409, "이미 사용 중인 이메일입니다.", {
+        email: "다른 이메일을 입력해 주세요.",
+      });
+    }
   }
 
   const before: Record<string, string | number | boolean> = {};

@@ -115,10 +115,13 @@ export async function PATCH(request: Request) {
       return noStoreJson({ error: "회원 정보를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const duplicate = await database
-      .prepare("SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1")
-      .bind(email, session.userId)
-      .first<{ id: string }>();
+    const duplicate =
+      email === profile.email
+        ? null
+        : await database
+            .prepare("SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1")
+            .bind(email, session.userId)
+            .first<{ id: string }>();
     if (duplicate) {
       return noStoreJson(
         { error: "이미 사용 중인 이메일입니다." },
