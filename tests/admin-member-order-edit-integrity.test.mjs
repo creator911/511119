@@ -27,8 +27,13 @@ test("member management exposes an authenticated product-change workflow", async
   assert.match(service, /stock_guard INTEGER NOT NULL CHECK\(stock_guard = 1\)/);
   assert.match(service, /WHERE id = \? AND user_id = \? AND updated_at = \?/);
   assert.match(service, /SET product_id = \?, product_name = \?, product_image = \?/);
+  assert.match(service, /unit_price = \?, quantity = \?, line_total = \?/);
+  assert.match(service, /const quantity = Number\(value\.quantity\)/);
+  assert.match(service, /const wasFullyPaidWithPoints =/);
+  assert.match(service, /\? maximumPointUse\s*:\s*Math\.min\(currentPointsUsed, maximumPointUse\)/s);
   assert.match(service, /SET stock = stock \+ \?/);
   assert.match(service, /SET stock = stock - \?/);
+  assert.match(service, /UPDATE order_option_items\s+SET quantity = \?/s);
   assert.match(service, /order_point_debits/);
   assert.match(service, /order_point_credits/);
   assert.match(service, /member\.order-item\.update/);
@@ -37,9 +42,12 @@ test("member management exposes an authenticated product-change workflow", async
   assert.match(manager, />\s*상품변경\s*</u);
   assert.match(manager, /title="상품변경"/);
   assert.match(manager, /상품ID \(it_id\)/u);
+  assert.match(manager, /<span>수량<\/span>/u);
+  assert.match(manager, /quantity: event\.currentTarget\.value/);
+  assert.match(manager, /quantity,/);
   assert.match(manager, /type="datetime-local"/);
   assert.match(manager, /step=\{1\}/);
-  assert.match(manager, /상품명·단가·주문금액·마일리지가 자동 계산/u);
+  assert.match(manager, /단가·주문금액·사용 및 보유 마일리지가 자동 계산/u);
   assert.match(styles, /\.legacy-member-order \{/);
   assert.match(styles, /\.legacy-member-order-editor/);
 });
@@ -100,6 +108,7 @@ test("product edits atomically update order totals, member points, and stock", (
     productId: "1762011927",
     productName: "호랑이 골드바",
     unitPrice: 500,
+    quantity: 3,
     memberPoints: 950,
   });
 
@@ -108,9 +117,9 @@ test("product edits atomically update order totals, member points, and stock", (
     {
       id: "order-1",
       user_id: "member-1",
-      subtotal: 500,
+      subtotal: 1500,
       discount: 200,
-      total: 300,
+      total: 1300,
       created_at: "2026-07-01 12:34:56",
       updated_at: "revision-2",
     },
@@ -119,7 +128,7 @@ test("product edits atomically update order totals, member points, and stock", (
     {
       ...database
         .prepare(
-          `SELECT product_id, product_name, unit_price, line_total, created_at
+          `SELECT product_id, product_name, unit_price, quantity, line_total, created_at
            FROM order_items WHERE id = 1`,
         )
         .get(),
@@ -128,7 +137,8 @@ test("product edits atomically update order totals, member points, and stock", (
       product_id: "1762011927",
       product_name: "호랑이 골드바",
       unit_price: 500,
-      line_total: 500,
+      quantity: 3,
+      line_total: 1500,
       created_at: "2026-07-01 12:34:56",
     },
   );
@@ -143,7 +153,7 @@ test("product edits atomically update order totals, member points, and stock", (
     database
       .prepare("SELECT stock FROM product_stock WHERE product_id = '1762011927'")
       .get().stock,
-    4,
+    2,
   );
 
   assert.throws(
@@ -156,6 +166,7 @@ test("product edits atomically update order totals, member points, and stock", (
         productId: "another-product",
         productName: "충돌상품",
         unitPrice: 100,
+        quantity: 2,
         memberPoints: 0,
       }),
     /constraint/iu,
@@ -181,8 +192,8 @@ function applyProductEdit(database, values) {
          WHERE id = 'order-1' AND user_id = 'member-1' AND updated_at = ?`,
       )
       .run(
-        values.unitPrice,
-        Math.max(0, values.unitPrice - 200),
+        values.unitPrice * values.quantity,
+        Math.max(0, values.unitPrice * values.quantity - 200),
         values.purchasedAt,
         values.nextUpdatedAt,
         values.expectedUpdatedAt,
@@ -197,14 +208,15 @@ function applyProductEdit(database, values) {
       .prepare(
         `UPDATE order_items
          SET product_id = ?, product_name = ?, unit_price = ?,
-             line_total = ?, created_at = ?
+             quantity = ?, line_total = ?, created_at = ?
          WHERE id = 1 AND order_id = 'order-1'`,
       )
       .run(
         values.productId,
         values.productName,
         values.unitPrice,
-        values.unitPrice,
+        values.quantity,
+        values.unitPrice * values.quantity,
         values.purchasedAt,
       );
     database
@@ -229,9 +241,9 @@ function applyProductEdit(database, values) {
       .run();
     database
       .prepare(
-        "UPDATE product_stock SET stock = stock - 1 WHERE product_id = '1762011927' AND stock >= 1",
+        "UPDATE product_stock SET stock = stock - ? WHERE product_id = '1762011927' AND stock >= ?",
       )
-      .run();
+      .run(values.quantity, values.quantity);
     database
       .prepare(
         `UPDATE admin_member_order_write_guards

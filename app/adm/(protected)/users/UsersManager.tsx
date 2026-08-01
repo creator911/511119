@@ -106,6 +106,7 @@ interface MemberOrdersApiResponse extends Partial<AdminMemberOrderList> {
 
 interface MemberOrderDraft {
   productId: string;
+  quantity: string;
   purchasedAt: string;
 }
 
@@ -905,6 +906,15 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
       );
       return;
     }
+    const quantity = Number(draft.quantity);
+    if (
+      !Number.isSafeInteger(quantity) ||
+      quantity < 1 ||
+      quantity > 99
+    ) {
+      setOrderError("수량은 1개부터 99개까지 입력해 주세요.");
+      return;
+    }
     const purchasedAt = walletLocalDateTimeToIso(draft.purchasedAt);
     if (!purchasedAt) {
       setOrderError("구매일시는 초 단위까지 정확히 입력해 주세요.");
@@ -922,6 +932,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
           body: JSON.stringify({
             itemId: item.itemId,
             productId,
+            quantity,
             purchasedAt,
             expectedUpdatedAt: item.updatedAt,
           }),
@@ -967,7 +978,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
       });
       pushToast({
         title: "구매상품을 수정했습니다.",
-        message: `${item.orderId} 주문의 상품·구매일·금액·마일리지를 반영했습니다.`,
+        message: `${item.orderId} 주문의 상품·수량·구매일·금액·마일리지를 반영했습니다.`,
         tone: "success",
       });
     } catch (cause) {
@@ -2735,6 +2746,13 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                     const draft = orderDrafts[item.itemId];
                     if (!draft) return null;
                     const rowSaving = orderSavingItemId === item.itemId;
+                    const parsedDraftQuantity = Number(draft.quantity);
+                    const previewQuantity =
+                      Number.isSafeInteger(parsedDraftQuantity) &&
+                      parsedDraftQuantity >= 1 &&
+                      parsedDraftQuantity <= 99
+                        ? parsedDraftQuantity
+                        : item.quantity;
                     return (
                       <article
                         className="legacy-member-order-card"
@@ -2761,6 +2779,23 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                               onChange={(event) =>
                                 updateMemberOrderDraft(item.itemId, {
                                   productId: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label>
+                            <span>수량</span>
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              min={1}
+                              max={99}
+                              step={1}
+                              value={draft.quantity}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateMemberOrderDraft(item.itemId, {
+                                  quantity: event.currentTarget.value,
                                 })
                               }
                             />
@@ -2793,13 +2828,13 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                             <span>단가 × 수량</span>
                             <strong>
                               {item.unitPrice.toLocaleString("ko-KR")}원 ×{" "}
-                              {item.quantity.toLocaleString("ko-KR")}
+                              {previewQuantity.toLocaleString("ko-KR")}
                             </strong>
                           </div>
                           <div>
                             <span>상품금액</span>
                             <strong>
-                              {item.lineTotal.toLocaleString("ko-KR")}원
+                              {(item.unitPrice * previewQuantity).toLocaleString("ko-KR")}원
                             </strong>
                           </div>
                           <div>
@@ -2823,7 +2858,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                         </div>
                         <footer>
                           <span>
-                            상품ID를 변경하면 상품명·단가·주문금액·마일리지가 자동 계산됩니다.
+                            상품ID나 수량을 변경하면 단가·주문금액·사용 및 보유 마일리지가 자동 계산됩니다.
                           </span>
                           <AdminButton
                             variant="primary"
@@ -3551,6 +3586,7 @@ async function readMemberOrdersResponse(
 function memberOrderDraft(item: AdminMemberOrderItem): MemberOrderDraft {
   return {
     productId: item.productId,
+    quantity: String(item.quantity),
     purchasedAt: walletDateTimeInput(item.purchasedAt),
   };
 }

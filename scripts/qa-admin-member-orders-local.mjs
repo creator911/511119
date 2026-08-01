@@ -13,6 +13,8 @@ const email = `${loginId}@qa.invalid`;
 const orderId = `QA-ORDER-${suffix}`;
 const originalProductId = "1762011941";
 const nextProductId = "1762011927";
+const nextQuantity = 3;
+const startingMemberPoints = 10_000_000;
 const catalog = JSON.parse(
   readFileSync(resolve(workspace, "data/catalog.json"), "utf8"),
 );
@@ -42,7 +44,7 @@ try {
       nickname: "QA상품",
       email,
       phone: "010-1111-2222",
-      points: 1000,
+      points: startingMemberPoints,
       level: 2,
       active: true,
     }),
@@ -90,8 +92,8 @@ try {
              recipient_name, recipient_phone, postcode, address1,
              subtotal, shipping_fee, discount, total, payment_method,
              payment_status, status, created_at, updated_at
-           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, 'bank',
-                     'pending', 'ordered', ?, ?)`,
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 0, 'points',
+                     'paid', 'payment_confirmed', ?, ?)`,
         )
         .run(
           orderId,
@@ -125,6 +127,18 @@ try {
           "2026-07-31 01:00:00",
         );
       itemId = Number(inserted.lastInsertRowid);
+      database
+        .prepare(
+          `INSERT INTO order_point_debits (
+             order_id, user_id, points_used, guard_value, created_at
+           ) VALUES (?, ?, ?, 1, ?)`,
+        )
+        .run(
+          orderId,
+          memberId,
+          originalProduct.price,
+          "2026-07-31 01:00:00",
+        );
       database
         .prepare(
           `INSERT INTO order_catalog_guards (
@@ -162,6 +176,7 @@ try {
       body: JSON.stringify({
         itemId,
         productId: nextProductId,
+        quantity: nextQuantity,
         purchasedAt: "2026-07-01T12:34:56+09:00",
         expectedUpdatedAt: list.items[0].updatedAt,
       }),
@@ -176,6 +191,7 @@ try {
       body: JSON.stringify({
         itemId,
         productId: nextProductId,
+        quantity: nextQuantity,
         purchasedAt: "2026-07-01T12:34:56+09:00",
         expectedUpdatedAt: list.items[0].updatedAt,
       }),
@@ -187,11 +203,16 @@ try {
   assert.equal(updated.items[0].productId, nextProductId);
   assert.equal(updated.items[0].productName, nextProduct.name);
   assert.equal(updated.items[0].unitPrice, nextProduct.price);
-  assert.equal(updated.items[0].lineTotal, nextProduct.price);
-  assert.equal(updated.items[0].subtotal, nextProduct.price);
-  assert.equal(updated.items[0].total, nextProduct.price);
+  assert.equal(updated.items[0].quantity, nextQuantity);
+  assert.equal(updated.items[0].lineTotal, nextProduct.price * nextQuantity);
+  assert.equal(updated.items[0].subtotal, nextProduct.price * nextQuantity);
+  assert.equal(updated.items[0].pointsUsed, nextProduct.price * nextQuantity);
+  assert.equal(updated.items[0].total, 0);
   assert.equal(updated.items[0].purchasedAt, "2026-07-01 03:34:56");
-  assert.equal(updated.member.points, 1000);
+  const expectedMemberPoints =
+    startingMemberPoints -
+    (nextProduct.price * nextQuantity - originalProduct.price);
+  assert.equal(updated.member.points, expectedMemberPoints);
 
   const staleResponse = await adminFetch(
     `/api/admin/users/${encodeURIComponent(memberId)}/orders`,
@@ -200,6 +221,7 @@ try {
       body: JSON.stringify({
         itemId,
         productId: originalProductId,
+        quantity: 1,
         purchasedAt: "2026-06-01T00:00:00+09:00",
         expectedUpdatedAt: list.items[0].updatedAt,
       }),
@@ -212,8 +234,11 @@ try {
     const stored = verificationDatabase
       .prepare(
         `SELECT o.created_at, o.subtotal, o.total, oi.product_id,
-                oi.product_name, oi.unit_price, oi.line_total
+                oi.product_name, oi.unit_price, oi.quantity, oi.line_total,
+                opd.points_used, u.points AS member_points
          FROM orders o JOIN order_items oi ON oi.order_id = o.id
+         JOIN users u ON u.id = o.user_id
+         LEFT JOIN order_point_debits opd ON opd.order_id = o.id
          WHERE o.id = ? AND oi.id = ?`,
       )
       .get(orderId, itemId);
@@ -221,8 +246,12 @@ try {
     assert.equal(stored.product_id, nextProductId);
     assert.equal(stored.product_name, nextProduct.name);
     assert.equal(stored.unit_price, nextProduct.price);
-    assert.equal(stored.subtotal, nextProduct.price);
-    assert.equal(stored.total, nextProduct.price);
+    assert.equal(stored.quantity, nextQuantity);
+    assert.equal(stored.line_total, nextProduct.price * nextQuantity);
+    assert.equal(stored.subtotal, nextProduct.price * nextQuantity);
+    assert.equal(stored.points_used, nextProduct.price * nextQuantity);
+    assert.equal(stored.member_points, expectedMemberPoints);
+    assert.equal(stored.total, 0);
 
     const originalStock = verificationDatabase
       .prepare("SELECT stock FROM product_stock WHERE product_id = ?")
@@ -236,7 +265,7 @@ try {
     );
     assert.equal(
       nextStock,
-      Number(nextStockRow?.stock ?? nextProduct.stock) - 1,
+      Number(nextStockRow?.stock ?? nextProduct.stock) - nextQuantity,
     );
   } finally {
     verificationDatabase.close();
@@ -250,6 +279,8 @@ try {
       productIdResolved: true,
       purchaseDateUpdatedToSeconds: true,
       totalsRecalculated: true,
+      quantityUpdated: true,
+      fullPointBalanceReconciled: true,
       inventoryRebalanced: true,
       staleWriteBlocked: true,
       crossOriginBlocked: true,

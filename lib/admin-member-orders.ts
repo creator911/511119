@@ -14,6 +14,8 @@ import { ensurePromotionSchema } from "@/lib/commerce-promotions";
 
 const memberIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
 const productIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u;
+const MAX_ITEM_QUANTITY = 99;
+const MAX_ORDER_QUANTITY = 100;
 let memberOrderSchemaInitialization: Promise<void> | null = null;
 
 export interface AdminMemberOrderItem {
@@ -87,11 +89,13 @@ interface EditableOrderRow extends MemberOrderRow {
   points_reversal_applied: number;
   same_product_item_count: number;
   product_option_count: number;
+  order_quantity_total: number;
 }
 
 interface OrderedOptionRow {
   option_id: string;
   quantity: number;
+  stock: number;
 }
 
 export async function getAdminMemberOrders(
@@ -197,7 +201,12 @@ export async function updateAdminMemberOrderItem(
            SELECT COUNT(*) FROM order_option_items option_item
            WHERE option_item.order_id = o.id
              AND option_item.product_id = oi.product_id
-         ) AS product_option_count
+         ) AS product_option_count,
+         (
+           SELECT COALESCE(SUM(order_quantity.quantity), 0)
+           FROM order_items order_quantity
+           WHERE order_quantity.order_id = o.id
+         ) AS order_quantity_total
        FROM order_items oi
        JOIN orders o ON o.id = oi.order_id
        JOIN users u ON u.id = o.user_id
@@ -224,27 +233,43 @@ export async function updateAdminMemberOrderItem(
   const productsById = new Map(products.map((product) => [product.id, product]));
   const requestedProduct = productsById.get(values.productId);
   const productChanged = current.product_id !== values.productId;
+  const currentQuantity = Number(current.quantity);
+  const nextQuantity = values.quantity;
+  const quantityChanged = currentQuantity !== nextQuantity;
   if (productChanged && (!requestedProduct || !requestedProduct.active)) {
     throw new AdminApiError(400, "판매 가능한 상품ID를 확인해 주세요.", {
       productId: "상품 페이지 주소의 it_id 숫자를 입력해 주세요.",
     });
   }
   if (
-    productChanged &&
+    (productChanged || quantityChanged) &&
     Number(current.product_option_count) > 0 &&
     Number(current.same_product_item_count) > 1
   ) {
     throw new AdminApiError(
       409,
-      "같은 상품이 여러 줄이고 옵션이 포함된 주문은 주문관리에서 먼저 분리해 주세요.",
+      "같은 상품이 여러 줄이고 옵션이 포함된 주문은 수량을 정확히 구분할 수 없습니다.",
     );
   }
 
-  const quantity = Number(current.quantity);
+  const nextOrderQuantityTotal =
+    Number(current.order_quantity_total) - currentQuantity + nextQuantity;
+  if (
+    !Number.isSafeInteger(nextOrderQuantityTotal) ||
+    nextOrderQuantityTotal < 1 ||
+    nextOrderQuantityTotal > MAX_ORDER_QUANTITY
+  ) {
+    throw new AdminApiError(
+      400,
+      `한 주문의 전체 수량은 최대 ${MAX_ORDER_QUANTITY}개까지 가능합니다.`,
+      { quantity: "다른 구매상품 수량을 포함한 전체 수량을 확인해 주세요." },
+    );
+  }
+
   const nextUnitPrice = productChanged
     ? Math.trunc(requestedProduct!.price)
     : Number(current.unit_price);
-  const nextLineTotal = nextUnitPrice * quantity;
+  const nextLineTotal = nextUnitPrice * nextQuantity;
   const nextSubtotal = Number(current.subtotal) - Number(current.line_total) + nextLineTotal;
   if (
     !Number.isSafeInteger(nextLineTotal) ||
@@ -267,7 +292,11 @@ export async function updateAdminMemberOrderItem(
     0,
     nextSubtotal + Number(current.shipping_fee) - nextCouponAmount - otherDiscount,
   );
-  const nextPointsUsed = Math.min(currentPointsUsed, maximumPointUse);
+  const wasFullyPaidWithPoints =
+    currentPointsUsed > 0 && Number(current.total) === 0;
+  const nextPointsUsed = wasFullyPaidWithPoints
+    ? maximumPointUse
+    : Math.min(currentPointsUsed, maximumPointUse);
   const nextDiscount = nextCouponAmount + otherDiscount + nextPointsUsed;
   const nextTotal = Math.max(
     0,
@@ -275,11 +304,19 @@ export async function updateAdminMemberOrderItem(
   );
 
   const previousProduct = productsById.get(current.product_id);
-  const rewardDifference = productChanged
-    ? (Math.max(0, Math.trunc(requestedProduct!.rewardPoints)) -
-        Math.max(0, Math.trunc(previousProduct?.rewardPoints ?? 0))) *
-      quantity
-    : 0;
+  const currentLineReward =
+    Math.max(0, Math.trunc(previousProduct?.rewardPoints ?? 0)) *
+    currentQuantity;
+  const nextLineReward =
+    Math.max(
+      0,
+      Math.trunc(
+        productChanged
+          ? requestedProduct!.rewardPoints
+          : previousProduct?.rewardPoints ?? 0,
+      ),
+    ) * nextQuantity;
+  const rewardDifference = nextLineReward - currentLineReward;
   const nextEarnedPoints = Math.max(
     0,
     Number(current.points_earned) + rewardDifference,
@@ -317,19 +354,59 @@ export async function updateAdminMemberOrderItem(
     current.status !== "cancelled" &&
     current.status !== "refunded" &&
     !current.stock_restored;
-  if (productChanged && inventoryHeld && requestedProduct!.stock < quantity) {
+  const productStockRequired = productChanged
+    ? nextQuantity
+    : Math.max(0, nextQuantity - currentQuantity);
+  const destinationProduct = productChanged ? requestedProduct : previousProduct;
+  if (
+    inventoryHeld &&
+    productStockRequired > 0 &&
+    (!destinationProduct || destinationProduct.stock < productStockRequired)
+  ) {
     throw new AdminApiError(409, "변경할 상품의 재고가 부족합니다.");
   }
-  const orderedOptions = productChanged
+  const orderedOptions = productChanged || quantityChanged
     ? await database
         .prepare(
-          `SELECT option_id, quantity
-           FROM order_option_items
-           WHERE order_id = ? AND product_id = ?`,
+          `SELECT option_item.option_id, option_item.quantity,
+                  COALESCE(product_option.stock, 0) AS stock
+           FROM order_option_items option_item
+           LEFT JOIN product_options product_option
+             ON product_option.id = option_item.option_id
+           WHERE option_item.order_id = ? AND option_item.product_id = ?`,
         )
         .bind(current.order_id, current.product_id)
         .all<OrderedOptionRow>()
     : { results: [] as OrderedOptionRow[] };
+  const resizedOptions = productChanged
+    ? []
+    : (orderedOptions.results ?? []).map((option) => {
+        const currentOptionQuantity = Number(option.quantity);
+        if (
+          !Number.isSafeInteger(currentOptionQuantity) ||
+          currentOptionQuantity < 1 ||
+          currentOptionQuantity % currentQuantity !== 0
+        ) {
+          throw new AdminApiError(
+            409,
+            "옵션 수량과 상품 수량이 일치하지 않아 변경할 수 없습니다.",
+          );
+        }
+        const nextOptionQuantity =
+          (currentOptionQuantity / currentQuantity) * nextQuantity;
+        const optionStockRequired = Math.max(
+          0,
+          nextOptionQuantity - currentOptionQuantity,
+        );
+        if (inventoryHeld && Number(option.stock) < optionStockRequired) {
+          throw new AdminApiError(409, "변경할 상품 옵션의 재고가 부족합니다.");
+        }
+        return {
+          ...option,
+          currentQuantity: currentOptionQuantity,
+          nextQuantity: nextOptionQuantity,
+        };
+      });
 
   const operationId = crypto.randomUUID();
   const normalizedAdmin = adminUsername.trim().slice(0, 128);
@@ -363,19 +440,21 @@ export async function updateAdminMemberOrderItem(
       .prepare(
         `UPDATE order_items
          SET product_id = ?, product_name = ?, product_image = ?,
-             unit_price = ?, line_total = ?, created_at = ?
-         WHERE id = ? AND order_id = ? AND product_id = ?`,
+             unit_price = ?, quantity = ?, line_total = ?, created_at = ?
+         WHERE id = ? AND order_id = ? AND product_id = ? AND quantity = ?`,
       )
       .bind(
         productChanged ? requestedProduct!.id : current.product_id,
         productChanged ? requestedProduct!.name : current.product_name,
         productChanged ? requestedProduct!.images[0] ?? "" : current.product_image,
         nextUnitPrice,
+        nextQuantity,
         nextLineTotal,
         values.purchasedAt,
         values.itemId,
         current.order_id,
         current.product_id,
+        currentQuantity,
       ),
     database
       .prepare(
@@ -518,46 +597,88 @@ export async function updateAdminMemberOrderItem(
     );
   }
 
-  if (productChanged) {
+  if (productChanged || quantityChanged) {
     if (inventoryHeld) {
       statements.push(
         database
           .prepare(
-            `INSERT INTO product_stock (product_id, stock)
+          `INSERT INTO product_stock (product_id, stock)
              VALUES (?, ?)
              ON CONFLICT(product_id) DO NOTHING`,
           )
           .bind(current.product_id, previousProduct?.stock ?? 0),
-        database
-          .prepare(
-            `INSERT INTO product_stock (product_id, stock)
-             VALUES (?, ?)
-             ON CONFLICT(product_id) DO NOTHING`,
-          )
-          .bind(requestedProduct!.id, requestedProduct!.stock),
-        database
-          .prepare(
-            `UPDATE product_stock
-             SET stock = stock + ?, updated_at = CURRENT_TIMESTAMP
-             WHERE product_id = ?`,
-          )
-          .bind(quantity, current.product_id),
-        database
-          .prepare(
-            `UPDATE product_stock
-             SET stock = stock - ?, updated_at = CURRENT_TIMESTAMP
-             WHERE product_id = ? AND stock >= ?`,
-          )
-          .bind(quantity, requestedProduct!.id, quantity),
-        database
-          .prepare(
-            `UPDATE ${guardTable}
-             SET stock_guard = CASE WHEN changes() = 1 THEN 1 ELSE 0 END
-             WHERE operation_id = ?`,
-          )
-          .bind(operationId),
       );
-      if (!current.option_stock_restored) {
+      if (productChanged) {
+        statements.push(
+          database
+            .prepare(
+              `INSERT INTO product_stock (product_id, stock)
+               VALUES (?, ?)
+               ON CONFLICT(product_id) DO NOTHING`,
+            )
+            .bind(requestedProduct!.id, requestedProduct!.stock),
+          database
+            .prepare(
+              `UPDATE product_stock
+               SET stock = stock + ?, updated_at = CURRENT_TIMESTAMP
+               WHERE product_id = ?`,
+            )
+            .bind(currentQuantity, current.product_id),
+          database
+            .prepare(
+              `UPDATE product_stock
+               SET stock = stock - ?, updated_at = CURRENT_TIMESTAMP
+               WHERE product_id = ? AND stock >= ?`,
+            )
+            .bind(nextQuantity, requestedProduct!.id, nextQuantity),
+          database
+            .prepare(
+              `UPDATE ${guardTable}
+               SET stock_guard = CASE
+                 WHEN stock_guard = 1 AND changes() = 1 THEN 1 ELSE 0 END
+               WHERE operation_id = ?`,
+            )
+            .bind(operationId),
+        );
+      } else if (nextQuantity > currentQuantity) {
+        const quantityIncrease = nextQuantity - currentQuantity;
+        statements.push(
+          database
+            .prepare(
+              `UPDATE product_stock
+               SET stock = stock - ?, updated_at = CURRENT_TIMESTAMP
+               WHERE product_id = ? AND stock >= ?`,
+            )
+            .bind(quantityIncrease, current.product_id, quantityIncrease),
+          database
+            .prepare(
+              `UPDATE ${guardTable}
+               SET stock_guard = CASE
+                 WHEN stock_guard = 1 AND changes() = 1 THEN 1 ELSE 0 END
+               WHERE operation_id = ?`,
+            )
+            .bind(operationId),
+        );
+      } else if (nextQuantity < currentQuantity) {
+        statements.push(
+          database
+            .prepare(
+              `UPDATE product_stock
+               SET stock = stock + ?, updated_at = CURRENT_TIMESTAMP
+               WHERE product_id = ?`,
+            )
+            .bind(currentQuantity - nextQuantity, current.product_id),
+          database
+            .prepare(
+              `UPDATE ${guardTable}
+               SET stock_guard = CASE
+                 WHEN stock_guard = 1 AND changes() = 1 THEN 1 ELSE 0 END
+               WHERE operation_id = ?`,
+            )
+            .bind(operationId),
+        );
+      }
+      if (productChanged && !current.option_stock_restored) {
         for (const option of orderedOptions.results ?? []) {
           statements.push(
             database
@@ -572,46 +693,103 @@ export async function updateAdminMemberOrderItem(
         }
       }
     }
-    statements.push(
-      database
-        .prepare(
-          `DELETE FROM order_option_guards
-           WHERE order_id = ? AND option_id IN (
-             SELECT option_id FROM order_option_items
-             WHERE order_id = ? AND product_id = ?
-           )`,
-        )
-        .bind(current.order_id, current.order_id, current.product_id),
-      database
-        .prepare(
-          `DELETE FROM order_option_items
-           WHERE order_id = ? AND product_id = ?`,
-        )
-        .bind(current.order_id, current.product_id),
-      database
-        .prepare(
-          `DELETE FROM order_catalog_guards
-           WHERE order_id = ? AND product_id = ?
-             AND NOT EXISTS (
-               SELECT 1 FROM order_items
+    if (productChanged) {
+      statements.push(
+        database
+          .prepare(
+            `DELETE FROM order_option_guards
+             WHERE order_id = ? AND option_id IN (
+               SELECT option_id FROM order_option_items
                WHERE order_id = ? AND product_id = ?
              )`,
-        )
-        .bind(
-          current.order_id,
-          current.product_id,
-          current.order_id,
-          current.product_id,
-        ),
-      database
-        .prepare(
-          `INSERT INTO order_catalog_guards (
-             order_id, product_id, catalog_guard
-           ) VALUES (?, ?, 1)
-           ON CONFLICT(order_id, product_id) DO UPDATE SET catalog_guard = 1`,
-        )
-        .bind(current.order_id, requestedProduct!.id),
-    );
+          )
+          .bind(current.order_id, current.order_id, current.product_id),
+        database
+          .prepare(
+            `DELETE FROM order_option_items
+             WHERE order_id = ? AND product_id = ?`,
+          )
+          .bind(current.order_id, current.product_id),
+        database
+          .prepare(
+            `DELETE FROM order_catalog_guards
+             WHERE order_id = ? AND product_id = ?
+               AND NOT EXISTS (
+                 SELECT 1 FROM order_items
+                 WHERE order_id = ? AND product_id = ?
+               )`,
+          )
+          .bind(
+            current.order_id,
+            current.product_id,
+            current.order_id,
+            current.product_id,
+          ),
+        database
+          .prepare(
+            `INSERT INTO order_catalog_guards (
+               order_id, product_id, catalog_guard
+             ) VALUES (?, ?, 1)
+             ON CONFLICT(order_id, product_id) DO UPDATE SET catalog_guard = 1`,
+          )
+          .bind(current.order_id, requestedProduct!.id),
+      );
+    } else if (quantityChanged) {
+      for (const option of resizedOptions) {
+        if (inventoryHeld && option.nextQuantity !== option.currentQuantity) {
+          const stockDifference = option.nextQuantity - option.currentQuantity;
+          statements.push(
+            stockDifference > 0
+              ? database
+                  .prepare(
+                    `UPDATE product_options
+                     SET stock = stock - ?, revision = revision + 1,
+                         updated_at = CURRENT_TIMESTAMP
+                     WHERE id = ? AND stock >= ?`,
+                  )
+                  .bind(stockDifference, option.option_id, stockDifference)
+              : database
+                  .prepare(
+                    `UPDATE product_options
+                     SET stock = stock + ?, revision = revision + 1,
+                         updated_at = CURRENT_TIMESTAMP
+                     WHERE id = ?`,
+                  )
+                  .bind(-stockDifference, option.option_id),
+            database
+              .prepare(
+                `UPDATE ${guardTable}
+                 SET stock_guard = CASE
+                   WHEN stock_guard = 1 AND changes() = 1 THEN 1 ELSE 0 END
+                 WHERE operation_id = ?`,
+              )
+              .bind(operationId),
+          );
+        }
+        statements.push(
+          database
+            .prepare(
+              `UPDATE order_option_items
+               SET quantity = ?
+               WHERE order_id = ? AND option_id = ? AND quantity = ?`,
+            )
+            .bind(
+              option.nextQuantity,
+              current.order_id,
+              option.option_id,
+              option.currentQuantity,
+            ),
+          database
+            .prepare(
+              `UPDATE ${guardTable}
+               SET item_guard = CASE
+                 WHEN item_guard = 1 AND changes() = 1 THEN 1 ELSE 0 END
+               WHERE operation_id = ?`,
+            )
+            .bind(operationId),
+        );
+      }
+    }
   }
 
   statements.push(
@@ -631,6 +809,7 @@ export async function updateAdminMemberOrderItem(
             productId: current.product_id,
             productName: current.product_name,
             unitPrice: Number(current.unit_price),
+            quantity: currentQuantity,
             lineTotal: Number(current.line_total),
             subtotal: Number(current.subtotal),
             total: Number(current.total),
@@ -643,6 +822,7 @@ export async function updateAdminMemberOrderItem(
             productId: productChanged ? requestedProduct!.id : current.product_id,
             productName: productChanged ? requestedProduct!.name : current.product_name,
             unitPrice: nextUnitPrice,
+            quantity: nextQuantity,
             lineTotal: nextLineTotal,
             subtotal: nextSubtotal,
             total: nextTotal,
@@ -729,6 +909,7 @@ function memberOrderItem(row: MemberOrderRow): AdminMemberOrderItem {
 function parseMemberOrderUpdate(input: unknown): {
   itemId: number;
   productId: string;
+  quantity: number;
   purchasedAt: string;
   expectedUpdatedAt: string;
 } {
@@ -748,6 +929,18 @@ function parseMemberOrderUpdate(input: unknown): {
       productId: "상품 페이지 주소의 it_id 숫자를 입력해 주세요.",
     });
   }
+  const quantity = Number(value.quantity);
+  if (
+    !Number.isSafeInteger(quantity) ||
+    quantity < 1 ||
+    quantity > MAX_ITEM_QUANTITY
+  ) {
+    throw new AdminApiError(
+      400,
+      `수량은 1개부터 ${MAX_ITEM_QUANTITY}개까지 입력해 주세요.`,
+      { quantity: "구매상품 수량을 확인해 주세요." },
+    );
+  }
   const purchasedAt = normalizePurchaseDate(value.purchasedAt);
   const expectedUpdatedAt = typeof value.expectedUpdatedAt === "string"
     ? value.expectedUpdatedAt.trim()
@@ -755,7 +948,7 @@ function parseMemberOrderUpdate(input: unknown): {
   if (!expectedUpdatedAt || expectedUpdatedAt.length > 64) {
     throw new AdminApiError(400, "수정 기준시각을 확인해 주세요.");
   }
-  return { itemId, productId, purchasedAt, expectedUpdatedAt };
+  return { itemId, productId, quantity, purchasedAt, expectedUpdatedAt };
 }
 
 function normalizePurchaseDate(value: unknown): string {
