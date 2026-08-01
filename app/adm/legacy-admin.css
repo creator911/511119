@@ -243,6 +243,37 @@ body:has(.kiel-legacy-admin) {
   background: #223390 url("/adm-assets/img/menu-op.png") 50% 50% no-repeat;
 }
 
+.kiel-legacy-admin #admin_quick_links {
+  float: left;
+  padding: 10px 0 10px 18px;
+}
+
+.kiel-legacy-admin #admin_quick_links ul {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kiel-legacy-admin #admin_quick_links a {
+  display: block;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 3px;
+  background: rgba(34, 51, 144, 0.42);
+  color: #fff;
+  font-weight: 600;
+  line-height: 28px;
+  white-space: nowrap;
+}
+
+.kiel-legacy-admin #admin_quick_links a:hover,
+.kiel-legacy-admin #admin_quick_links a:focus-visible,
+.kiel-legacy-admin #admin_quick_links a[aria-current="page"] {
+  border-color: rgba(255, 255, 255, 0.52);
+  background: #ff4081;
+}
+
 .kiel-legacy-admin #tnb {
   float: right;
   padding: 10px;
@@ -4651,6 +4682,7 @@ body:has(.kiel-legacy-admin) {
 
 @media (max-width: 1200px) {
   .kiel-legacy-admin,
+  .kiel-legacy-admin #hd_top,
   .kiel-legacy-admin #container {
     min-width: 1200px !important;
   }

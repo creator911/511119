@@ -15,6 +15,12 @@ test("administrator shell uses the original fixed light interface", async () => 
   assert.doesNotMatch(frame, /data-admin-dark|ADMIN_THEME_STORAGE_KEY|darkMode/);
   assert.doesNotMatch(shell, /data-admin-dark|themeToggle/);
   assert.match(shell, /id="hd_top"/);
+  assert.match(shell, /id="admin_quick_links"/);
+  assert.match(shell, /aria-label="자주 쓰는 회원관리"/);
+  assert.match(shell, /label: "회원관리"[\s\S]*href: "\/adm\/users"/);
+  assert.match(shell, /label: "포인트관리"[\s\S]*href: "\/adm\/reports\?view=points"/);
+  assert.match(shell, /label: "충전신청"[\s\S]*href: "\/adm\/wallet\?kind=charge"/);
+  assert.match(shell, /label: "환전신청"[\s\S]*href: "\/adm\/wallet\?kind=withdrawal"/);
   assert.match(shell, /id="gnb"/);
   assert.match(shell, /id="container_title"/);
   assert.match(shell, /id="container_wr"/);
@@ -29,6 +35,7 @@ test("administrator shell uses the original fixed light interface", async () => 
   assert.match(legacyCss, /padding:\s*0 20px 0 240px/);
   assert.match(legacyCss, /height:\s*51px/);
   assert.match(legacyCss, /min-width:\s*1200px/);
+  assert.match(legacyCss, /#admin_quick_links a\[aria-current="page"\]/);
   assert.match(legacyCss, /animation-duration:\s*0s !important/);
   assert.match(legacyCss, /transition-duration:\s*0s !important/);
 });
@@ -62,5 +69,6 @@ test("protected admin layout loads the legacy skin and keeps mobile fixed-width"
   assert.match(layout, /import "\.\.\/legacy-admin\.css"/);
   assert.match(legacyCss, /@media \(max-width: 1200px\)/);
   assert.match(legacyCss, /body:has\(\.kiel-legacy-admin\)/);
+  assert.match(legacyCss, /\.kiel-legacy-admin #hd_top,[\s\S]*min-width:\s*1200px !important/);
   assert.match(legacyCss, /min-width:\s*1200px !important/);
 });

@@ -439,6 +439,29 @@ export const KIEL_ADMIN_NAVIGATION: AdminNavGroup[] = [
 
 export const KIEL_ADMIN_UTILITY_ACTIONS: AdminUtilityAction[] = [];
 
+const KIEL_ADMIN_QUICK_LINKS: AdminNavItem[] = [
+  {
+    id: "item-200-members",
+    label: "회원관리",
+    href: "/adm/users",
+  },
+  {
+    id: "item-200-points",
+    label: "포인트관리",
+    href: "/adm/reports?view=points",
+  },
+  {
+    id: "item-200-charge-requests",
+    label: "충전신청",
+    href: "/adm/wallet?kind=charge",
+  },
+  {
+    id: "item-200-exchange-requests",
+    label: "환전신청",
+    href: "/adm/wallet?kind=withdrawal",
+  },
+];
+
 export interface AdminShellProps {
   children: ReactNode;
   navigation?: AdminNavGroup[];
@@ -557,6 +580,24 @@ export function AdminShell({
             >
               메뉴
             </button>
+
+            <nav id="admin_quick_links" aria-label="자주 쓰는 회원관리">
+              <ul>
+                {KIEL_ADMIN_QUICK_LINKS.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={item.href!}
+                      aria-current={
+                        activeNavId === item.id ? "page" : undefined
+                      }
+                      onClick={(event) => handleNavigation(event, item)}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
             <nav id="tnb" aria-label="관리자 바로가기">
               <ul>
