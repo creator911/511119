@@ -4282,6 +4282,478 @@
   line-height: 1.5;
 }
 
+/* Kiel legacy order form parity */
+
+.legacyCheckoutProducts {
+  border-top-width: 1px;
+}
+
+.legacyCheckoutPage .checkoutSteps {
+  margin-bottom: 30px;
+}
+
+.legacyCheckoutProductHeader {
+  border-bottom: 1px solid #333;
+}
+
+.checkoutLayout {
+  grid-template-columns: minmax(0, 744px) minmax(330px, 355px);
+  gap: 16px;
+}
+
+.legacyCheckoutSection {
+  position: relative;
+  margin: 0 0 25px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.legacyCheckoutSectionHeader {
+  position: relative;
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.legacyCheckoutSectionHeader::before {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 0;
+  height: 0;
+  border-top: 20px solid #586cc0;
+  border-right: 20px solid transparent;
+  content: "";
+}
+
+.legacyCheckoutSectionHeader h2 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.legacyCheckoutSectionBody {
+  padding: 35px 25px 42px;
+}
+
+.legacyCheckoutSection .fieldTable {
+  border-top: 1px solid #333;
+}
+
+.legacyCheckoutSection .fieldTable + .fieldTable {
+  border-top: 0;
+}
+
+.legacyCheckoutSection .formRow {
+  min-height: 63px;
+  grid-template-columns: 78px minmax(0, 1fr);
+  border-bottom: 0;
+}
+
+.legacyCheckoutSection .formRow > span {
+  justify-content: flex-end;
+  padding: 10px 5px;
+  color: #444;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.legacyCheckoutSection .formRow > div {
+  width: 100%;
+  max-width: none;
+  padding: 9px 0 9px 15px;
+}
+
+.legacyCheckoutSection .formRow > div > input,
+.legacyCheckoutSection .formRow > div > select {
+  width: 200px;
+  max-width: 100%;
+  min-height: 39px;
+}
+
+.legacyCheckoutSection .addressRow > div > input {
+  width: 100%;
+  max-width: none;
+}
+
+.legacyCheckoutSection .addressRow > div {
+  gap: 8px;
+}
+
+.legacyCheckoutSection .inlineField {
+  width: 255px;
+  max-width: 100%;
+  gap: 5px;
+}
+
+.legacyCheckoutSection .inlineField input {
+  min-height: 39px;
+}
+
+.legacyCheckoutSection .inlineField button {
+  min-width: 100px;
+  border: 0;
+  background: #d93a2f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.legacyRequiredInput {
+  background-image: linear-gradient(225deg, #df1f0b 0 7px, transparent 7px);
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: 10px 10px;
+}
+
+.legacyShippingChoices {
+  flex-flow: row wrap !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 20px !important;
+}
+
+.legacyShippingChoices label,
+.legacyShippingName label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.legacyShippingChoices input,
+.legacyShippingName input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--kiel-red);
+}
+
+.legacyShippingChoices button {
+  min-height: 28px;
+  padding: 0 12px;
+  border: 0;
+  color: #fff;
+  background: #444;
+  font: 700 12px "S-Core Dream", "S-CoreDream", Arial, sans-serif;
+  cursor: pointer;
+}
+
+.legacyShippingName {
+  flex-flow: row wrap !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
+.legacyShippingName > input[type="text"] {
+  width: 200px;
+  min-height: 39px;
+}
+
+.legacyCheckoutDeliveryHelp {
+  margin: 20px 0 0 93px;
+  color: #888;
+  font-size: 11px;
+}
+
+.legacyCheckoutSummary {
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.legacyCheckoutEquation {
+  display: grid;
+  min-height: 95px;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr) 24px minmax(0, 1fr);
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.legacyCheckoutEquation > div {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.legacyCheckoutEquation > div > span,
+.legacyCheckoutSummaryRow > span {
+  color: #666;
+  font-size: 13px;
+}
+
+.legacyCheckoutEquation strong,
+.legacyCheckoutSummaryRow strong,
+.legacyCheckoutPaymentInfo strong {
+  color: #222;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.legacyCheckoutEquation small,
+.legacyCheckoutSummaryRow small,
+.legacyCheckoutPaymentInfo small,
+.legacyCheckoutGrandTotal small {
+  margin-left: 1px;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.legacyCheckoutOperator {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #ddd;
+  color: #db2a13;
+  background: #fff;
+  font: 20px/1 Arial, sans-serif;
+}
+
+button.legacyCheckoutOperator {
+  cursor: pointer;
+}
+
+.legacyCheckoutSummaryRow {
+  display: flex;
+  width: 100%;
+  min-height: 47px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+}
+
+button.legacyCheckoutSummaryRow {
+  cursor: pointer;
+}
+
+.legacyCheckoutSummaryTotal strong {
+  color: #d4270b;
+  font-size: 20px;
+}
+
+.legacyCheckoutSummary > .legacyCheckoutSummaryRow:last-child {
+  border-bottom: 0;
+}
+
+.legacyCheckoutCompactTool {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.legacyCheckoutCompactTool > div {
+  display: flex;
+  gap: 5px;
+}
+
+.legacyCheckoutCompactTool input {
+  min-width: 0;
+  min-height: 35px;
+  flex: 1;
+  border: 1px solid #ccc;
+}
+
+.legacyCheckoutCompactTool button {
+  min-width: 54px;
+  border: 0;
+  color: #fff;
+  background: #555;
+  font-weight: 700;
+}
+
+.legacyCheckoutCompactTool p {
+  margin: 7px 0 0;
+  color: #8b2b20;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.legacyCheckoutPaymentInfo {
+  margin-top: 18px;
+}
+
+.legacyCheckoutPaymentInfo h2,
+.legacyCheckoutPayment h2 {
+  margin: 0 0 9px;
+  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.legacyCheckoutPaymentInfo > div {
+  display: flex;
+  min-height: 55px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border: 1px solid #ddd;
+  border-bottom: 0;
+}
+
+.legacyCheckoutPaymentInfo > div > span {
+  color: #555;
+  font-size: 13px;
+}
+
+.legacyCheckoutPaymentInfo > p {
+  min-height: 48px;
+  margin: 0;
+  padding: 13px 16px;
+  border: 1px solid #ddd;
+  color: #777;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.legacyCheckoutPaymentInfo em {
+  color: #d92708;
+  font-style: normal;
+}
+
+.legacyCheckoutGrandTotal {
+  display: flex;
+  min-height: 55px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0 16px;
+  padding: 0 16px;
+  border: 1px solid #d92708;
+  background: #fff;
+}
+
+.legacyCheckoutGrandTotal > strong {
+  color: #333;
+  font-size: 14px;
+}
+
+.legacyCheckoutGrandTotal > b {
+  color: #d92708;
+  font-size: 22px;
+}
+
+.legacyCheckoutPayment .paymentMethods {
+  display: flex;
+  grid-template-columns: none;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.legacyCheckoutPayment .paymentMethods label {
+  width: calc(50% - 3px);
+}
+
+.legacyCheckoutPayment .paymentMethods span {
+  position: relative;
+  min-height: 60px;
+  padding: 8px 24px 8px 42px;
+  color: #444;
+  border-color: #ccc;
+  background: #fff;
+  font-size: 13px;
+  text-align: center;
+}
+
+.legacyCheckoutPayment .paymentMethods span::before {
+  position: absolute;
+  left: 17px;
+  color: #aaa;
+  content: "▤";
+  font-size: 22px;
+}
+
+.legacyCheckoutPayment .paymentMethods .paymentMethodActive span {
+  color: #444;
+  border-color: #d92708;
+  background: #fff;
+}
+
+.legacyCheckoutPayment .paymentMethods .paymentMethodActive span::after {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  color: #d92708;
+  content: "✓";
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.legacyCheckoutPayment .bankFields {
+  margin-top: 18px;
+  padding: 14px 15px 16px;
+  border: 1px solid #d92708;
+}
+
+.legacyBankAccount,
+.legacyDepositorField {
+  display: block;
+  margin: 0;
+}
+
+.legacyBankAccount > span,
+.legacyBankAccount > strong,
+.legacyDepositorField > span {
+  display: block;
+}
+
+.legacyBankAccount > span,
+.legacyDepositorField > span {
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 12px;
+}
+
+.legacyBankAccount > strong {
+  margin-bottom: 17px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.legacyBankAccount select,
+.legacyDepositorField input {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid #ccc;
+}
+
+.checkoutAside .primaryFormButton {
+  min-height: 50px;
+  margin-top: 18px;
+  border-color: #d92708;
+  background: #d92708;
+}
+
+.checkoutAside .primaryFormButton:hover {
+  background: #bb2109;
+}
+
+.legacyCheckoutCancel {
+  min-height: 42px;
+  margin-top: 7px;
+  border-color: #aaa;
+  background: #fff;
+}
+
 /* My page */
 
 .myPage {
@@ -8384,5 +8856,145 @@
 @media (prefers-reduced-motion: reduce) {
   .shoppingPanelOpen {
     animation: none;
+  }
+}
+
+@media (max-width: 991px) {
+  .checkoutLayout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .checkoutAside {
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+  }
+
+  .checkoutAsideSticky {
+    position: static;
+  }
+}
+
+@media (max-width: 767px) {
+  .legacyCheckoutPage {
+    padding: 20px 0 55px;
+  }
+
+  .legacyCheckoutProducts {
+    margin-bottom: 20px;
+  }
+
+  .legacyCheckoutSection {
+    margin-right: 0;
+    margin-bottom: 18px;
+    margin-left: 0;
+  }
+
+  .legacyCheckoutSectionHeader {
+    min-height: 56px;
+    padding: 12px 15px;
+  }
+
+  .legacyCheckoutSectionHeader::before {
+    border-top-width: 15px;
+    border-right-width: 15px;
+  }
+
+  .legacyCheckoutSectionHeader h2 {
+    font-size: 17px;
+  }
+
+  .legacyCheckoutSectionBody {
+    padding: 18px 13px 22px;
+  }
+
+  .legacyCheckoutSection .formRow {
+    display: grid;
+    min-height: 58px;
+    grid-template-columns: 70px minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .legacyCheckoutSection .formRow > span {
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+
+  .legacyCheckoutSection .formRow > div {
+    padding: 8px 0 8px 10px;
+  }
+
+  .legacyCheckoutSection .formRow > div > input,
+  .legacyCheckoutSection .formRow > div > select,
+  .legacyShippingName > input[type="text"] {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  .legacyCheckoutSection .inlineField {
+    width: 100%;
+  }
+
+  .legacyCheckoutSection .inlineField button {
+    min-width: 82px;
+  }
+
+  .legacyShippingChoices {
+    gap: 8px 13px !important;
+  }
+
+  .legacyShippingChoices label,
+  .legacyShippingName label {
+    font-size: 11px;
+  }
+
+  .legacyShippingName {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+
+  .legacyCheckoutDeliveryHelp {
+    margin: 12px 0 0 80px;
+  }
+
+  .legacyCheckoutEquation {
+    min-height: 84px;
+    grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr) 22px minmax(0, 1fr);
+    padding: 0 5px;
+  }
+
+  .legacyCheckoutOperator {
+    width: 22px;
+    height: 22px;
+  }
+
+  .legacyCheckoutEquation > div > span,
+  .legacyCheckoutSummaryRow > span {
+    font-size: 11px;
+  }
+
+  .legacyCheckoutEquation strong,
+  .legacyCheckoutSummaryRow strong {
+    font-size: 13px;
+  }
+
+  .legacyCheckoutSummaryTotal strong {
+    font-size: 18px;
+  }
+
+  .legacyCheckoutPaymentInfo h2,
+  .legacyCheckoutPayment h2 {
+    font-size: 18px;
+  }
+
+  .legacyCheckoutPayment .paymentMethods label {
+    width: 100%;
+  }
+
+  .checkoutAside .primaryFormButton {
+    min-height: 52px;
   }
 }

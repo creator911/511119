@@ -327,7 +327,7 @@ export interface CheckoutPanelProps {
 
 const paymentLabels: Record<PaymentMethod, string> = {
   card: "신용카드",
-  bank: "무통장입금",
+  bank: "실시간계좌이체",
   transfer: "실시간 계좌이체",
   virtual: "가상계좌",
   mobile: "휴대폰결제",
@@ -384,6 +384,12 @@ export function CheckoutPanel({
     useState<AppliedCoupon | null>(null);
   const [couponError, setCouponError] = useState("");
   const [couponChecking, setCouponChecking] = useState(false);
+  const [couponPanelOpen, setCouponPanelOpen] = useState(false);
+  const [pointPanelOpen, setPointPanelOpen] = useState(false);
+  const [buyerMobile, setBuyerMobile] = useState("");
+  const [recipientMobile, setRecipientMobile] = useState("");
+  const [shippingLabel, setShippingLabel] = useState("");
+  const [saveShippingAddress, setSaveShippingAddress] = useState(false);
 
   const productTotal = items.reduce(
     (sum, line) => sum + line.unitPrice * line.quantity,
@@ -442,6 +448,10 @@ export function CheckoutPanel({
   });
   const appliedPoints = pointValidation.ok ? pointsUsed : 0;
   const amountDue = Math.max(0, orderTotal - appliedPoints);
+  const checkoutSummaryRows = [
+    { label: "쿠폰 할인", value: couponDiscount },
+    { label: "포인트", value: appliedPoints },
+  ];
   const effectivePaymentMethod: PaymentMethod =
     amountDue === 0 && (appliedPoints > 0 || couponDiscount > 0)
       ? "points"
@@ -540,7 +550,13 @@ export function CheckoutPanel({
 
   function copyBuyer(checked: boolean) {
     setSameAsBuyer(checked);
-    if (checked) setRecipient({ ...buyer });
+    if (checked) {
+      setRecipient({ ...buyer });
+      setRecipientMobile(buyerMobile);
+      return;
+    }
+    setRecipient({ ...blankContact });
+    setRecipientMobile("");
   }
 
   async function applyCoupon() {
@@ -633,6 +649,7 @@ export function CheckoutPanel({
         </span>
         <div>
           <input
+            className={styles.legacyRequiredInput}
             type="text"
             value={contact.name}
             onChange={(event) => updateContact(target, "name", event.target.value)}
@@ -643,10 +660,11 @@ export function CheckoutPanel({
       </label>
       <label className={styles.formRow}>
         <span>
-          휴대전화 <em>*</em>
+          전화번호 <em>*</em>
         </span>
         <div>
           <input
+            className={styles.legacyRequiredInput}
             type="tel"
             value={contact.phone}
             onChange={(event) => updateContact(target, "phone", event.target.value)}
@@ -655,22 +673,20 @@ export function CheckoutPanel({
           />
         </div>
       </label>
-      {target === "buyer" ? (
-        <label className={styles.formRow}>
-          <span>
-            이메일 <em>*</em>
-          </span>
-          <div>
-            <input
-              type="email"
-              value={contact.email ?? ""}
-              onChange={(event) => updateContact(target, "email", event.target.value)}
-              autoComplete="email"
-              required
-            />
-          </div>
-        </label>
-      ) : null}
+      <label className={styles.formRow}>
+        <span>핸드폰</span>
+        <div>
+          <input
+            type="tel"
+            value={target === "buyer" ? buyerMobile : recipientMobile}
+            onChange={(event) => {
+              if (target === "buyer") setBuyerMobile(event.currentTarget.value);
+              else setRecipientMobile(event.currentTarget.value);
+            }}
+            autoComplete={target === "buyer" ? "tel" : "shipping tel"}
+          />
+        </div>
+      </label>
       <div className={classNames(styles.formRow, styles.addressRow)}>
         <span>
           주소 <em>*</em>
@@ -678,6 +694,7 @@ export function CheckoutPanel({
         <div>
           <div className={styles.inlineField}>
             <input
+              className={styles.legacyRequiredInput}
               type="text"
               value={contact.postcode}
               onChange={(event) =>
@@ -705,6 +722,7 @@ export function CheckoutPanel({
             </button>
           </div>
           <input
+            className={styles.legacyRequiredInput}
             type="text"
             value={contact.address1}
             onChange={(event) =>
@@ -723,6 +741,23 @@ export function CheckoutPanel({
           />
         </div>
       </div>
+      {target === "buyer" ? (
+        <label className={styles.formRow}>
+          <span>
+            E-mail <em>*</em>
+          </span>
+          <div>
+            <input
+              className={styles.legacyRequiredInput}
+              type="email"
+              value={contact.email ?? ""}
+              onChange={(event) => updateContact(target, "email", event.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+        </label>
+      ) : null}
     </div>
   );
 
@@ -751,10 +786,16 @@ export function CheckoutPanel({
                 <div>
                   <img src={line.image} alt="" />
                   <span>
-                    <strong>{line.name}</strong>
+                    <strong>
+                      {line.name.includes("요약정보 및 구매")
+                        ? line.name
+                        : `${line.name} 요약정보 및 구매`}
+                    </strong>
                     {line.option ? <small>{line.option}</small> : null}
                     <small>
-                      {line.name} {line.quantity}개 (+0원)
+                      {line.name.includes("요약정보 및 구매")
+                        ? line.name
+                        : `${line.name} 요약정보 및 구매`} {line.quantity}개 (+0원)
                     </small>
                   </span>
                 </div>
@@ -774,194 +815,227 @@ export function CheckoutPanel({
           </section>
 
           <div className={styles.checkoutLayout}>
-          <div className={styles.checkoutMain}>
-            <Panel title="주문하시는 분">{renderContactFields("buyer", buyer)}</Panel>
-            <Panel
-              title="받으시는 분"
-              actions={
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={sameAsBuyer}
-                    onChange={(event) => copyBuyer(event.target.checked)}
-                  />
-                  <span>주문자 정보와 동일</span>
-                </label>
-              }
-            >
-              {renderContactFields("recipient", recipient)}
-              <label className={styles.formRow}>
-                <span>배송 메모</span>
-                <div>
-                  <select name="deliveryMemo" defaultValue="">
-                    <option value="">배송 메모를 선택해 주세요.</option>
-                    <option value="문 앞에 놓아주세요.">문 앞에 놓아주세요.</option>
-                    <option value="배송 전 연락 바랍니다.">
-                      배송 전 연락 바랍니다.
-                    </option>
-                    <option value="경비실에 맡겨주세요.">
-                      경비실에 맡겨주세요.
-                    </option>
-                    <option value="택배함에 넣어주세요.">
-                      택배함에 넣어주세요.
-                    </option>
-                  </select>
+            <div className={styles.checkoutMain}>
+              <section className={styles.legacyCheckoutSection}>
+                <header className={styles.legacyCheckoutSectionHeader}>
+                  <h2>주문하시는 분</h2>
+                </header>
+                <div className={styles.legacyCheckoutSectionBody}>
+                  {renderContactFields("buyer", buyer)}
                 </div>
-              </label>
-              {shippingCarrier || customerServicePhone ? (
-                <p className={styles.checkoutPaymentNotice}>
-                  {shippingCarrier ? `기본 택배사: ${shippingCarrier}` : null}
-                  {shippingCarrier && customerServicePhone ? " · " : null}
-                  {customerServicePhone
-                    ? `배송 문의: ${customerServicePhone}`
-                    : null}
-                </p>
-              ) : null}
-              {shippingAdditionalFee > 0 ? (
-                <p className={styles.checkoutPaymentNotice} role="status">
-                  {shippingRuleName
-                    ? `${shippingRuleName} 지역 `
-                    : ""}
-                  추가배송비{" "}
-                  {shippingAdditionalFee.toLocaleString("ko-KR")}원이
-                  적용됩니다.
-                </p>
-              ) : null}
-              {hasShippingDestination && shippingQuoteError ? (
-                <p className={styles.checkoutPointError} role="status">
-                  {shippingQuoteError}
-                </p>
-              ) : null}
-            </Panel>
+              </section>
 
-            <Panel title="쿠폰 사용">
-              <div className={styles.fieldTable}>
-                <label className={styles.formRow}>
-                  <span>쿠폰코드</span>
-                  <div>
-                    <div className={styles.inlineField}>
-                      <input
-                        type="text"
-                        value={couponCode}
-                        maxLength={40}
-                        autoCapitalize="characters"
-                        spellCheck={false}
-                        placeholder="쿠폰코드 입력"
-                        onChange={(event) => {
-                          setCouponCode(
-                            event.currentTarget.value.toUpperCase(),
-                          );
-                          setAppliedCoupon(null);
-                          setCouponError("");
-                        }}
-                      />
-                      <button
-                        type="button"
-                        disabled={couponChecking}
-                        onClick={() => void applyCoupon()}
-                      >
-                        {couponChecking ? "확인 중…" : "쿠폰 적용"}
-                      </button>
+              <section className={styles.legacyCheckoutSection}>
+                <header className={styles.legacyCheckoutSectionHeader}>
+                  <h2>받으시는 분</h2>
+                </header>
+                <div className={styles.legacyCheckoutSectionBody}>
+                  <div className={styles.fieldTable}>
+                    <div className={styles.formRow}>
+                      <span>배송지선택</span>
+                      <div className={styles.legacyShippingChoices}>
+                        <label>
+                          <input
+                            type="radio"
+                            name="shippingChoice"
+                            checked={sameAsBuyer}
+                            onChange={() => copyBuyer(true)}
+                          />
+                          주문자와 동일
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="shippingChoice"
+                            checked={!sameAsBuyer}
+                            onChange={() => copyBuyer(false)}
+                          />
+                          신규배송지
+                        </label>
+                        <button type="button" onClick={() => copyBuyer(true)}>
+                          배송지목록
+                        </button>
+                      </div>
                     </div>
-                    {appliedCoupon ? (
-                      <p className={styles.checkoutPaymentNotice} role="status">
-                        {appliedCoupon.name} ·{" "}
-                        {appliedCoupon.discount.toLocaleString("ko-KR")}원 할인
-                      </p>
-                    ) : null}
-                    {couponError ? (
-                      <p className={styles.checkoutPointError} role="alert">
-                        {couponError}
-                      </p>
-                    ) : null}
+                    <label className={styles.formRow}>
+                      <span>배송지명</span>
+                      <div className={styles.legacyShippingName}>
+                        <input
+                          type="text"
+                          value={shippingLabel}
+                          onChange={(event) => setShippingLabel(event.currentTarget.value)}
+                        />
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={saveShippingAddress}
+                            onChange={(event) => setSaveShippingAddress(event.currentTarget.checked)}
+                          />
+                          기본배송지로 설정
+                        </label>
+                      </div>
+                    </label>
                   </div>
-                </label>
-              </div>
-            </Panel>
-
-            <Panel title="포인트 사용">
-              <div className={styles.fieldTable}>
-                <div className={styles.formRow}>
-                  <span>보유 포인트</span>
-                  <div>
-                    <strong>
-                      {canUsePoints
-                        ? `${Math.max(0, Math.trunc(availablePoints)).toLocaleString("ko-KR")}P`
-                        : pointUseEnabled
-                          ? "로그인 후 사용 가능"
-                          : "사용 안 함"}
-                    </strong>
-                  </div>
+                  {renderContactFields("recipient", recipient)}
+                  <input name="deliveryMemo" type="hidden" value="" />
+                  {shippingAdditionalFee > 0 ? (
+                    <p className={styles.checkoutPaymentNotice} role="status">
+                      {shippingRuleName ? `${shippingRuleName} 지역 ` : ""}
+                      추가배송비 {shippingAdditionalFee.toLocaleString("ko-KR")}원이 적용됩니다.
+                    </p>
+                  ) : null}
+                  {hasShippingDestination && shippingQuoteError ? (
+                    <p className={styles.checkoutPointError} role="status">
+                      {shippingQuoteError}
+                    </p>
+                  ) : null}
+                  {shippingCarrier || customerServicePhone ? (
+                    <p className={styles.legacyCheckoutDeliveryHelp}>
+                      {shippingCarrier ? `기본 택배사 ${shippingCarrier}` : null}
+                      {shippingCarrier && customerServicePhone ? " · " : null}
+                      {customerServicePhone ? `배송 문의 ${customerServicePhone}` : null}
+                    </p>
+                  ) : null}
                 </div>
-                <label className={styles.formRow}>
-                  <span>사용 포인트</span>
-                  <div className={styles.inlineField}>
-                    <input
-                      type="number"
-                      min={0}
-                      max={maximumUsablePoints}
-                      step={pointUseUnit}
-                      inputMode="numeric"
-                      value={pointsUsed}
-                      disabled={!canSelectPoints}
-                      aria-invalid={Boolean(pointError) || undefined}
-                      onChange={(event) => {
-                        const value = Number(event.currentTarget.value);
-                        setPointsUsed(
-                          Number.isFinite(value)
-                            ? Math.max(0, Math.trunc(value))
-                            : 0,
-                        );
-                        setPointError("");
-                      }}
-                    />
+              </section>
+            </div>
+
+            <aside className={styles.checkoutAside}>
+              <div className={styles.checkoutAsideSticky}>
+                <section className={styles.legacyCheckoutSummary} aria-label="주문 금액 요약">
+                  <div className={styles.legacyCheckoutEquation}>
+                    <div>
+                      <span>주문</span>
+                      <strong>{productTotal.toLocaleString("ko-KR")}<small>원</small></strong>
+                    </div>
+                    <span className={styles.legacyCheckoutOperator} aria-hidden="true">−</span>
+                    <div>
+                      <span>{checkoutSummaryRows[0].label}</span>
+                      <strong>{checkoutSummaryRows[0].value.toLocaleString("ko-KR")}<small>원</small></strong>
+                    </div>
                     <button
                       type="button"
-                      disabled={!canSelectPoints}
-                      onClick={() => {
-                        setPointsUsed(maximumUsablePoints);
-                        setPointError("");
-                      }}
+                      className={styles.legacyCheckoutOperator}
+                      aria-label="쿠폰 사용"
+                      aria-expanded={couponPanelOpen}
+                      onClick={() => setCouponPanelOpen((current) => !current)}
                     >
-                      전액사용
+                      +
                     </button>
+                    <div>
+                      <span>배송비</span>
+                      <strong>{shippingTotal.toLocaleString("ko-KR")}<small>원</small></strong>
+                    </div>
                   </div>
-                </label>
-                <p className={styles.checkoutPaymentNotice}>
-                  {pointUseEnabled
-                    ? `${pointUseMinimum.toLocaleString("ko-KR")}P 이상 · 최대 ${pointUseMaximum.toLocaleString("ko-KR")}P · ${pointUseUnit.toLocaleString("ko-KR")}P 단위로 사용할 수 있습니다.`
-                    : "현재 포인트 결제를 사용하지 않습니다."}
-                </p>
-                {pointError ? (
-                  <p className={styles.checkoutPointError} role="alert">
-                    {pointError}
-                  </p>
-                ) : null}
-              </div>
-            </Panel>
+                  {couponPanelOpen ? (
+                    <div className={styles.legacyCheckoutCompactTool}>
+                      <div>
+                        <input
+                          type="text"
+                          value={couponCode}
+                          maxLength={40}
+                          autoCapitalize="characters"
+                          spellCheck={false}
+                          placeholder="쿠폰코드 입력"
+                          onChange={(event) => {
+                            setCouponCode(event.currentTarget.value.toUpperCase());
+                            setAppliedCoupon(null);
+                            setCouponError("");
+                          }}
+                        />
+                        <button type="button" disabled={couponChecking} onClick={() => void applyCoupon()}>
+                          {couponChecking ? "확인 중" : "적용"}
+                        </button>
+                      </div>
+                      {appliedCoupon ? (
+                        <p role="status">
+                          {appliedCoupon.name} · {appliedCoupon.discount.toLocaleString("ko-KR")}원 할인
+                        </p>
+                      ) : null}
+                      {couponError ? <p role="alert">{couponError}</p> : null}
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={styles.legacyCheckoutSummaryRow}
+                    aria-expanded={pointPanelOpen}
+                    onClick={() => setPointPanelOpen((current) => !current)}
+                  >
+                    <span>{checkoutSummaryRows[1].label}</span>
+                    <strong>{checkoutSummaryRows[1].value.toLocaleString("ko-KR")}<small>점</small></strong>
+                  </button>
+                  {pointPanelOpen ? (
+                    <div className={styles.legacyCheckoutCompactTool}>
+                      <div>
+                        <input
+                          type="number"
+                          min={0}
+                          max={maximumUsablePoints}
+                          step={pointUseUnit}
+                          inputMode="numeric"
+                          value={pointsUsed}
+                          disabled={!canSelectPoints}
+                          aria-invalid={Boolean(pointError) || undefined}
+                          onChange={(event) => {
+                            const value = Number(event.currentTarget.value);
+                            setPointsUsed(Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0);
+                            setPointError("");
+                          }}
+                        />
+                        <button
+                          type="button"
+                          disabled={!canSelectPoints}
+                          onClick={() => {
+                            setPointsUsed(maximumUsablePoints);
+                            setPointError("");
+                          }}
+                        >
+                          전액
+                        </button>
+                      </div>
+                      <p>
+                        {pointUseEnabled
+                          ? `${pointUseMinimum.toLocaleString("ko-KR")}P 이상 · ${pointUseUnit.toLocaleString("ko-KR")}P 단위`
+                          : "현재 포인트 결제를 사용하지 않습니다."}
+                      </p>
+                      {pointError ? <p role="alert">{pointError}</p> : null}
+                    </div>
+                  ) : null}
+                  <div className={classNames(styles.legacyCheckoutSummaryRow, styles.legacyCheckoutSummaryTotal)}>
+                    <span>총계</span>
+                    <strong>{amountDue.toLocaleString("ko-KR")}<small>원</small></strong>
+                  </div>
+                  <div className={styles.legacyCheckoutSummaryRow}>
+                    <span>보유 포인트</span>
+                    <strong>{availablePoints.toLocaleString("ko-KR")}<small>원</small></strong>
+                  </div>
+                </section>
 
-            <Panel title="결제수단">
-              {effectivePaymentMethod === "points" ? (
-                <p className={styles.checkoutPaymentNotice}>
-                  {couponDiscount > 0 && appliedPoints > 0
-                    ? "쿠폰과 포인트로"
-                    : couponDiscount > 0
-                      ? "쿠폰으로"
-                      : "포인트로"}{" "}
-                  전액 결제됩니다. 별도의 입금 정보는 필요하지 않습니다.
-                </p>
-              ) : (
-                <>
-                  {paymentMethods.length > 0 ? (
-                    <div className={styles.paymentMethods}>
+                <section className={styles.legacyCheckoutPaymentInfo}>
+                  <h2>결제정보</h2>
+                  <div>
+                    <span>추가배송비</span>
+                    <strong>{shippingAdditionalFee.toLocaleString("ko-KR")}<small>원</small></strong>
+                  </div>
+                  <p><em>*</em> 지역에 따라 추가되는 도선료 등의 배송비입니다.</p>
+                </section>
+                <div className={styles.legacyCheckoutGrandTotal}>
+                  <strong>총 주문금액</strong>
+                  <b>{amountDue.toLocaleString("ko-KR")}<small>원</small></b>
+                </div>
+
+                <section className={styles.legacyCheckoutPayment}>
+                  <h2>결제수단</h2>
+                  {effectivePaymentMethod === "points" ? (
+                    <p className={styles.checkoutPaymentNotice}>
+                      쿠폰과 포인트로 전액 결제됩니다.
+                    </p>
+                  ) : paymentMethods.length > 0 ? (
+                    <div className={styles.paymentMethods} role="radiogroup" aria-label="결제방법 선택">
                       {paymentMethods.map((method) => (
                         <label
                           key={method}
-                          className={
-                            paymentMethod === method
-                              ? styles.paymentMethodActive
-                              : undefined
-                          }
+                          className={paymentMethod === method ? styles.paymentMethodActive : undefined}
                         >
                           <input
                             type="radio"
@@ -975,88 +1049,46 @@ export function CheckoutPanel({
                       ))}
                     </div>
                   ) : (
-                    <p className={styles.checkoutPointError} role="alert">
-                      현재 사용할 수 있는 결제수단이 없습니다.
-                    </p>
+                    <p className={styles.checkoutPointError} role="alert">현재 사용할 수 있는 결제수단이 없습니다.</p>
                   )}
-                </>
-              )}
-              {effectivePaymentMethod === "bank" ? (
-                <div className={styles.bankFields}>
-                  <label className={styles.formRow}>
-                    <span>입금계좌</span>
-                    <div>
-                      <select
-                        name="bankCode"
-                        required
-                        defaultValue={banks.length === 1 ? banks[0].value : ""}
-                      >
-                        {banks.length > 1 ? (
-                          <option value="">계좌를 선택해 주세요.</option>
-                        ) : null}
-                        {banks.map((bank) => (
-                          <option key={bank.value} value={bank.value}>
-                            {bank.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </label>
-                  <label className={styles.formRow}>
-                    <span>입금자명</span>
-                    <div>
-                      <input
-                        name="depositor"
-                        type="text"
-                        defaultValue={buyer.name}
-                        required
-                      />
-                    </div>
-                  </label>
-                  <label className={styles.formRow}>
-                    <span>현금영수증</span>
-                    <div>
-                      <input
-                        name="cashReceiptNumber"
-                        type="text"
-                        placeholder="휴대전화 또는 사업자번호"
-                      />
-                    </div>
-                  </label>
-                </div>
-              ) : null}
-            </Panel>
-          </div>
 
-          <aside className={styles.checkoutAside}>
-            <div className={styles.checkoutAsideSticky}>
-              <PriceSummary
-                rows={[
-                  { label: "주문", value: productTotal },
-                  { label: "쿠폰할인", value: -couponDiscount },
-                  { label: "배송비", value: shippingTotal },
-                  { label: "포인트", value: -appliedPoints },
-                  {
-                    label: "보유 포인트",
-                    value: availablePoints,
-                    muted: true,
-                  },
-                ]}
-                total={amountDue}
-                totalLabel="총계"
-              />
-              <button
-                type="submit"
-                className={styles.primaryFormButton}
-                disabled={submitting || !hasAvailablePaymentMethod}
-              >
-                {submitting ? "주문 접수 중…" : submitLabel ?? "주문하기"}
-              </button>
-              <a className={styles.legacyCheckoutCancel} href="/shop/cart.php">
-                취소
-              </a>
-            </div>
-          </aside>
+                  {effectivePaymentMethod === "bank" ? (
+                    <div className={styles.bankFields}>
+                      <div className={styles.legacyBankAccount}>
+                        <span>입금할 계좌</span>
+                        {banks.length === 1 ? (
+                          <>
+                            <input name="bankCode" type="hidden" value={banks[0].value} />
+                            <strong>{banks[0].label}</strong>
+                          </>
+                        ) : (
+                          <select name="bankCode" required defaultValue="">
+                            <option value="">계좌를 선택해 주세요.</option>
+                            {banks.map((bank) => (
+                              <option key={bank.value} value={bank.value}>{bank.label}</option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                      <label className={styles.legacyDepositorField}>
+                        <span>입금자명</span>
+                        <input name="depositor" type="text" defaultValue={buyer.name} required />
+                      </label>
+                      <input name="cashReceiptNumber" type="hidden" value="" />
+                    </div>
+                  ) : null}
+                </section>
+
+                <button
+                  type="submit"
+                  className={styles.primaryFormButton}
+                  disabled={submitting || !hasAvailablePaymentMethod}
+                >
+                  {submitting ? "주문 접수 중…" : submitLabel ?? "주문하기"}
+                </button>
+                <a className={styles.legacyCheckoutCancel} href="/shop/cart.php">취소</a>
+              </div>
+            </aside>
           </div>
         </form>
       </div>
