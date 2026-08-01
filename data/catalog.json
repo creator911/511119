@@ -2275,7 +2275,7 @@
       "categoryId": "7030",
       "name": "퓨마 반지",
       "basic": "",
-      "price": 1958000,
+      "price": 1710000,
       "originalPrice": 1958000,
       "stock": 988,
       "maker": "",
@@ -2287,7 +2287,7 @@
         "recommend": false,
         "new": false,
         "popular": false,
-        "sale": false
+        "sale": true
       },
       "images": [
         "/legacy/products/1762011422/gallery-1.jpg",
@@ -3239,8 +3239,8 @@
       "categoryId": "6010",
       "name": "리버스 하트 곰돌이 목걸이",
       "basic": "",
-      "price": 917000,
-      "originalPrice": 917000,
+      "price": 980000,
+      "originalPrice": 980000,
       "stock": 999,
       "maker": "",
       "origin": "",

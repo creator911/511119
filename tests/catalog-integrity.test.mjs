@@ -42,8 +42,20 @@ test("preserves the complete public catalog with local media only", async () => 
   );
   assert.equal(
     catalog.products.filter((product) => product.flags.sale).length,
-    5,
+    6,
   );
+  const reverseHeartBearNecklace = catalog.products.find(
+    (product) => product.id === "1762010733",
+  );
+  assert.equal(reverseHeartBearNecklace?.price, 980_000);
+  assert.equal(reverseHeartBearNecklace?.originalPrice, 980_000);
+
+  const pumaRing = catalog.products.find(
+    (product) => product.id === "1762011422",
+  );
+  assert.equal(pumaRing?.price, 1_710_000);
+  assert.equal(pumaRing?.originalPrice, 1_958_000);
+  assert.equal(pumaRing?.flags.sale, true);
   assert.equal(
     catalog.categories.find((category) => category.id === "9120")?.name,
     "랩다이아몬드",
