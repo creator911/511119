@@ -4299,7 +4299,7 @@
 .checkoutLayout {
   grid-template-columns: minmax(0, 745px) minmax(330px, 370px);
   gap: 0;
-  margin-top: 5.5px;
+  margin-top: 11px;
 }
 
 .legacyCheckoutPage .checkoutMain {
@@ -4636,7 +4636,7 @@ button.legacyCheckoutSummaryRow {
 
 .legacyCheckoutPayment h2 {
   height: 24px;
-  margin-bottom: 10px;
+  margin-bottom: 8.5px;
   line-height: 24px;
 }
 
@@ -4675,7 +4675,7 @@ button.legacyCheckoutSummaryRow {
   min-height: 52px;
   align-items: center;
   justify-content: space-between;
-  margin: 20px 0 16px;
+  margin: 20px 0 18px;
   padding: 0 16px;
   border: 1px solid #d92708;
   background: #fff;
@@ -4742,7 +4742,7 @@ button.legacyCheckoutSummaryRow {
   width: calc(100% - 2px);
   margin-top: 20px;
   margin-left: 2px;
-  padding: 14px 15px 16px;
+  padding: 14px 15px 20px;
   border: 1px solid #d92708;
 }
 
@@ -4776,7 +4776,7 @@ button.legacyCheckoutSummaryRow {
 }
 
 .legacyBankAccount > strong {
-  margin-bottom: 17px;
+  margin-bottom: 24px;
   color: #555;
   font-size: 13px;
   font-weight: 500;
@@ -4791,9 +4791,16 @@ button.legacyCheckoutSummaryRow {
   border: 1px solid #ccc;
 }
 
+.legacyDepositorField > span {
+  height: 32px;
+  margin-bottom: 0;
+  line-height: 32px;
+}
+
 .checkoutAside .primaryFormButton {
-  min-height: 50px;
-  margin-top: 18px;
+  height: 46px;
+  min-height: 46px;
+  margin-top: 19.5px;
   border-color: #d92708;
   background: #d92708;
 }
@@ -4803,8 +4810,8 @@ button.legacyCheckoutSummaryRow {
 }
 
 .legacyCheckoutCancel {
-  min-height: 42px;
-  margin-top: 7px;
+  min-height: 46px;
+  margin-top: 15px;
   border-color: #aaa;
   background: #fff;
 }
@@ -8929,6 +8936,10 @@ button.legacyCheckoutSummaryRow {
   .checkoutAsideSticky {
     position: static;
   }
+
+  .legacyCheckoutPage .checkoutMain {
+    width: 100%;
+  }
 }
 
 @media (max-width: 767px) {
@@ -8940,15 +8951,19 @@ button.legacyCheckoutSummaryRow {
     margin-bottom: 20px;
   }
 
+  .checkoutLayout {
+    margin-top: 21px;
+  }
+
   .legacyCheckoutSection {
-    margin-right: 0;
-    margin-bottom: 18px;
-    margin-left: 0;
+    margin-right: 1px;
+    margin-bottom: 0;
+    margin-left: 1px;
   }
 
   .legacyCheckoutSectionHeader {
-    min-height: 56px;
-    padding: 12px 15px;
+    min-height: 70px;
+    padding: 15px 20px;
   }
 
   .legacyCheckoutSectionHeader::before {
@@ -8957,40 +8972,52 @@ button.legacyCheckoutSummaryRow {
   }
 
   .legacyCheckoutSectionHeader h2 {
-    font-size: 17px;
+    font-size: 18px;
   }
 
   .legacyCheckoutSectionBody {
-    padding: 18px 13px 22px;
+    padding: 29px 15px 40px;
   }
 
   .legacyCheckoutSection .formRow {
-    display: grid;
-    min-height: 58px;
-    grid-template-columns: 70px minmax(0, 1fr);
+    display: block;
+    min-height: 90.71875px;
     padding: 0;
   }
 
   .legacyCheckoutSection .formRow > span {
+    width: 100%;
+    height: 32.71875px;
     align-items: center;
-    justify-content: flex-end;
-    padding: 8px 4px;
-    font-size: 12px;
+    justify-content: flex-start;
+    padding: 0;
+    font-size: 13px;
+    text-align: left;
   }
 
   .legacyCheckoutSection .formRow > div {
-    padding: 8px 0 8px 10px;
+    min-height: 58px;
+    padding: 0 0 20px;
   }
 
   .legacyCheckoutSection .formRow > div > input,
   .legacyCheckoutSection .formRow > div > select,
   .legacyShippingName > input[type="text"] {
+    width: 200px;
+    height: 38px;
+    min-height: 38px;
+  }
+
+  .legacyCheckoutSection .addressRow {
+    min-height: 206.71875px;
+  }
+
+  .legacyCheckoutSection .addressRow > div > input {
     width: 100%;
-    min-height: 40px;
   }
 
   .legacyCheckoutSection .inlineField {
-    width: 100%;
+    width: 255px;
   }
 
   .legacyCheckoutSection .inlineField button {
@@ -9009,6 +9036,14 @@ button.legacyCheckoutSummaryRow {
   .legacyShippingName {
     align-items: flex-start !important;
     flex-direction: column !important;
+  }
+
+  .legacyCheckoutSection:last-child .fieldTable:first-child .formRow:first-child {
+    min-height: 89.6875px;
+  }
+
+  .legacyCheckoutSection:last-child .fieldTable:first-child .formRow:nth-child(2) {
+    min-height: 117.71875px;
   }
 
   .legacyCheckoutDeliveryHelp {
@@ -9050,6 +9085,6 @@ button.legacyCheckoutSummaryRow {
   }
 
   .checkoutAside .primaryFormButton {
-    min-height: 52px;
+    min-height: 46px;
   }
 }
