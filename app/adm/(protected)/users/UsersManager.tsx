@@ -25,6 +25,10 @@ import {
 import { OperationDialog } from "../OperationDialog";
 import dialogStyles from "../operation-dialog.module.css";
 import type { AdminMemberDetail } from "@/lib/admin-operations";
+import type {
+  AdminMemberOrderItem,
+  AdminMemberOrderList,
+} from "@/lib/admin-member-orders";
 import { MAX_POINTS } from "@/lib/commerce-limits";
 import {
   MAX_WALLET_REQUEST_AMOUNT,
@@ -93,6 +97,16 @@ interface MemberWalletDraft {
   accountHolder: string;
   adminMemo: string;
   createdAt: string;
+}
+
+interface MemberOrdersApiResponse extends Partial<AdminMemberOrderList> {
+  ok?: boolean;
+  message?: string;
+}
+
+interface MemberOrderDraft {
+  productId: string;
+  purchasedAt: string;
 }
 
 interface LegacyMemberRecord extends MemberListRecord {
@@ -191,6 +205,16 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     Record<string, MemberWalletDraft>
   >({});
   const [walletSavingKey, setWalletSavingKey] = useState("");
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderError, setOrderError] = useState("");
+  const [orderMember, setOrderMember] =
+    useState<AdminMemberOrderList["member"] | null>(null);
+  const [memberOrders, setMemberOrders] = useState<AdminMemberOrderItem[]>([]);
+  const [orderDrafts, setOrderDrafts] = useState<
+    Record<number, MemberOrderDraft>
+  >({});
+  const [orderSavingItemId, setOrderSavingItemId] = useState(0);
 
   const members = result.rows.map(adminMemberListRecord).map(
     (record) => memberOverrides[String(record.id)] ?? record,
@@ -252,6 +276,12 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     setWalletDialogOpen(false);
     setWalletError("");
   }, [walletSavingKey]);
+
+  const closeOrderDialog = useCallback(() => {
+    if (orderSavingItemId) return;
+    setOrderDialogOpen(false);
+    setOrderError("");
+  }, [orderSavingItemId]);
 
   useEffect(() => {
     if (!dialogOpen) return;
@@ -750,6 +780,160 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
       );
     } finally {
       setWalletSavingKey("");
+    }
+  };
+
+  const openMemberOrders = async (record: LegacyMemberRecord) => {
+    const id = String(record.id);
+    setOrderMember({
+      id,
+      loginId: record.loginId,
+      name: record.name,
+      points: record.points,
+    });
+    setMemberOrders([]);
+    setOrderDrafts({});
+    setOrderError("");
+    setOrderDialogOpen(true);
+    setOrderLoading(true);
+    try {
+      const response = await fetch(
+        `/api/admin/users/${encodeURIComponent(id)}/orders`,
+        { cache: "no-store" },
+      );
+      if (response.status === 401) {
+        redirectToAdminLogin();
+        return;
+      }
+      const payload = await readMemberOrdersResponse(response);
+      if (
+        !response.ok ||
+        !payload.member ||
+        !Array.isArray(payload.items)
+      ) {
+        throw new Error(
+          payload.message ?? "회원의 구매상품을 불러오지 못했습니다.",
+        );
+      }
+      setOrderMember(payload.member);
+      setMemberOrders(payload.items);
+      setOrderDrafts(
+        Object.fromEntries(
+          payload.items.map((item) => [
+            item.itemId,
+            memberOrderDraft(item),
+          ]),
+        ),
+      );
+    } catch (cause) {
+      setOrderError(
+        cause instanceof Error
+          ? cause.message
+          : "회원의 구매상품을 불러오지 못했습니다.",
+      );
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
+  const updateMemberOrderDraft = (
+    itemId: number,
+    changes: Partial<MemberOrderDraft>,
+  ) => {
+    setOrderDrafts((current) => {
+      const draft = current[itemId];
+      if (!draft) return current;
+      return {
+        ...current,
+        [itemId]: { ...draft, ...changes },
+      };
+    });
+  };
+
+  const saveMemberOrder = async (item: AdminMemberOrderItem) => {
+    if (!orderMember || orderSavingItemId) return;
+    const draft = orderDrafts[item.itemId];
+    if (!draft) return;
+    const productId = draft.productId.trim();
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u.test(productId)) {
+      setOrderError(
+        "상품 페이지 주소의 it_id 값(예: 1762011927)을 입력해 주세요.",
+      );
+      return;
+    }
+    const purchasedAt = walletLocalDateTimeToIso(draft.purchasedAt);
+    if (!purchasedAt) {
+      setOrderError("구매일시는 초 단위까지 정확히 입력해 주세요.");
+      return;
+    }
+
+    setOrderSavingItemId(item.itemId);
+    setOrderError("");
+    try {
+      const response = await fetch(
+        `/api/admin/users/${encodeURIComponent(orderMember.id)}/orders`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            itemId: item.itemId,
+            productId,
+            purchasedAt,
+            expectedUpdatedAt: item.updatedAt,
+          }),
+        },
+      );
+      if (response.status === 401) {
+        redirectToAdminLogin();
+        return;
+      }
+      const payload = await readMemberOrdersResponse(response);
+      if (
+        !response.ok ||
+        !payload.member ||
+        !Array.isArray(payload.items)
+      ) {
+        throw new Error(payload.message ?? "구매상품을 수정하지 못했습니다.");
+      }
+      setOrderMember(payload.member);
+      setMemberOrders(payload.items);
+      setOrderDrafts(
+        Object.fromEntries(
+          payload.items.map((nextItem) => [
+            nextItem.itemId,
+            memberOrderDraft(nextItem),
+          ]),
+        ),
+      );
+      setMemberOverrides((current) => {
+        const existing = current[orderMember.id];
+        const base =
+          existing ??
+          members.find(
+            (candidate) => String(candidate.id) === orderMember.id,
+          );
+        if (!base) return current;
+        return {
+          ...current,
+          [orderMember.id]: {
+            ...base,
+            points: payload.member!.points,
+          },
+        };
+      });
+      pushToast({
+        title: "구매상품을 수정했습니다.",
+        message: `${item.orderId} 주문의 상품·구매일·금액·마일리지를 반영했습니다.`,
+        tone: "success",
+      });
+    } catch (cause) {
+      setOrderError(
+        cause instanceof Error
+          ? cause.message
+          : "구매상품을 수정하지 못했습니다.",
+      );
+    } finally {
+      setOrderSavingItemId(0);
     }
   };
 
@@ -2272,6 +2456,13 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                       >
                         충환변경
                       </button>
+                      <button
+                        type="button"
+                        className="legacy-member-order"
+                        onClick={() => void openMemberOrders(record)}
+                      >
+                        상품변경
+                      </button>
                     </td>
                   </tr>,
                   <tr
@@ -2419,6 +2610,179 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                 <p className="legacy-member-group-state">
                   등록된 접근가능그룹이 없습니다.
                 </p>
+              )}
+            </>
+          )}
+        </div>
+      </OperationDialog>
+      <OperationDialog
+        open={orderDialogOpen}
+        title="상품변경"
+        subtitle={
+          orderMember
+            ? `${orderMember.loginId} 회원의 최근 구매상품`
+            : undefined
+        }
+        busy={Boolean(orderSavingItemId)}
+        onClose={closeOrderDialog}
+        footer={
+          <AdminButton
+            onClick={closeOrderDialog}
+            disabled={Boolean(orderSavingItemId)}
+          >
+            닫기
+          </AdminButton>
+        }
+      >
+        <div className="legacy-member-order-editor">
+          {orderLoading ? (
+            <p className="legacy-member-order-state" role="status">
+              구매상품 목록을 불러오는 중입니다.
+            </p>
+          ) : (
+            <>
+              {orderError ? (
+                <p className="legacy-member-order-error" role="alert">
+                  {orderError}
+                </p>
+              ) : null}
+              {orderMember ? (
+                <div className="legacy-member-order-summary">
+                  <span>
+                    회원 <strong>{orderMember.loginId}</strong>
+                  </span>
+                  <span>
+                    이름 <strong>{orderMember.name || "-"}</strong>
+                  </span>
+                  <span>
+                    현재 마일리지{" "}
+                    <strong>
+                      {orderMember.points.toLocaleString("ko-KR")}P
+                    </strong>
+                  </span>
+                  <span>
+                    구매상품{" "}
+                    <strong>
+                      {memberOrders.length.toLocaleString("ko-KR")}건
+                    </strong>
+                  </span>
+                </div>
+              ) : null}
+              {memberOrders.length === 0 ? (
+                <p className="legacy-member-order-state">
+                  등록된 구매상품이 없습니다.
+                </p>
+              ) : (
+                <div className="legacy-member-order-list">
+                  {memberOrders.map((item) => {
+                    const draft = orderDrafts[item.itemId];
+                    if (!draft) return null;
+                    const rowSaving = orderSavingItemId === item.itemId;
+                    return (
+                      <article
+                        className="legacy-member-order-card"
+                        key={item.itemId}
+                      >
+                        <header>
+                          <span className="legacy-member-order-number">
+                            {item.orderId}
+                          </span>
+                          <strong>{item.productName}</strong>
+                          <span className="legacy-member-order-status">
+                            {memberOrderStatusLabel(item.status)}
+                          </span>
+                        </header>
+                        <div className="legacy-member-order-fields">
+                          <label>
+                            <span>상품ID (it_id)</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              maxLength={80}
+                              value={draft.productId}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateMemberOrderDraft(item.itemId, {
+                                  productId: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label>
+                            <span>구매일시</span>
+                            <input
+                              type="datetime-local"
+                              step={1}
+                              value={draft.purchasedAt}
+                              disabled={rowSaving}
+                              onChange={(event) =>
+                                updateMemberOrderDraft(item.itemId, {
+                                  purchasedAt: event.currentTarget.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <div className="legacy-member-order-product">
+                            <span>현재 상품</span>
+                            <a
+                              href={`/shop/item.php?it_id=${encodeURIComponent(item.productId)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {item.productName}
+                            </a>
+                          </div>
+                          <div>
+                            <span>단가 × 수량</span>
+                            <strong>
+                              {item.unitPrice.toLocaleString("ko-KR")}원 ×{" "}
+                              {item.quantity.toLocaleString("ko-KR")}
+                            </strong>
+                          </div>
+                          <div>
+                            <span>상품금액</span>
+                            <strong>
+                              {item.lineTotal.toLocaleString("ko-KR")}원
+                            </strong>
+                          </div>
+                          <div>
+                            <span>주문 결제금액</span>
+                            <strong className="legacy-member-order-total">
+                              {item.total.toLocaleString("ko-KR")}원
+                            </strong>
+                          </div>
+                          <div>
+                            <span>사용 마일리지</span>
+                            <strong>
+                              {item.pointsUsed.toLocaleString("ko-KR")}P
+                            </strong>
+                          </div>
+                          <div>
+                            <span>적립 마일리지</span>
+                            <strong>
+                              {item.earnedPoints.toLocaleString("ko-KR")}P
+                            </strong>
+                          </div>
+                        </div>
+                        <footer>
+                          <span>
+                            상품ID를 변경하면 상품명·단가·주문금액·마일리지가 자동 계산됩니다.
+                          </span>
+                          <AdminButton
+                            variant="primary"
+                            loading={rowSaving}
+                            disabled={Boolean(
+                              orderSavingItemId && !rowSaving,
+                            )}
+                            onClick={() => void saveMemberOrder(item)}
+                          >
+                            상품 수정
+                          </AdminButton>
+                        </footer>
+                      </article>
+                    );
+                  })}
+                </div>
               )}
             </>
           )}
@@ -3115,6 +3479,36 @@ async function readMemberWalletResponse(
   } catch {
     return {};
   }
+}
+
+async function readMemberOrdersResponse(
+  response: Response,
+): Promise<MemberOrdersApiResponse> {
+  try {
+    return (await response.json()) as MemberOrdersApiResponse;
+  } catch {
+    return {};
+  }
+}
+
+function memberOrderDraft(item: AdminMemberOrderItem): MemberOrderDraft {
+  return {
+    productId: item.productId,
+    purchasedAt: walletDateTimeInput(item.purchasedAt),
+  };
+}
+
+function memberOrderStatusLabel(status: AdminMemberOrderItem["status"]): string {
+  const labels: Record<AdminMemberOrderItem["status"], string> = {
+    ordered: "주문",
+    payment_confirmed: "입금확인",
+    preparing: "상품준비",
+    shipped: "배송",
+    delivered: "완료",
+    cancelled: "취소",
+    refunded: "환불",
+  };
+  return labels[status];
 }
 
 function walletRequestKey(request: WalletRequest): string {
