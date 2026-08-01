@@ -36,9 +36,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(`${protocol}://${safeHost}`),
-    alternates: {
-      canonical: "/",
-    },
     title: {
       default: metaSettings.title,
       template: `%s | ${metaSettings.title}`,
@@ -54,7 +51,6 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "ko_KR",
-      url: "/",
       siteName: "GOLDRIAN",
       title: metaSettings.title,
       description: metaSettings.description,
