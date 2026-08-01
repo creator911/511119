@@ -9101,6 +9101,10 @@ button.legacyCheckoutSummaryRow {
     padding-left: 15px;
   }
 
+  .legacyCheckoutPage .checkoutAsideSticky {
+    padding-top: 21px;
+  }
+
   .legacyCheckoutSummary {
     border: 0;
   }
