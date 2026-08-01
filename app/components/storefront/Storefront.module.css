@@ -4297,13 +4297,28 @@
 }
 
 .checkoutLayout {
-  grid-template-columns: minmax(0, 744px) minmax(330px, 355px);
-  gap: 16px;
+  grid-template-columns: minmax(0, 745px) minmax(330px, 370px);
+  gap: 0;
+  margin-top: 5.5px;
+}
+
+.legacyCheckoutPage .checkoutMain {
+  width: 744px;
+}
+
+.legacyCheckoutPage .checkoutAside {
+  box-sizing: border-box;
+  padding-right: 15px;
+  padding-left: 16px;
+}
+
+.legacyCheckoutPage .checkoutAsideSticky {
+  padding-top: 20px;
 }
 
 .legacyCheckoutSection {
   position: relative;
-  margin: 0 0 25px;
+  margin: 0;
   border: 1px solid #ddd;
   background: #fff;
 }
@@ -4338,7 +4353,7 @@
 }
 
 .legacyCheckoutSectionBody {
-  padding: 35px 25px 42px;
+  padding: 29px 15px 40px;
 }
 
 .legacyCheckoutSection .fieldTable {
@@ -4351,7 +4366,7 @@
 
 .legacyCheckoutSection .formRow {
   min-height: 63px;
-  grid-template-columns: 78px minmax(0, 1fr);
+  grid-template-columns: 95px minmax(0, 1fr);
   border-bottom: 0;
 }
 
@@ -4368,14 +4383,16 @@
 .legacyCheckoutSection .formRow > div {
   width: 100%;
   max-width: none;
-  padding: 9px 0 9px 15px;
+  justify-content: flex-start;
+  padding: 5px 8px 20px 15px;
 }
 
 .legacyCheckoutSection .formRow > div > input,
 .legacyCheckoutSection .formRow > div > select {
   width: 200px;
+  height: 38px;
   max-width: 100%;
-  min-height: 39px;
+  min-height: 38px;
 }
 
 .legacyCheckoutSection .addressRow > div > input {
@@ -4384,25 +4401,32 @@
 }
 
 .legacyCheckoutSection .addressRow > div {
-  gap: 8px;
+  gap: 0;
 }
 
 .legacyCheckoutSection .inlineField {
   width: 255px;
   max-width: 100%;
   gap: 5px;
+  margin-bottom: 25px;
 }
 
 .legacyCheckoutSection .inlineField input {
-  min-height: 39px;
+  height: 38px;
+  min-height: 38px;
 }
 
 .legacyCheckoutSection .inlineField button {
+  height: 37px;
   min-width: 100px;
   border: 0;
   background: #d93a2f;
   font-size: 13px;
   font-weight: 700;
+}
+
+.legacyCheckoutSection .addressRow > div > input + input {
+  margin-top: 15px;
 }
 
 .legacyRequiredInput {
@@ -4431,9 +4455,19 @@
 
 .legacyShippingChoices input,
 .legacyShippingName input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
+  width: 13px;
+  height: 13px;
+  min-height: 13px;
   accent-color: var(--kiel-red);
+}
+
+.legacyCheckoutSection:last-child .fieldTable:first-child .formRow:first-child {
+  min-height: 41px;
+}
+
+.legacyCheckoutSection .legacyShippingChoices {
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .legacyShippingChoices button {
@@ -4459,9 +4493,7 @@
 }
 
 .legacyCheckoutDeliveryHelp {
-  margin: 20px 0 0 93px;
-  color: #888;
-  font-size: 11px;
+  display: none;
 }
 
 .legacyCheckoutSummary {
@@ -4491,14 +4523,14 @@
 .legacyCheckoutEquation > div > span,
 .legacyCheckoutSummaryRow > span {
   color: #666;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .legacyCheckoutEquation strong,
 .legacyCheckoutSummaryRow strong,
 .legacyCheckoutPaymentInfo strong {
   color: #222;
-  font-size: 14px;
+  font-size: 16px;
   white-space: nowrap;
 }
 
@@ -4530,7 +4562,7 @@ button.legacyCheckoutOperator {
 .legacyCheckoutSummaryRow {
   display: flex;
   width: 100%;
-  min-height: 47px;
+  min-height: 43.5px;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
@@ -4588,10 +4620,13 @@ button.legacyCheckoutSummaryRow {
 }
 
 .legacyCheckoutPaymentInfo {
-  margin-top: 18px;
+  margin-top: 19px;
 }
 
-.legacyCheckoutPaymentInfo h2,
+.legacyCheckoutPaymentInfo h2 {
+  display: none;
+}
+
 .legacyCheckoutPayment h2 {
   margin: 0 0 9px;
   color: #333;
@@ -4599,9 +4634,15 @@ button.legacyCheckoutSummaryRow {
   font-weight: 700;
 }
 
+.legacyCheckoutPayment h2 {
+  height: 24px;
+  margin-bottom: 10px;
+  line-height: 24px;
+}
+
 .legacyCheckoutPaymentInfo > div {
   display: flex;
-  min-height: 55px;
+  min-height: 37px;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
@@ -4611,13 +4652,13 @@ button.legacyCheckoutSummaryRow {
 
 .legacyCheckoutPaymentInfo > div > span {
   color: #555;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .legacyCheckoutPaymentInfo > p {
-  min-height: 48px;
+  min-height: 37px;
   margin: 0;
-  padding: 13px 16px;
+  padding: 8px 16px;
   border: 1px solid #ddd;
   color: #777;
   font-size: 11px;
@@ -4631,10 +4672,10 @@ button.legacyCheckoutSummaryRow {
 
 .legacyCheckoutGrandTotal {
   display: flex;
-  min-height: 55px;
+  min-height: 52px;
   align-items: center;
   justify-content: space-between;
-  margin: 12px 0 16px;
+  margin: 20px 0 16px;
   padding: 0 16px;
   border: 1px solid #d92708;
   background: #fff;
@@ -4654,11 +4695,12 @@ button.legacyCheckoutSummaryRow {
   display: flex;
   grid-template-columns: none;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 0;
+  padding-left: 1px;
 }
 
 .legacyCheckoutPayment .paymentMethods label {
-  width: calc(50% - 3px);
+  width: 50%;
 }
 
 .legacyCheckoutPayment .paymentMethods span {
@@ -4697,7 +4739,9 @@ button.legacyCheckoutSummaryRow {
 }
 
 .legacyCheckoutPayment .bankFields {
-  margin-top: 18px;
+  width: calc(100% - 2px);
+  margin-top: 20px;
+  margin-left: 2px;
   padding: 14px 15px 16px;
   border: 1px solid #d92708;
 }
@@ -4721,6 +4765,16 @@ button.legacyCheckoutSummaryRow {
   font-size: 12px;
 }
 
+.legacyBankAccount > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .legacyBankAccount > strong {
   margin-bottom: 17px;
   color: #555;
@@ -4732,7 +4786,8 @@ button.legacyCheckoutSummaryRow {
 .legacyBankAccount select,
 .legacyDepositorField input {
   width: 100%;
-  min-height: 36px;
+  height: 32px;
+  min-height: 32px;
   border: 1px solid #ccc;
 }
 
