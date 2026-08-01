@@ -510,5 +510,9 @@ test("guest checkout is blocked at both the page and order API boundaries", asyn
   assert.match(checkout, /label: "주문\/결제"/);
   assert.match(checkout, /label: "주문완료"/);
   assert.match(checkout, /legacyCheckoutProductHeader/);
+  assert.match(checkout, /<span>포인트사용<\/span>/);
+  assert.match(checkout, /aria-label="사용할 포인트"/);
+  assert.match(checkout, /type="checkbox"\s+name="paymentMethod"/);
+  assert.doesNotMatch(checkout, /aria-expanded=\{pointPanelOpen\}/);
   assert.match(checkout, /submitLabel \?\? "주문하기"/);
 });

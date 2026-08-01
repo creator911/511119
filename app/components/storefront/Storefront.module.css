@@ -4743,6 +4743,28 @@ button.legacyCheckoutSummaryRow {
   font-weight: 800;
 }
 
+.legacyCheckoutPayment .paymentMethods .legacyPointPaymentOption span::before {
+  content: "P";
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.legacyCheckoutPayment .paymentMethods input:disabled + span {
+  color: #999;
+  background: #f7f7f7;
+  cursor: not-allowed;
+}
+
+.legacyCheckoutPointTool {
+  width: calc(100% - 2px);
+  margin: 12px 0 0 2px;
+  border: 1px solid #d92708;
+}
+
+.legacyCheckoutPayment .checkoutPaymentNotice {
+  margin-top: 12px;
+}
+
 .legacyCheckoutPayment .bankFields {
   width: calc(100% - 2px);
   margin-top: 20px;

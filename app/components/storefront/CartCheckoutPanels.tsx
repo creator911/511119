@@ -374,18 +374,16 @@ export function CheckoutPanel({
   });
   const [recipient, setRecipient] = useState<CheckoutContact>(blankContact);
   const [sameAsBuyer, setSameAsBuyer] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
-    paymentMethods[0] ?? "card",
-  );
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
   const [pointsUsed, setPointsUsed] = useState(0);
   const [pointError, setPointError] = useState("");
+  const [pointUseSelected, setPointUseSelected] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] =
     useState<AppliedCoupon | null>(null);
   const [couponError, setCouponError] = useState("");
   const [couponChecking, setCouponChecking] = useState(false);
   const [couponPanelOpen, setCouponPanelOpen] = useState(false);
-  const [pointPanelOpen, setPointPanelOpen] = useState(false);
   const [buyerMobile, setBuyerMobile] = useState("");
   const [recipientMobile, setRecipientMobile] = useState("");
   const [shippingLabel, setShippingLabel] = useState("");
@@ -439,30 +437,28 @@ export function CheckoutPanel({
         settings: pointSettings,
       })
     : 0;
+  const requestedPoints = pointUseSelected ? pointsUsed : 0;
   const pointValidation = validatePointUse({
-    pointsUsed,
+    pointsUsed: requestedPoints,
     orderTotal,
     availablePoints,
     authenticated: canUsePoints,
     settings: pointSettings,
   });
-  const appliedPoints = pointValidation.ok ? pointsUsed : 0;
+  const appliedPoints = pointValidation.ok ? requestedPoints : 0;
   const amountDue = Math.max(0, orderTotal - appliedPoints);
-  const checkoutSummaryRows = [
-    { label: "쿠폰 할인", value: couponDiscount },
-    { label: "포인트", value: appliedPoints },
-  ];
-  const effectivePaymentMethod: PaymentMethod =
+  const effectivePaymentMethod: PaymentMethod | null =
     amountDue === 0 && (appliedPoints > 0 || couponDiscount > 0)
       ? "points"
-      : paymentMethod;
+      : paymentMethod || null;
   const canSelectPoints =
     canUsePoints &&
     pointUseEnabled &&
     maximumUsablePoints >= pointUseMinimum;
   const hasAvailablePaymentMethod =
-    effectivePaymentMethod === "points" ||
-    paymentMethods.includes(effectivePaymentMethod);
+    effectivePaymentMethod !== null &&
+    (effectivePaymentMethod === "points" ||
+      paymentMethods.includes(effectivePaymentMethod));
 
   useEffect(() => {
     const postcode = recipient.postcode.trim();
@@ -620,7 +616,7 @@ export function CheckoutPanel({
       );
       return;
     }
-    if (!hasAvailablePaymentMethod) return;
+    if (!hasAvailablePaymentMethod || !effectivePaymentMethod) return;
     setPointError("");
     const form = new FormData(event.currentTarget);
     onSubmit?.({
@@ -910,8 +906,8 @@ export function CheckoutPanel({
                     </div>
                     <span className={styles.legacyCheckoutOperator} aria-hidden="true">−</span>
                     <div>
-                      <span>{checkoutSummaryRows[0].label}</span>
-                      <strong>{checkoutSummaryRows[0].value.toLocaleString("ko-KR")}<small>원</small></strong>
+                      <span>쿠폰 할인</span>
+                      <strong>{couponDiscount.toLocaleString("ko-KR")}<small>원</small></strong>
                     </div>
                     <button
                       type="button"
@@ -955,52 +951,6 @@ export function CheckoutPanel({
                       {couponError ? <p role="alert">{couponError}</p> : null}
                     </div>
                   ) : null}
-                  <button
-                    type="button"
-                    className={styles.legacyCheckoutSummaryRow}
-                    aria-expanded={pointPanelOpen}
-                    onClick={() => setPointPanelOpen((current) => !current)}
-                  >
-                    <span>{checkoutSummaryRows[1].label}</span>
-                    <strong>{checkoutSummaryRows[1].value.toLocaleString("ko-KR")}<small>점</small></strong>
-                  </button>
-                  {pointPanelOpen ? (
-                    <div className={styles.legacyCheckoutCompactTool}>
-                      <div>
-                        <input
-                          type="number"
-                          min={0}
-                          max={maximumUsablePoints}
-                          step={pointUseUnit}
-                          inputMode="numeric"
-                          value={pointsUsed}
-                          disabled={!canSelectPoints}
-                          aria-invalid={Boolean(pointError) || undefined}
-                          onChange={(event) => {
-                            const value = Number(event.currentTarget.value);
-                            setPointsUsed(Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0);
-                            setPointError("");
-                          }}
-                        />
-                        <button
-                          type="button"
-                          disabled={!canSelectPoints}
-                          onClick={() => {
-                            setPointsUsed(maximumUsablePoints);
-                            setPointError("");
-                          }}
-                        >
-                          전액
-                        </button>
-                      </div>
-                      <p>
-                        {pointUseEnabled
-                          ? `${pointUseMinimum.toLocaleString("ko-KR")}P 이상 · ${pointUseUnit.toLocaleString("ko-KR")}P 단위`
-                          : "현재 포인트 결제를 사용하지 않습니다."}
-                      </p>
-                      {pointError ? <p role="alert">{pointError}</p> : null}
-                    </div>
-                  ) : null}
                   <div className={classNames(styles.legacyCheckoutSummaryRow, styles.legacyCheckoutSummaryTotal)}>
                     <span>총계</span>
                     <strong>{amountDue.toLocaleString("ko-KR")}<small>원</small></strong>
@@ -1026,28 +976,91 @@ export function CheckoutPanel({
 
                 <section className={styles.legacyCheckoutPayment}>
                   <h2>결제수단</h2>
-                  {effectivePaymentMethod === "points" ? (
-                    <p className={styles.checkoutPaymentNotice}>
-                      쿠폰과 포인트로 전액 결제됩니다.
-                    </p>
-                  ) : paymentMethods.length > 0 ? (
-                    <div className={styles.paymentMethods} role="radiogroup" aria-label="결제방법 선택">
+                  {paymentMethods.length > 0 || pointUseEnabled ? (
+                    <>
+                    <div className={styles.paymentMethods} role="group" aria-label="결제수단 선택">
                       {paymentMethods.map((method) => (
                         <label
                           key={method}
                           className={paymentMethod === method ? styles.paymentMethodActive : undefined}
                         >
                           <input
-                            type="radio"
+                            type="checkbox"
                             name="paymentMethod"
                             value={method}
                             checked={paymentMethod === method}
-                            onChange={() => setPaymentMethod(method)}
+                            onChange={(event) =>
+                              setPaymentMethod(event.currentTarget.checked ? method : "")
+                            }
                           />
                           <span>{paymentLabels[method]}</span>
                         </label>
                       ))}
+                      {pointUseEnabled ? (
+                        <label
+                          className={classNames(
+                            styles.legacyPointPaymentOption,
+                            pointUseSelected ? styles.paymentMethodActive : undefined,
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            name="usePoints"
+                            checked={pointUseSelected}
+                            disabled={!canSelectPoints}
+                            onChange={(event) => {
+                              const checked = event.currentTarget.checked;
+                              setPointUseSelected(checked);
+                              if (!checked) setPointsUsed(0);
+                              setPointError("");
+                            }}
+                          />
+                          <span>포인트사용</span>
+                        </label>
+                      ) : null}
                     </div>
+                    {pointUseSelected ? (
+                      <div className={classNames(styles.legacyCheckoutCompactTool, styles.legacyCheckoutPointTool)}>
+                        <div>
+                          <input
+                            type="number"
+                            min={0}
+                            max={maximumUsablePoints}
+                            step={pointUseUnit}
+                            inputMode="numeric"
+                            value={pointsUsed}
+                            disabled={!canSelectPoints}
+                            aria-label="사용할 포인트"
+                            aria-invalid={Boolean(pointError) || undefined}
+                            onChange={(event) => {
+                              const value = Number(event.currentTarget.value);
+                              setPointsUsed(Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0);
+                              setPointError("");
+                            }}
+                          />
+                          <button
+                            type="button"
+                            disabled={!canSelectPoints}
+                            onClick={() => {
+                              setPointsUsed(maximumUsablePoints);
+                              setPointError("");
+                            }}
+                          >
+                            전액
+                          </button>
+                        </div>
+                        <p>
+                          {pointUseMinimum.toLocaleString("ko-KR")}P 이상 · {pointUseUnit.toLocaleString("ko-KR")}P 단위
+                        </p>
+                        {pointError ? <p role="alert">{pointError}</p> : null}
+                      </div>
+                    ) : null}
+                    {effectivePaymentMethod === "points" ? (
+                      <p className={styles.checkoutPaymentNotice}>
+                        쿠폰과 포인트로 전액 결제됩니다.
+                      </p>
+                    ) : null}
+                    </>
                   ) : (
                     <p className={styles.checkoutPointError} role="alert">현재 사용할 수 있는 결제수단이 없습니다.</p>
                   )}

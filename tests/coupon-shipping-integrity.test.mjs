@@ -66,7 +66,7 @@ test("checkout applies coupon and regional shipping with server authority", asyn
 
   assert.match(checkout, /\/api\/coupons\/quote/);
   assert.match(checkout, /\/api\/shipping\/quote/);
-  assert.match(checkout, /label: "쿠폰 ?할인"/);
+  assert.match(checkout, /<span>쿠폰 할인<\/span>/);
   assert.match(checkout, /couponCode: appliedCoupon\?\.code/);
   assert.match(quoteRoute, /validateCouponForOrder/);
   assert.match(shippingRoute, /getEffectiveSiteSettings\(\{ strict: true \}\)/);
