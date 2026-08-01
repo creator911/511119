@@ -4299,7 +4299,7 @@
 .checkoutLayout {
   grid-template-columns: minmax(0, 745px) minmax(330px, 370px);
   gap: 0;
-  margin-top: 11px;
+  margin-top: 35.5px;
 }
 
 .legacyCheckoutPage .checkoutMain {
@@ -4353,7 +4353,7 @@
 }
 
 .legacyCheckoutSectionBody {
-  padding: 29px 15px 40px;
+  padding: 28px 15px 40px;
 }
 
 .legacyCheckoutSection .fieldTable {
@@ -4462,7 +4462,12 @@
 }
 
 .legacyCheckoutSection:last-child .fieldTable:first-child .formRow:first-child {
+  height: 41px;
   min-height: 41px;
+}
+
+.legacyCheckoutSection:last-child .legacyCheckoutSectionBody {
+  padding-bottom: 39px;
 }
 
 .legacyCheckoutSection .legacyShippingChoices {
@@ -8952,7 +8957,7 @@ button.legacyCheckoutSummaryRow {
   }
 
   .checkoutLayout {
-    margin-top: 21px;
+    margin-top: 35.5px;
   }
 
   .legacyCheckoutSection {
@@ -8963,7 +8968,7 @@ button.legacyCheckoutSummaryRow {
 
   .legacyCheckoutSectionHeader {
     min-height: 70px;
-    padding: 15px 20px;
+    padding: 15px 19px;
   }
 
   .legacyCheckoutSectionHeader::before {
@@ -8973,10 +8978,11 @@ button.legacyCheckoutSummaryRow {
 
   .legacyCheckoutSectionHeader h2 {
     font-size: 18px;
+    transform: translateY(-1px);
   }
 
   .legacyCheckoutSectionBody {
-    padding: 29px 15px 40px;
+    padding: 28px 14px 40px;
   }
 
   .legacyCheckoutSection .formRow {
@@ -9021,7 +9027,7 @@ button.legacyCheckoutSummaryRow {
   }
 
   .legacyCheckoutSection .inlineField button {
-    min-width: 82px;
+    min-width: 100px;
   }
 
   .legacyShippingChoices {
@@ -9039,11 +9045,17 @@ button.legacyCheckoutSummaryRow {
   }
 
   .legacyCheckoutSection:last-child .fieldTable:first-child .formRow:first-child {
+    height: 89.6875px;
     min-height: 89.6875px;
   }
 
   .legacyCheckoutSection:last-child .fieldTable:first-child .formRow:nth-child(2) {
+    height: 117.71875px;
     min-height: 117.71875px;
+  }
+
+  .legacyCheckoutSection:last-child .legacyCheckoutSectionBody {
+    padding-bottom: 39px;
   }
 
   .legacyCheckoutDeliveryHelp {
@@ -9051,7 +9063,8 @@ button.legacyCheckoutSummaryRow {
   }
 
   .legacyCheckoutEquation {
-    min-height: 84px;
+    height: 97px;
+    min-height: 97px;
     grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr) 22px minmax(0, 1fr);
     padding: 0 5px;
   }
@@ -9080,8 +9093,25 @@ button.legacyCheckoutSummaryRow {
     font-size: 18px;
   }
 
+  .legacyCheckoutPage .checkoutAside {
+    width: calc(100% - 2px);
+    margin-right: 1px;
+    margin-left: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .legacyCheckoutSummary {
+    border: 0;
+  }
+
+  .legacyCheckoutGrandTotal > strong {
+    font-size: 15px;
+    line-height: 30px;
+  }
+
   .legacyCheckoutPayment .paymentMethods label {
-    width: 100%;
+    width: 50%;
   }
 
   .checkoutAside .primaryFormButton {
