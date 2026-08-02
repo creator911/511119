@@ -26,6 +26,27 @@ test("member management exposes an authenticated product-change workflow", async
   assert.match(service, /balance_guard INTEGER NOT NULL CHECK\(balance_guard = 1\)/);
   assert.match(service, /stock_guard INTEGER NOT NULL CHECK\(stock_guard = 1\)/);
   assert.match(service, /WHERE id = \? AND user_id = \? AND updated_at = \?/);
+  assert.match(service, /SET id = \?, subtotal = \?, discount = \?, total = \?/);
+  assert.match(service, /function orderIdForPurchaseDate/);
+  assert.match(service, /\^\(\.\*KG\)\\d\{14\}/);
+  assert.match(service, /date\.getTime\(\) \+ 9 \* 60 \* 60 \* 1_000/);
+  assert.match(service, /UPDATE \$\{table\} SET order_id = \? WHERE order_id = \?/);
+  for (const table of [
+    "order_items",
+    "order_payment_details",
+    "order_option_items",
+    "order_option_guards",
+    "order_catalog_guards",
+    "order_inventory_adjustments",
+    "order_point_debits",
+    "order_point_credits",
+    "order_point_reversals",
+    "order_requests",
+    "coupon_redemptions",
+    "personal_payments",
+  ]) {
+    assert.match(service, new RegExp(`"${table}"`, "u"));
+  }
   assert.match(service, /SET product_id = \?, product_name = \?, product_image = \?/);
   assert.match(service, /unit_price = \?, quantity = \?, line_total = \?/);
   assert.match(service, /const quantity = Number\(value\.quantity\)/);

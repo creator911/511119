@@ -11,11 +11,26 @@ import {
 import { commerceDb } from "@/lib/commerce-db";
 import { MAX_POINTS } from "@/lib/commerce-limits";
 import { ensurePromotionSchema } from "@/lib/commerce-promotions";
+import { ensurePersonalPaymentSchema } from "@/lib/personal-payments";
 
 const memberIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
 const productIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u;
 const MAX_ITEM_QUANTITY = 99;
 const MAX_ORDER_QUANTITY = 100;
+const orderIdReferenceTables = [
+  "order_items",
+  "order_payment_details",
+  "order_option_items",
+  "order_option_guards",
+  "order_catalog_guards",
+  "order_inventory_adjustments",
+  "order_point_debits",
+  "order_point_credits",
+  "order_point_reversals",
+  "order_requests",
+  "coupon_redemptions",
+  "personal_payments",
+] as const;
 let memberOrderSchemaInitialization: Promise<void> | null = null;
 
 export interface AdminMemberOrderItem {
@@ -229,6 +244,24 @@ export async function updateAdminMemberOrderItem(
     );
   }
 
+  const nextOrderId = orderIdForPurchaseDate(
+    current.order_id,
+    values.purchasedAt,
+  );
+  const orderIdChanged = nextOrderId !== current.order_id;
+  if (orderIdChanged) {
+    const duplicateOrder = await database
+      .prepare("SELECT id FROM orders WHERE id = ? LIMIT 1")
+      .bind(nextOrderId)
+      .first<{ id: string }>();
+    if (duplicateOrder) {
+      throw new AdminApiError(
+        409,
+        "변경할 구매일시로 생성되는 주문번호가 이미 존재합니다.",
+      );
+    }
+  }
+
   const products = await getEffectiveProducts({ database, strict: true });
   const productsById = new Map(products.map((product) => [product.id, product]));
   const requestedProduct = productsById.get(values.productId);
@@ -415,11 +448,12 @@ export async function updateAdminMemberOrderItem(
     database
       .prepare(
         `UPDATE orders
-         SET subtotal = ?, discount = ?, total = ?, created_at = ?,
+         SET id = ?, subtotal = ?, discount = ?, total = ?, created_at = ?,
              updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now')
          WHERE id = ? AND user_id = ? AND updated_at = ?`,
       )
       .bind(
+        nextOrderId,
         nextSubtotal,
         nextDiscount,
         nextTotal,
@@ -792,6 +826,16 @@ export async function updateAdminMemberOrderItem(
     }
   }
 
+  if (orderIdChanged) {
+    for (const table of orderIdReferenceTables) {
+      statements.push(
+        database
+          .prepare(`UPDATE ${table} SET order_id = ? WHERE order_id = ?`)
+          .bind(nextOrderId, current.order_id),
+      );
+    }
+  }
+
   statements.push(
     database
       .prepare(
@@ -804,8 +848,9 @@ export async function updateAdminMemberOrderItem(
         JSON.stringify({
           adminUsername: normalizedAdmin,
           memberId,
-          orderId: current.order_id,
+          orderId: nextOrderId,
           before: {
+            orderId: current.order_id,
             productId: current.product_id,
             productName: current.product_name,
             unitPrice: Number(current.unit_price),
@@ -819,6 +864,7 @@ export async function updateAdminMemberOrderItem(
             memberPoints: Number(current.member_points),
           },
           after: {
+            orderId: nextOrderId,
             productId: productChanged ? requestedProduct!.id : current.product_id,
             productName: productChanged ? requestedProduct!.name : current.product_name,
             unitPrice: nextUnitPrice,
@@ -859,6 +905,7 @@ async function ensureAdminMemberOrderSchema(): Promise<void> {
       ensureAdminOperationsSchema(),
       ensureAdminProductSchema(),
       ensurePromotionSchema(),
+      ensurePersonalPaymentSchema(),
     ])
       .then(async () => {
         await commerceDb()
@@ -968,6 +1015,22 @@ function normalizePurchaseDate(value: unknown): string {
     throw new AdminApiError(400, "구매일시는 2000년부터 2100년 사이로 입력해 주세요.");
   }
   return date.toISOString().slice(0, 19).replace("T", " ");
+}
+
+function orderIdForPurchaseDate(orderId: string, purchasedAt: string): string {
+  const match = /^(.*KG)\d{14}([A-Za-z0-9]{6})$/u.exec(orderId);
+  if (!match) return orderId;
+  const date = new Date(`${purchasedAt.replace(" ", "T")}Z`);
+  const koreaDate = new Date(date.getTime() + 9 * 60 * 60 * 1_000);
+  const stamp = [
+    koreaDate.getUTCFullYear(),
+    String(koreaDate.getUTCMonth() + 1).padStart(2, "0"),
+    String(koreaDate.getUTCDate()).padStart(2, "0"),
+    String(koreaDate.getUTCHours()).padStart(2, "0"),
+    String(koreaDate.getUTCMinutes()).padStart(2, "0"),
+    String(koreaDate.getUTCSeconds()).padStart(2, "0"),
+  ].join("");
+  return `${match[1]}${stamp}${match[2]}`;
 }
 
 function assertMemberId(memberId: string): void {

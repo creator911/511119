@@ -10,7 +10,10 @@ const baseUrl =
 const suffix = crypto.randomUUID().replace(/-/gu, "").slice(0, 12);
 const loginId = `qaorder${suffix}`.slice(0, 30);
 const email = `${loginId}@qa.invalid`;
-const orderId = `QA-ORDER-${suffix}`;
+const memberPassword = `Qa!${suffix}safe`;
+const orderSuffix = suffix.slice(0, 6).toUpperCase();
+const orderId = `KG20260731100000${orderSuffix}`;
+const updatedOrderId = `KG20260701123456${orderSuffix}`;
 const originalProductId = "1762011941";
 const nextProductId = "1762011927";
 const nextQuantity = 3;
@@ -39,7 +42,7 @@ try {
     method: "POST",
     body: JSON.stringify({
       loginId,
-      password: `Qa!${suffix}safe`,
+      password: memberPassword,
       name: "QA 상품변경 회원",
       nickname: "QA상품",
       email,
@@ -200,6 +203,7 @@ try {
   assert.equal(updateResponse.status, 200);
   const updated = await updateResponse.json();
   assert.equal(updated.items.length, 1);
+  assert.equal(updated.items[0].orderId, updatedOrderId);
   assert.equal(updated.items[0].productId, nextProductId);
   assert.equal(updated.items[0].productName, nextProduct.name);
   assert.equal(updated.items[0].unitPrice, nextProduct.price);
@@ -213,6 +217,31 @@ try {
     startingMemberPoints -
     (nextProduct.price * nextQuantity - originalProduct.price);
   assert.equal(updated.member.points, expectedMemberPoints);
+
+  const customerLoginResponse = await fetch(`${baseUrl}/api/customer/session`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: baseUrl,
+    },
+    body: JSON.stringify({
+      userId: loginId,
+      password: memberPassword,
+      remember: false,
+    }),
+  });
+  assert.equal(customerLoginResponse.status, 200);
+  const customerCookie = customerLoginResponse.headers
+    .get("set-cookie")
+    ?.split(";", 1)[0];
+  assert.ok(customerCookie);
+  const customerSessionResponse = await fetch(
+    `${baseUrl}/api/customer/session`,
+    { headers: { Cookie: customerCookie } },
+  );
+  assert.equal(customerSessionResponse.status, 200);
+  const customerSession = await customerSessionResponse.json();
+  assert.equal(customerSession.orders[0].id, updatedOrderId);
 
   const staleResponse = await adminFetch(
     `/api/admin/users/${encodeURIComponent(memberId)}/orders`,
@@ -241,7 +270,7 @@ try {
          LEFT JOIN order_point_debits opd ON opd.order_id = o.id
          WHERE o.id = ? AND oi.id = ?`,
       )
-      .get(orderId, itemId);
+      .get(updatedOrderId, itemId);
     assert.equal(stored.created_at, "2026-07-01 03:34:56");
     assert.equal(stored.product_id, nextProductId);
     assert.equal(stored.product_name, nextProduct.name);
@@ -252,6 +281,20 @@ try {
     assert.equal(stored.points_used, nextProduct.price * nextQuantity);
     assert.equal(stored.member_points, expectedMemberPoints);
     assert.equal(stored.total, 0);
+    assert.equal(
+      verificationDatabase
+        .prepare(
+          "SELECT COUNT(*) AS count FROM order_catalog_guards WHERE order_id = ?",
+        )
+        .get(updatedOrderId).count,
+      1,
+    );
+    assert.equal(
+      verificationDatabase
+        .prepare("SELECT COUNT(*) AS count FROM orders WHERE id = ?")
+        .get(orderId).count,
+      0,
+    );
 
     const originalStock = verificationDatabase
       .prepare("SELECT stock FROM product_stock WHERE product_id = ?")
@@ -278,6 +321,8 @@ try {
       memberOrderList: true,
       productIdResolved: true,
       purchaseDateUpdatedToSeconds: true,
+      orderNumberDateUpdatedInKoreaTime: true,
+      customerOrderHistoryUpdated: true,
       totalsRecalculated: true,
       quantityUpdated: true,
       fullPointBalanceReconciled: true,
@@ -387,8 +432,10 @@ function cleanupQaRows() {
     try {
       if (tableExists(database, "admin_member_order_write_guards")) {
         database
-          .prepare("DELETE FROM admin_member_order_write_guards WHERE order_id = ?")
-          .run(orderId);
+          .prepare(
+            "DELETE FROM admin_member_order_write_guards WHERE order_id IN (?, ?)",
+          )
+          .run(orderId, updatedOrderId);
       }
       if (tableExists(database, "admin_audit_logs")) {
         database
@@ -413,12 +460,14 @@ function cleanupQaRows() {
       ]) {
         if (tableExists(database, table)) {
           database
-            .prepare(`DELETE FROM ${table} WHERE order_id = ?`)
-            .run(orderId);
+            .prepare(`DELETE FROM ${table} WHERE order_id IN (?, ?)`)
+            .run(orderId, updatedOrderId);
         }
       }
       if (tableExists(database, "orders")) {
-        database.prepare("DELETE FROM orders WHERE id = ?").run(orderId);
+        database
+          .prepare("DELETE FROM orders WHERE id IN (?, ?)")
+          .run(orderId, updatedOrderId);
       }
       restoreStock(database, originalProductId, originalStockRow);
       restoreStock(database, nextProductId, nextStockRow);
