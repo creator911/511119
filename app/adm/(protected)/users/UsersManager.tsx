@@ -154,6 +154,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
   const [error, setError] = useState("");
   const [member, setMember] = useState<AdminMemberDetail | null>(null);
   const [loginId, setLoginId] = useState("");
+  const [joinedAt, setJoinedAt] = useState("");
   const [name, setName] = useState("");
   const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
@@ -299,6 +300,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
 
   const populateForm = (nextMember: AdminMemberDetail) => {
     setLoginId(nextMember.loginId);
+    setJoinedAt(walletDateTimeInput(nextMember.joinedAt));
     setName(nextMember.name);
     setNickname(nextMember.nickname);
     setEmail(nextMember.email);
@@ -343,6 +345,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     setError("");
     setMember(null);
     setLoginId("");
+    setJoinedAt("");
     setName("");
     setNickname("");
     setEmail("");
@@ -1005,8 +1008,13 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     const newPassword = newPasswordInput?.value ?? "";
     const adminPassword = adminPasswordInput?.value ?? "";
     const normalizedLoginId = loginId.trim();
+    const normalizedJoinedAt = walletLocalDateTimeToIso(joinedAt);
     if (!/^[A-Za-z0-9_-]{4,30}$/u.test(normalizedLoginId)) {
       setError("아이디는 영문·숫자 4~30자로 입력해 주세요.");
+      return;
+    }
+    if (!normalizedJoinedAt) {
+      setError("가입일시는 초 단위까지 정확히 입력해 주세요.");
       return;
     }
     if (!name.trim() || name.trim().length > 80) {
@@ -1062,6 +1070,9 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     const payload: Record<string, number | boolean | string | null> = {};
     if (normalizedLoginId !== member.loginId) {
       payload.loginId = normalizedLoginId;
+    }
+    if (joinedAt !== walletDateTimeInput(member.joinedAt)) {
+      payload.joinedAt = normalizedJoinedAt;
     }
     if (name.trim() !== member.name) payload.name = name.trim();
     if (nickname.trim() !== member.nickname) {
@@ -2104,6 +2115,23 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                     {verificationHistory || "본인인증 내역이 없습니다."}
                   </td>
                 </tr>
+                {dialogMode !== "create" ? (
+                  <tr className="legacy-member-form-date-row">
+                    <th scope="row">가입일시</th>
+                    <td colSpan={3}>
+                      <AdminInput
+                        type="datetime-local"
+                        step={1}
+                        value={joinedAt}
+                        onChange={(event) =>
+                          setJoinedAt(event.currentTarget.value)
+                        }
+                        disabled={saving}
+                        required
+                      />
+                    </td>
+                  </tr>
+                ) : null}
                 <tr className="legacy-member-form-date-row">
                   <th scope="row">탈퇴일자</th>
                   <td>
@@ -3344,6 +3372,19 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                           required
                         />
                       </label>
+                      <label className={dialogStyles.field}>
+                        <span className={dialogStyles.label}>가입일시</span>
+                        <AdminInput
+                          type="datetime-local"
+                          step={1}
+                          value={joinedAt}
+                          onChange={(event) =>
+                            setJoinedAt(event.currentTarget.value)
+                          }
+                          disabled={saving}
+                          required
+                        />
+                      </label>
                       {profileFields}
                       <label className={dialogStyles.field}>
                         <span className={dialogStyles.label}>
@@ -3539,6 +3580,8 @@ function adminMemberListRecord(member: AdminMemberRow): LegacyMemberRecord {
 
 function formatLegacyMemberDate(value: string | null | undefined): string {
   if (!value) return "-";
+  const localDateTime = walletDateTimeInput(value);
+  if (localDateTime) return localDateTime.slice(0, 10);
   const normalized = value.trim().replace("T", " ");
   const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2})/u);
   return match ? `${match[1]}-${match[2]}-${match[3]}` : normalized;

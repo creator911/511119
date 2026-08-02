@@ -192,6 +192,7 @@ try {
       body: JSON.stringify({
         expectedUpdatedAt,
         loginId: updatedLoginId,
+        joinedAt: "2026-06-15T01:02:03+09:00",
         name: "QA 수정회원",
         nickname: "QA수정닉",
         email: updatedEmail,
@@ -227,6 +228,7 @@ try {
   assert.equal(updateResponse.status, 200);
   const updated = await updateResponse.json();
   assert.equal(updated.member.loginId, updatedLoginId);
+  assert.equal(updated.member.joinedAt, "2026-06-14 16:02:03");
   assert.equal(updated.member.name, "QA 수정회원");
   assert.equal(updated.member.email, updatedEmail);
   assert.equal(updated.member.telephone, "031-111-2222");
@@ -252,6 +254,17 @@ try {
   const newLoginResponse = await customerLogin(updatedLoginId, memberPassword);
   assert.equal(newLoginResponse.status, 200);
   assert.equal((await newLoginResponse.json()).ok, true);
+  const customerCookie = newLoginResponse.headers
+    .get("set-cookie")
+    ?.split(";", 1)[0];
+  assert.ok(customerCookie);
+  const customerSessionResponse = await fetch(
+    `${baseUrl}/api/customer/session`,
+    { headers: { Cookie: customerCookie } },
+  );
+  assert.equal(customerSessionResponse.status, 200);
+  const customerSession = await customerSessionResponse.json();
+  assert.equal(customerSession.user.joinedAt, "2026-06-14 16:02:03");
 
   const memberListResponse = await adminFetch(
     `/adm/users?q=${encodeURIComponent(updatedLoginId)}`,
@@ -262,6 +275,7 @@ try {
   assert.match(memberListHtml, new RegExp(updatedLoginId, "u"));
   assert.match(memberListHtml, /QA 수정회원/u);
   assert.match(memberListHtml, /031-111-2222/u);
+  assert.match(memberListHtml, /2026-06-15/u);
 
   for (const url of [...memberMediaUrls]) {
     const removed = await deleteUploadedMemberImage(url);
@@ -365,6 +379,8 @@ try {
       memberCreate: true,
       memberUpdate: true,
       memberLoginIdUpdate: true,
+      memberJoinedAtUpdate: true,
+      customerJoinedAtUpdated: true,
       duplicateMemberLoginIdBlocked: true,
       oldLoginRejectedAndNewLoginAccepted: true,
       extendedMemberFields: true,
@@ -454,8 +470,9 @@ async function cleanupMemberMedia() {
 
 async function createLocalAdminCookie() {
   const localEnvPath = resolve(workspace, ".env.local");
-  const values = existsSync(localEnvPath)
-    ? Object.fromEntries(
+  const values = {
+    ...(existsSync(localEnvPath)
+      ? Object.fromEntries(
         readFileSync(localEnvPath, "utf8")
           .split(/\r?\n/u)
           .filter((line) => line && !line.trimStart().startsWith("#"))
@@ -469,8 +486,10 @@ async function createLocalAdminCookie() {
                 ];
           })
           .filter(([key]) => key),
-      )
-    : process.env;
+        )
+      : {}),
+    ...process.env,
+  };
   assert.ok(values.ADMIN_USERNAME);
   assert.ok(values.SESSION_SECRET?.length >= 32);
   const now = Math.floor(Date.now() / 1_000);

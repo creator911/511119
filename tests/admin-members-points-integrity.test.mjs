@@ -304,9 +304,14 @@ test("admin member creation and edits cover core identity fields without leaking
   assert.match(operations, /WHERE id = \? AND updated_at = \?/);
   assert.match(operations, /UNIQUE constraint failed:\\s\*users/);
   assert.match(operations, /const updateLoginId = hasOwn\(body, "loginId"\)/u);
+  assert.match(operations, /const updateJoinedAt = hasOwn\(body, "joinedAt"\)/u);
   assert.match(operations, /assignments\.push\("login_id = \?"\)/u);
+  assert.match(operations, /assignments\.push\("created_at = \?"\)/u);
   assert.match(operations, /WHERE login_id = \? AND id <> \? LIMIT 1/u);
   assert.match(manager, /payload\.loginId = normalizedLoginId/u);
+  assert.match(manager, /payload\.joinedAt = normalizedJoinedAt/u);
+  assert.match(manager, />가입일시</u);
+  assert.match(manager, /type="datetime-local"/u);
   assert.doesNotMatch(manager, /readOnly=\{dialogMode !== "create"\}/u);
   for (const field of [
     "nickname",

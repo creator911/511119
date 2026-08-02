@@ -1093,6 +1093,7 @@ export async function updateAdminMember(
   const errors: Record<string, string> = {};
   let supplied = false;
   let loginId = current.loginId;
+  let joinedAt = current.joinedAt;
   let name = current.name;
   let nickname = current.nickname;
   let email = current.email;
@@ -1135,6 +1136,7 @@ export async function updateAdminMember(
   let points = current.points;
   let active = current.active;
   const updateLoginId = hasOwn(body, "loginId");
+  const updateJoinedAt = hasOwn(body, "joinedAt");
   const updateName = hasOwn(body, "name");
   const updateNickname = hasOwn(body, "nickname");
   const updateEmail = hasOwn(body, "email");
@@ -1177,6 +1179,15 @@ export async function updateAdminMember(
     loginId = memberText(body.loginId, 30);
     if (!memberLoginIdPattern.test(loginId)) {
       errors.loginId = "아이디는 영문·숫자 4~30자로 입력해 주세요.";
+    }
+  }
+  if (updateJoinedAt) {
+    supplied = true;
+    const normalizedJoinedAt = normalizeMemberJoinedAt(body.joinedAt);
+    if (!normalizedJoinedAt) {
+      errors.joinedAt = "가입일시를 초 단위까지 정확히 입력해 주세요.";
+    } else {
+      joinedAt = normalizedJoinedAt;
     }
   }
   if (updateName) {
@@ -1462,6 +1473,10 @@ export async function updateAdminMember(
     before.loginId = current.loginId;
     after.loginId = loginId;
   }
+  if (updateJoinedAt) {
+    before.joinedAt = current.joinedAt;
+    after.joinedAt = joinedAt;
+  }
   if (updateName) {
     before.name = current.name;
     after.name = name;
@@ -1554,6 +1569,10 @@ export async function updateAdminMember(
   if (updateLoginId) {
     assignments.push("login_id = ?");
     bindings.push(loginId);
+  }
+  if (updateJoinedAt) {
+    assignments.push("created_at = ?");
+    bindings.push(joinedAt);
   }
   if (updateName) {
     assignments.push("name = ?");
@@ -2207,6 +2226,27 @@ function memberText(value: unknown, maximum: number): string {
     );
   }
   return normalized;
+}
+
+function normalizeMemberJoinedAt(value: unknown): string | null {
+  if (typeof value !== "string" || value.length > 40) return null;
+  const normalized = value.trim();
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/u.test(
+      normalized,
+    )
+  ) {
+    return null;
+  }
+  const date = new Date(normalized);
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.getUTCFullYear() < 2000 ||
+    date.getUTCFullYear() > 2100
+  ) {
+    return null;
+  }
+  return date.toISOString().slice(0, 19).replace("T", " ");
 }
 
 function normalizeIdentityMethod(
