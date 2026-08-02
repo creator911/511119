@@ -71,6 +71,14 @@ test("member management exposes an authenticated product-change workflow", async
   assert.match(manager, /단가·주문금액·사용 및 보유 마일리지가 자동 계산/u);
   assert.match(styles, /\.legacy-member-order \{/);
   assert.match(styles, /\.legacy-member-order-editor/);
+  assert.match(
+    styles,
+    /section\[role="dialog"\]:has\(\.legacy-member-order-editor\) \{[\s\S]*?display: flex !important;[\s\S]*?max-height: calc\(100vh - 40px\);[\s\S]*?overflow: hidden;/u,
+  );
+  assert.match(
+    styles,
+    /section\[role="dialog"\]:has\(\.legacy-member-order-editor\) > header \+ div \{[\s\S]*?overflow-y: scroll;[\s\S]*?scrollbar-gutter: stable;/u,
+  );
 });
 
 test("product edits atomically update order totals, member points, and stock", () => {
