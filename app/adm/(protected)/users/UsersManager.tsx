@@ -1004,6 +1004,11 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     ) as HTMLInputElement | null;
     const newPassword = newPasswordInput?.value ?? "";
     const adminPassword = adminPasswordInput?.value ?? "";
+    const normalizedLoginId = loginId.trim();
+    if (!/^[A-Za-z0-9_-]{4,30}$/u.test(normalizedLoginId)) {
+      setError("아이디는 영문·숫자 4~30자로 입력해 주세요.");
+      return;
+    }
     if (!name.trim() || name.trim().length > 80) {
       setError("회원 이름을 80자 이내로 입력해 주세요.");
       return;
@@ -1055,6 +1060,9 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
     }
 
     const payload: Record<string, number | boolean | string | null> = {};
+    if (normalizedLoginId !== member.loginId) {
+      payload.loginId = normalizedLoginId;
+    }
     if (name.trim() !== member.name) payload.name = name.trim();
     if (nickname.trim() !== member.nickname) {
       payload.nickname = nickname.trim();
@@ -1665,7 +1673,6 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                       minLength={4}
                       maxLength={30}
                       autoComplete="off"
-                      readOnly={dialogMode !== "create"}
                       onChange={(event) =>
                         setLoginId(event.currentTarget.value)
                       }
@@ -3257,7 +3264,7 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                   </label>
                 </div>
                 <p className={dialogStyles.help}>
-                  회원아이디는 등록 후 변경할 수 없습니다. 본인인증·회원
+                  회원아이디는 중복되지 않는 영문·숫자 4~30자로 등록하거나 변경할 수 있습니다. 본인인증·회원
                   아이콘은 외부 인증 서비스가 연결되지 않아 이 화면에서
                   처리하지 않습니다.
                 </p>
@@ -3323,6 +3330,20 @@ export function UsersManager({ initialResult }: UsersManagerProps) {
                   >
                     <h3 className={dialogStyles.sectionTitle}>운영 정보 수정</h3>
                     <div className={dialogStyles.formGrid}>
+                      <label className={dialogStyles.field}>
+                        <span className={dialogStyles.label}>회원아이디</span>
+                        <AdminInput
+                          value={loginId}
+                          minLength={4}
+                          maxLength={30}
+                          autoComplete="off"
+                          onChange={(event) =>
+                            setLoginId(event.currentTarget.value)
+                          }
+                          disabled={saving}
+                          required
+                        />
+                      </label>
                       {profileFields}
                       <label className={dialogStyles.field}>
                         <span className={dialogStyles.label}>

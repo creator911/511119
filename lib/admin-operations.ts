@@ -1092,6 +1092,7 @@ export async function updateAdminMember(
 
   const errors: Record<string, string> = {};
   let supplied = false;
+  let loginId = current.loginId;
   let name = current.name;
   let nickname = current.nickname;
   let email = current.email;
@@ -1133,6 +1134,7 @@ export async function updateAdminMember(
   let level = current.level;
   let points = current.points;
   let active = current.active;
+  const updateLoginId = hasOwn(body, "loginId");
   const updateName = hasOwn(body, "name");
   const updateNickname = hasOwn(body, "nickname");
   const updateEmail = hasOwn(body, "email");
@@ -1170,6 +1172,13 @@ export async function updateAdminMember(
       ? body.expectedUpdatedAt
       : "";
 
+  if (updateLoginId) {
+    supplied = true;
+    loginId = memberText(body.loginId, 30);
+    if (!memberLoginIdPattern.test(loginId)) {
+      errors.loginId = "아이디는 영문·숫자 4~30자로 입력해 주세요.";
+    }
+  }
   if (updateName) {
     supplied = true;
     name = memberText(body.name, 80);
@@ -1424,6 +1433,17 @@ export async function updateAdminMember(
   if (Object.keys(errors).length > 0) {
     throw new AdminApiError(400, "회원 정보를 확인해 주세요.", errors);
   }
+  if (updateLoginId && loginId !== current.loginId) {
+    const duplicate = await database
+      .prepare("SELECT id FROM users WHERE login_id = ? AND id <> ? LIMIT 1")
+      .bind(loginId, id)
+      .first<{ id: string }>();
+    if (duplicate) {
+      throw new AdminApiError(409, "이미 사용 중인 회원아이디입니다.", {
+        loginId: "다른 회원아이디를 입력해 주세요.",
+      });
+    }
+  }
   if (updateEmail && email !== current.email) {
     const duplicate = await database
       .prepare("SELECT id FROM users WHERE email = ? AND id <> ? LIMIT 1")
@@ -1438,6 +1458,10 @@ export async function updateAdminMember(
 
   const before: Record<string, string | number | boolean> = {};
   const after: Record<string, string | number | boolean> = {};
+  if (updateLoginId) {
+    before.loginId = current.loginId;
+    after.loginId = loginId;
+  }
   if (updateName) {
     before.name = current.name;
     after.name = name;
@@ -1527,6 +1551,10 @@ export async function updateAdminMember(
   });
   const assignments: string[] = [];
   const bindings: Array<string | number> = [];
+  if (updateLoginId) {
+    assignments.push("login_id = ?");
+    bindings.push(loginId);
+  }
   if (updateName) {
     assignments.push("name = ?");
     bindings.push(name);
@@ -1700,9 +1728,22 @@ export async function updateAdminMember(
     ]);
   } catch (error) {
     if (isMemberIdentityConflict(error)) {
-      throw new AdminApiError(409, "이미 사용 중인 이메일입니다.", {
-        email: "다른 이메일을 입력해 주세요.",
-      });
+      const identityErrors: Record<string, string> = {};
+      if (updateLoginId) {
+        identityErrors.loginId = "다른 회원아이디를 입력해 주세요.";
+      }
+      if (updateEmail) {
+        identityErrors.email = "다른 이메일을 입력해 주세요.";
+      }
+      throw new AdminApiError(
+        409,
+        updateLoginId && updateEmail
+          ? "이미 사용 중인 회원아이디 또는 이메일입니다."
+          : updateLoginId
+            ? "이미 사용 중인 회원아이디입니다."
+            : "이미 사용 중인 이메일입니다.",
+        identityErrors,
+      );
     }
     throw error;
   }

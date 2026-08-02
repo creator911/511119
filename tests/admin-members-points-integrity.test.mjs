@@ -303,6 +303,11 @@ test("admin member creation and edits cover core identity fields without leaking
   assert.match(operations, /expectedUpdatedAt !== current\.updatedAt/);
   assert.match(operations, /WHERE id = \? AND updated_at = \?/);
   assert.match(operations, /UNIQUE constraint failed:\\s\*users/);
+  assert.match(operations, /const updateLoginId = hasOwn\(body, "loginId"\)/u);
+  assert.match(operations, /assignments\.push\("login_id = \?"\)/u);
+  assert.match(operations, /WHERE login_id = \? AND id <> \? LIMIT 1/u);
+  assert.match(manager, /payload\.loginId = normalizedLoginId/u);
+  assert.doesNotMatch(manager, /readOnly=\{dialogMode !== "create"\}/u);
   for (const field of [
     "nickname",
     "telephone",

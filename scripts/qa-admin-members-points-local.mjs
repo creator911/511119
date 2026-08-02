@@ -13,6 +13,8 @@ const baseUrl =
   "http://localhost:4173";
 const suffix = crypto.randomUUID().replace(/-/gu, "").slice(0, 12);
 const loginId = `qamp${suffix}`.slice(0, 30);
+const updatedLoginId = `${loginId}x`.slice(0, 30);
+const memberPassword = `Qa!${suffix}safe`;
 const originalEmail = `${loginId}@qa.invalid`;
 const updatedEmail = `${loginId}-updated@qa.invalid`;
 const adminCookie = await createLocalAdminCookie();
@@ -43,7 +45,7 @@ try {
     method: "POST",
     body: JSON.stringify({
       loginId,
-      password: `Qa!${suffix}safe`,
+      password: memberPassword,
       name: "QA 회원",
       nickname: "QA닉네임",
       email: originalEmail,
@@ -167,12 +169,29 @@ try {
   const detail = await detailResponse.json();
   const expectedUpdatedAt = detail.member.updatedAt;
 
+  const collisionLoginId = findExistingLoginId(memberId);
+  assert.ok(collisionLoginId, "A second local member is required for duplicate ID QA.");
+  const duplicateUpdateResponse = await adminFetch(
+    `/api/admin/users/${encodeURIComponent(memberId)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        expectedUpdatedAt,
+        loginId: collisionLoginId,
+      }),
+    },
+  );
+  assert.equal(duplicateUpdateResponse.status, 409);
+  const duplicateUpdate = await duplicateUpdateResponse.json();
+  assert.equal(typeof duplicateUpdate.fieldErrors?.loginId, "string");
+
   const updateResponse = await adminFetch(
     `/api/admin/users/${encodeURIComponent(memberId)}`,
     {
       method: "PATCH",
       body: JSON.stringify({
         expectedUpdatedAt,
+        loginId: updatedLoginId,
         name: "QA 수정회원",
         nickname: "QA수정닉",
         email: updatedEmail,
@@ -207,6 +226,7 @@ try {
   );
   assert.equal(updateResponse.status, 200);
   const updated = await updateResponse.json();
+  assert.equal(updated.member.loginId, updatedLoginId);
   assert.equal(updated.member.name, "QA 수정회원");
   assert.equal(updated.member.email, updatedEmail);
   assert.equal(updated.member.telephone, "031-111-2222");
@@ -227,13 +247,19 @@ try {
   assert.equal(updated.member.emailOptIn, false);
   assert.equal(updated.member.smsOptIn, false);
 
+  const oldLoginResponse = await customerLogin(loginId, memberPassword);
+  assert.equal(oldLoginResponse.status, 401);
+  const newLoginResponse = await customerLogin(updatedLoginId, memberPassword);
+  assert.equal(newLoginResponse.status, 200);
+  assert.equal((await newLoginResponse.json()).ok, true);
+
   const memberListResponse = await adminFetch(
-    `/adm/users?q=${encodeURIComponent(loginId)}`,
+    `/adm/users?q=${encodeURIComponent(updatedLoginId)}`,
   );
   assert.equal(memberListResponse.status, 200);
   const memberListHtml = await memberListResponse.text();
   assert.match(memberListHtml, /legacy-member-table/u);
-  assert.match(memberListHtml, new RegExp(loginId, "u"));
+  assert.match(memberListHtml, new RegExp(updatedLoginId, "u"));
   assert.match(memberListHtml, /QA 수정회원/u);
   assert.match(memberListHtml, /031-111-2222/u);
 
@@ -263,7 +289,7 @@ try {
   const creditResponse = await adminFetch("/api/admin/points", {
     method: "POST",
     body: JSON.stringify({
-      loginId,
+      loginId: updatedLoginId,
       reason: `QA 적립 ${suffix}`,
       delta: 350,
       expiresAt,
@@ -277,7 +303,7 @@ try {
   const debitResponse = await adminFetch("/api/admin/points", {
     method: "POST",
     body: JSON.stringify({
-      loginId,
+      loginId: updatedLoginId,
       reason: `QA 차감 ${suffix}`,
       delta: -100,
       expiresAt: "",
@@ -327,7 +353,7 @@ try {
   assert.equal(staleDeleteResponse.status, 409);
 
   const reportResponse = await adminFetch(
-    `/adm/reports?view=points&q=${encodeURIComponent(loginId)}`,
+    `/adm/reports?view=points&q=${encodeURIComponent(updatedLoginId)}`,
   );
   assert.equal(reportResponse.status, 200);
   const reportHtml = await reportResponse.text();
@@ -338,6 +364,9 @@ try {
       ok: true,
       memberCreate: true,
       memberUpdate: true,
+      memberLoginIdUpdate: true,
+      duplicateMemberLoginIdBlocked: true,
+      oldLoginRejectedAndNewLoginAccepted: true,
       extendedMemberFields: true,
       memberMediaUploadDelete: true,
       memberListRender: true,
@@ -362,6 +391,18 @@ function adminFetch(pathname, init = {}) {
   headers.set("Origin", baseUrl);
   if (init.body) headers.set("Content-Type", "application/json");
   return fetch(`${baseUrl}${pathname}`, { ...init, headers });
+}
+
+function customerLogin(userId, password) {
+  return fetch(`${baseUrl}/api/customer/session`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Origin: baseUrl,
+    },
+    body: JSON.stringify({ userId, password, remember: false }),
+  });
 }
 
 async function uploadMemberImage(fileName) {
@@ -412,21 +453,24 @@ async function cleanupMemberMedia() {
 }
 
 async function createLocalAdminCookie() {
-  const values = Object.fromEntries(
-    readFileSync(resolve(workspace, ".env.local"), "utf8")
-      .split(/\r?\n/u)
-      .filter((line) => line && !line.trimStart().startsWith("#"))
-      .map((line) => {
-        const separator = line.indexOf("=");
-        return separator < 0
-          ? ["", ""]
-          : [
-              line.slice(0, separator).trim(),
-              line.slice(separator + 1).trim(),
-            ];
-      })
-      .filter(([key]) => key),
-  );
+  const localEnvPath = resolve(workspace, ".env.local");
+  const values = existsSync(localEnvPath)
+    ? Object.fromEntries(
+        readFileSync(localEnvPath, "utf8")
+          .split(/\r?\n/u)
+          .filter((line) => line && !line.trimStart().startsWith("#"))
+          .map((line) => {
+            const separator = line.indexOf("=");
+            return separator < 0
+              ? ["", ""]
+              : [
+                  line.slice(0, separator).trim(),
+                  line.slice(separator + 1).trim(),
+                ];
+          })
+          .filter(([key]) => key),
+      )
+    : process.env;
   assert.ok(values.ADMIN_USERNAME);
   assert.ok(values.SESSION_SECRET?.length >= 32);
   const now = Math.floor(Date.now() / 1_000);
@@ -469,8 +513,8 @@ function cleanupQaRows() {
     try {
       if (!tableExists(database, "users")) continue;
       const storedMember = database
-        .prepare("SELECT id FROM users WHERE login_id = ? LIMIT 1")
-        .get(loginId);
+        .prepare("SELECT id FROM users WHERE login_id IN (?, ?) LIMIT 1")
+        .get(loginId, updatedLoginId);
       const cleanupMemberId = memberId || storedMember?.id || "";
       if (!cleanupMemberId && pointEntryIds.length === 0) continue;
       database.exec("BEGIN IMMEDIATE");
@@ -535,14 +579,50 @@ function cleanupQaRows() {
       const remains = database
         .prepare(
           `SELECT COUNT(*) AS count FROM users
-           WHERE id = ? OR login_id = ? OR email IN (?, ?)`,
+           WHERE id = ? OR login_id IN (?, ?) OR email IN (?, ?)`,
         )
-        .get(cleanupMemberId, loginId, originalEmail, updatedEmail);
+        .get(
+          cleanupMemberId,
+          loginId,
+          updatedLoginId,
+          originalEmail,
+          updatedEmail,
+        );
       assert.equal(Number(remains.count), 0, "QA 회원 정리가 완료돼야 합니다.");
     } finally {
       database.close();
     }
   }
+}
+
+function findExistingLoginId(excludedMemberId) {
+  const databaseDirectory = resolve(
+    workspace,
+    ".wrangler/state/v3/d1/miniflare-D1DatabaseObject",
+  );
+  if (!existsSync(databaseDirectory)) return "";
+  const databaseFiles = readdirSync(databaseDirectory)
+    .filter((name) => name.endsWith(".sqlite") && name !== "metadata.sqlite")
+    .map((name) => join(databaseDirectory, name));
+  for (const databaseFile of databaseFiles) {
+    const database = new DatabaseSync(databaseFile);
+    try {
+      if (!tableExists(database, "users")) continue;
+      const member = database
+        .prepare(
+          `SELECT login_id
+           FROM users
+           WHERE id <> ? AND login_id NOT IN (?, ?)
+           ORDER BY created_at ASC
+           LIMIT 1`,
+        )
+        .get(excludedMemberId, loginId, updatedLoginId);
+      if (member?.login_id) return String(member.login_id);
+    } finally {
+      database.close();
+    }
+  }
+  return "";
 }
 
 function tableExists(database, table) {
