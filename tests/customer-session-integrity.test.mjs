@@ -182,6 +182,11 @@ test("session cookies sign an explicit guarded version and preserve persistence"
   assert.match(strength, /"아주강함"/);
   assert.match(authPanels, /passwordStrengthMeter/);
   assert.match(authPanels, /비밀번호의 강도는 보통 이상이어야 합니다/);
+  assert.match(authPanels, /availabilityPending/);
+  assert.match(authPanels, /입력값이 변경되었습니다\. 다시 중복확인해 주세요/);
+  assert.match(authPanels, /legacyCheckButtonVerified/);
+  assert.match(authPanels, /aria-pressed=\{Boolean\(availabilityChecks\.userId\)\}/);
+  assert.match(authPanels, /\? "확인완료"/);
   assert.match(
     commerceDb,
     /workerEnvironment\.SESSION_SECRET \?\? runtimeEnvironment\?\.SESSION_SECRET/,

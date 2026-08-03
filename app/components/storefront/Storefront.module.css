@@ -3437,6 +3437,36 @@
   border-left: 1px solid #ddd;
   color: #555;
   background: #f7f7f7;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.legacyInfoSection .inlineField button:hover:not(:disabled),
+.legacyInfoSection .inlineField button:focus-visible {
+  color: #111;
+  background: #ececec;
+}
+
+.legacyInfoSection .inlineField button:focus-visible {
+  z-index: 5;
+  outline: 2px solid #333;
+  outline-offset: -2px;
+}
+
+.legacyInfoSection .inlineField button:disabled {
+  cursor: wait;
+}
+
+.legacyInfoSection .inlineField .legacyCheckButtonVerified,
+.legacyInfoSection .inlineField .legacyCheckButtonVerified:disabled {
+  border-left-color: #168451;
+  color: #fff;
+  background: #168451;
+  cursor: default;
 }
 
 .legacyInfoSection .inlineField .legacyCheckButton::before {
@@ -3445,6 +3475,10 @@
   content: "\f00c";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
+}
+
+.legacyInfoSection .inlineField .legacyCheckButtonVerified::before {
+  color: #fff;
 }
 
 .legacyHalfOwnRow {

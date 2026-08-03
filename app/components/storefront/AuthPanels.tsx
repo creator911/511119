@@ -166,6 +166,11 @@ export function RegisterPanel({
     nickname: "",
     email: "",
   });
+  const [availabilityPending, setAvailabilityPending] = useState({
+    userId: false,
+    nickname: false,
+    email: false,
+  });
   const formRef = useRef<HTMLFormElement>(null);
 
   const allChecked = agreements.terms && agreements.privacy;
@@ -207,6 +212,8 @@ export function RegisterPanel({
       setAvailabilityMessage("확인할 내용을 먼저 입력해 주세요.");
       return;
     }
+    setAvailabilityChecks((current) => ({ ...current, [field]: "" }));
+    setAvailabilityPending((current) => ({ ...current, [field]: true }));
     setAvailabilityMessage("중복 여부를 확인하고 있습니다.");
     try {
       const response = await fetch(
@@ -224,10 +231,24 @@ export function RegisterPanel({
         );
         return;
       }
+      const currentElement = formRef.current?.elements.namedItem(field);
+      const currentRawValue =
+        currentElement instanceof HTMLInputElement
+          ? currentElement.value.trim()
+          : "";
+      const currentValue =
+        field === "email" ? currentRawValue.toLowerCase() : currentRawValue;
+      if (currentValue !== value) {
+        setAvailabilityMessage("입력값이 변경되었습니다. 다시 중복확인해 주세요.");
+        return;
+      }
       setAvailabilityChecks((current) => ({ ...current, [field]: value }));
       setAvailabilityMessage("사용 가능한 정보입니다.");
     } catch {
+      setAvailabilityChecks((current) => ({ ...current, [field]: "" }));
       setAvailabilityMessage("중복 여부를 확인하지 못했습니다.");
+    } finally {
+      setAvailabilityPending((current) => ({ ...current, [field]: false }));
     }
   }
 
@@ -403,10 +424,23 @@ export function RegisterPanel({
                     />
                     <button
                       type="button"
-                      className={styles.legacyCheckButton}
+                      className={classNames(
+                        styles.legacyCheckButton,
+                        availabilityChecks.userId &&
+                          styles.legacyCheckButtonVerified,
+                      )}
                       onClick={() => void checkAvailability("userId")}
+                      disabled={
+                        availabilityPending.userId ||
+                        Boolean(availabilityChecks.userId)
+                      }
+                      aria-pressed={Boolean(availabilityChecks.userId)}
                     >
-                      중복체크
+                      {availabilityPending.userId
+                        ? "확인 중"
+                        : availabilityChecks.userId
+                          ? "확인완료"
+                          : "중복확인"}
                     </button>
                   </div>
                   <small>
@@ -587,10 +621,23 @@ export function RegisterPanel({
                     />
                     <button
                       type="button"
-                      className={styles.legacyCheckButton}
+                      className={classNames(
+                        styles.legacyCheckButton,
+                        availabilityChecks.nickname &&
+                          styles.legacyCheckButtonVerified,
+                      )}
                       onClick={() => void checkAvailability("nickname")}
+                      disabled={
+                        availabilityPending.nickname ||
+                        Boolean(availabilityChecks.nickname)
+                      }
+                      aria-pressed={Boolean(availabilityChecks.nickname)}
                     >
-                      중복체크
+                      {availabilityPending.nickname
+                        ? "확인 중"
+                        : availabilityChecks.nickname
+                          ? "확인완료"
+                          : "중복확인"}
                     </button>
                   </div>
                   <small>
@@ -677,10 +724,23 @@ export function RegisterPanel({
                     />
                     <button
                       type="button"
-                      className={styles.legacyCheckButton}
+                      className={classNames(
+                        styles.legacyCheckButton,
+                        availabilityChecks.email &&
+                          styles.legacyCheckButtonVerified,
+                      )}
                       onClick={() => void checkAvailability("email")}
+                      disabled={
+                        availabilityPending.email ||
+                        Boolean(availabilityChecks.email)
+                      }
+                      aria-pressed={Boolean(availabilityChecks.email)}
                     >
-                      중복체크
+                      {availabilityPending.email
+                        ? "확인 중"
+                        : availabilityChecks.email
+                          ? "확인완료"
+                          : "중복확인"}
                     </button>
                   </div>
                   <small>
