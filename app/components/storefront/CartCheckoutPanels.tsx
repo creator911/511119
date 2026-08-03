@@ -536,9 +536,10 @@ export function CheckoutPanel({
     value: string,
   ) {
     if (target === "buyer") {
-      const nextBuyer = { ...buyer, [field]: value };
-      setBuyer(nextBuyer);
-      if (sameAsBuyer) setRecipient({ ...nextBuyer });
+      setBuyer((current) => ({ ...current, [field]: value }));
+      if (sameAsBuyer) {
+        setRecipient((current) => ({ ...current, [field]: value }));
+      }
       return;
     }
     setRecipient((current) => ({ ...current, [field]: value }));

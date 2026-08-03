@@ -27,7 +27,10 @@ test("postcode search permits only the official Kakao script and frame origins",
 });
 
 test("postcode search embeds synchronously after preload and keeps the selected address type", async () => {
-  const postcode = await source("app/components/daum-postcode.ts");
+  const [postcode, checkout] = await Promise.all([
+    source("app/components/daum-postcode.ts"),
+    source("app/components/storefront/CartCheckoutPanels.tsx"),
+  ]);
 
   assert.match(
     postcode,
@@ -49,6 +52,15 @@ test("postcode search embeds synchronously after preload and keeps the selected 
   assert.match(postcode, /position:relative/u);
   assert.match(postcode, /catch \(error\) \{\s+close\(\)/u);
   assert.match(postcode, /previouslyFocused\?\.focus\(\)/u);
+  assert.match(
+    checkout,
+    /setBuyer\(\(current\) => \(\{ \.\.\.current, \[field\]: value \}\)\)/u,
+  );
+  assert.match(
+    checkout,
+    /setRecipient\(\(current\) => \(\{ \.\.\.current, \[field\]: value \}\)\)/u,
+  );
+  assert.doesNotMatch(checkout, /const nextBuyer = \{ \.\.\.buyer, \[field\]: value \}/u);
 });
 
 test("registration fills the matching form and moves focus to detailed address", async () => {
