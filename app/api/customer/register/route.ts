@@ -18,6 +18,8 @@ interface RegistrationBody {
   name?: string;
   nickname?: string;
   birthYear?: string;
+  birthMonth?: string;
+  birthDay?: string;
   email?: string;
   phone?: string;
   postcode?: string;
@@ -110,6 +112,9 @@ export async function POST(request: Request) {
     const name = body.name?.trim() ?? "";
     const nickname = body.nickname?.trim() ?? "";
     const birthYear = body.birthYear?.trim() ?? "";
+    const birthMonth = body.birthMonth?.trim() ?? "";
+    const birthDay = body.birthDay?.trim() ?? "";
+    const birthDate = `${birthYear}-${birthMonth}-${birthDay}`;
     const password = body.password ?? "";
     const phone = body.phone?.trim() ?? "";
     const postcode = body.postcode?.trim() ?? "";
@@ -138,7 +143,7 @@ export async function POST(request: Request) {
       !name ||
       name.length > 80 ||
       !/^[가-힣a-z0-9_-]{2,80}$/iu.test(nickname) ||
-      !validBirthYear(birthYear) ||
+      !validBirthDate(birthDate) ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
       email.length > 254 ||
       phone.length > 30 ||
@@ -199,7 +204,7 @@ export async function POST(request: Request) {
           address2,
           body.agreeMarketing ? 1 : 0,
           body.publicProfile ? 1 : 0,
-          birthYear,
+          birthDate,
         ),
       database
         .prepare(
@@ -259,6 +264,8 @@ function isRegistrationBody(
     "name",
     "nickname",
     "birthYear",
+    "birthMonth",
+    "birthDay",
     "email",
     "phone",
     "postcode",
@@ -293,13 +300,16 @@ function validAvailabilityValue(field: string, value: string) {
   return false;
 }
 
-function validBirthYear(value: string) {
-  const year = Number(value);
+function validBirthDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day || year < 1900) return false;
+  const date = new Date(Date.UTC(year, month - 1, day));
   return (
-    /^\d{4}$/u.test(value) &&
-    Number.isInteger(year) &&
-    year >= 1900 &&
-    year <= new Date().getFullYear()
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day &&
+    date <= new Date()
   );
 }
 

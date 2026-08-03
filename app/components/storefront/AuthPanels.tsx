@@ -119,6 +119,8 @@ export interface RegisterPayload {
   name: string;
   nickname: string;
   birthYear: string;
+  birthMonth: string;
+  birthDay: string;
   email: string;
   phone: string;
   postcode: string;
@@ -157,6 +159,9 @@ export function RegisterPanel({
   const [emailOptIn, setEmailOptIn] = useState(true);
   const [publicProfile, setPublicProfile] = useState(true);
   const [passwordValue, setPasswordValue] = useState("");
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [passwordStrengthError, setPasswordStrengthError] = useState(false);
   const [agreementError, setAgreementError] = useState("");
@@ -175,6 +180,10 @@ export function RegisterPanel({
 
   const allChecked = agreements.terms && agreements.privacy;
   const currentYear = new Date().getFullYear();
+  const birthDayCount =
+    birthYear && birthMonth
+      ? new Date(Number(birthYear), Number(birthMonth), 0).getDate()
+      : 31;
   const passwordStrength = passwordValue
     ? scorePasswordStrength(passwordValue)
     : null;
@@ -286,6 +295,8 @@ export function RegisterPanel({
       name: String(form.get("name") ?? ""),
       nickname,
       birthYear: String(form.get("birthYear") ?? ""),
+      birthMonth: String(form.get("birthMonth") ?? ""),
+      birthDay: String(form.get("birthDay") ?? ""),
       email,
       phone: String(form.get("phone") ?? ""),
       postcode: String(form.get("postcode") ?? ""),
@@ -673,7 +684,28 @@ export function RegisterPanel({
                     >
                       {"\uf073"}
                     </i>
-                    <select name="birthYear" required defaultValue="">
+                    <select
+                      name="birthYear"
+                      required
+                      value={birthYear}
+                      aria-label="생년"
+                      onChange={(event) => {
+                        const nextYear = event.target.value;
+                        setBirthYear(nextYear);
+                        if (
+                          birthDay &&
+                          birthMonth &&
+                          Number(birthDay) >
+                            new Date(
+                              Number(nextYear),
+                              Number(birthMonth),
+                              0,
+                            ).getDate()
+                        ) {
+                          setBirthDay("");
+                        }
+                      }}
+                    >
                       <option value="">년</option>
                       {Array.from(
                         { length: currentYear - 1959 },
@@ -681,6 +713,60 @@ export function RegisterPanel({
                       ).map((year) => (
                         <option value={year} key={year}>
                           {year}년
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="birthMonth"
+                      required
+                      value={birthMonth}
+                      aria-label="생월"
+                      onChange={(event) => {
+                        const nextMonth = event.target.value;
+                        setBirthMonth(nextMonth);
+                        if (
+                          birthDay &&
+                          birthYear &&
+                          Number(birthDay) >
+                            new Date(
+                              Number(birthYear),
+                              Number(nextMonth),
+                              0,
+                            ).getDate()
+                        ) {
+                          setBirthDay("");
+                        }
+                      }}
+                    >
+                      <option value="">월</option>
+                      {Array.from({ length: 12 }, (_, index) => index + 1).map(
+                        (month) => (
+                          <option
+                            value={String(month).padStart(2, "0")}
+                            key={month}
+                          >
+                            {month}월
+                          </option>
+                        ),
+                      )}
+                    </select>
+                    <select
+                      name="birthDay"
+                      required
+                      value={birthDay}
+                      aria-label="생일"
+                      onChange={(event) => setBirthDay(event.target.value)}
+                    >
+                      <option value="">일</option>
+                      {Array.from(
+                        { length: birthDayCount },
+                        (_, index) => index + 1,
+                      ).map((day) => (
+                        <option
+                          value={String(day).padStart(2, "0")}
+                          key={day}
+                        >
+                          {day}일
                         </option>
                       ))}
                     </select>

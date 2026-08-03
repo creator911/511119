@@ -3424,7 +3424,21 @@
 }
 
 .legacyBirthInput {
-  width: 100px;
+  display: grid;
+  width: 100%;
+  max-width: 430px;
+  grid-template-columns: minmax(128px, 1.45fr) repeat(2, minmax(82px, 1fr));
+  gap: 7px;
+}
+
+.legacyInfoSection .legacyBirthInput select {
+  width: 100%;
+  min-width: 0;
+  padding: 0 28px 0 10px;
+}
+
+.legacyInfoSection .legacyBirthInput select:first-of-type {
+  padding-left: 47px;
 }
 
 .legacyInfoSection .inlineField button {
@@ -3489,10 +3503,6 @@
 .legacyThirdOwnRow {
   grid-column: 1 / -1;
   width: calc(33.333% - 16px);
-}
-
-.legacyInfoSection select[name="birthYear"] {
-  width: 100px;
 }
 
 .legacyNicknameNotice {
@@ -5754,6 +5764,11 @@ button.legacyCheckoutSummaryRow {
 @media (max-width: 767px) {
   .container {
     max-width: 540px;
+  }
+
+  .legacyBirthInput {
+    max-width: none;
+    grid-template-columns: minmax(108px, 1.35fr) repeat(2, minmax(70px, 1fr));
   }
 
   .heroSlide img {

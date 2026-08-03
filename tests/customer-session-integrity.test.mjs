@@ -187,6 +187,11 @@ test("session cookies sign an explicit guarded version and preserve persistence"
   assert.match(authPanels, /legacyCheckButtonVerified/);
   assert.match(authPanels, /aria-pressed=\{Boolean\(availabilityChecks\.userId\)\}/);
   assert.match(authPanels, /\? "확인완료"/);
+  assert.match(authPanels, /name="birthMonth"/);
+  assert.match(authPanels, /name="birthDay"/);
+  assert.match(authPanels, /aria-label="생년"/);
+  assert.match(register, /const birthDate = `\$\{birthYear\}-\$\{birthMonth\}-\$\{birthDay\}`/);
+  assert.match(register, /validBirthDate\(birthDate\)/);
   assert.match(
     commerceDb,
     /workerEnvironment\.SESSION_SECRET \?\? runtimeEnvironment\?\.SESSION_SECRET/,
